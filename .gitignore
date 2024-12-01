@@ -3,6 +3,19 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# vscode
+.vscode/
+
+# build
+build/
+
+# cocosed
+cocos2d/
+
+#exclude android and mac
+proj.android/
+proj.ios_mac/
+
 # User-specific files
 *.rsuser
 *.suo
