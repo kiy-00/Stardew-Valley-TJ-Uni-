@@ -59,17 +59,94 @@ endif()
 
 include_directories(
         Classes
+        Classes/map
+        Classes/map/core
+        Classes/map/utils
+        Classes/map/events
+        Classes/map/builder
+        Classes/map/state
         ${COCOS2DX_ROOT_PATH}/cocos/audio/include/
 )
-# add cross-platforms source files and header files 
+# Scene module
+set(SCENE_SOURCE
+    Classes/scenes/BaseScene.cpp
+    Classes/scenes/GameScene.cpp
+    Classes/HelloWorldScene.cpp
+)
+set(SCENE_HEADER
+    Classes/scenes/BaseScene.h
+    Classes/scenes/GameScene.h
+    Classes/HelloWorldScene.h
+)
+
+# Map modules
+set(MAP_CORE_SOURCE
+    Classes/map/core/MapManager.cpp
+    Classes/map/core/MapLayer.cpp
+    Classes/map/core/GameMap.cpp
+    Classes/map/core/Tile.cpp
+)
+set(MAP_CORE_HEADER
+    Classes/map/core/MapManager.h
+    Classes/map/core/MapLayer.h
+    Classes/map/core/GameMap.h
+    Classes/map/core/Tile.h
+)
+
+set(MAP_UTILS_SOURCE
+    Classes/map/utils/MapUtils.cpp
+)
+set(MAP_UTILS_HEADER
+    Classes/map/utils/MapUtils.h
+    Classes/map/utils/MapConstants.h
+)
+
+set(MAP_PROPERTIES_SOURCE
+    Classes/map/properties/MapProperties.cpp
+    Classes/map/properties/TileProperties.cpp
+)
+set(MAP_PROPERTIES_HEADER
+    Classes/map/properties/MapProperties.h
+    Classes/map/properties/TileProperties.h
+)
+
+set(MAP_OTHER_SOURCE
+    Classes/map/builder/MapBuilder.cpp
+    Classes/map/state/TileState.cpp
+    Classes/map/events/MapEventManager.cpp
+)
+set(MAP_OTHER_HEADER
+    Classes/map/builder/MapBuilder.h
+    Classes/map/state/TileState.h
+    Classes/map/events/MapEventManager.h
+)
+
+# Core module
+set(CORE_SOURCE
+    Classes/AppDelegate.cpp
+)
+set(CORE_HEADER
+    Classes/AppDelegate.h
+)
+
+# Append all modules to main game sources
 list(APPEND GAME_SOURCE
-     Classes/AppDelegate.cpp
-     Classes/HelloWorldScene.cpp
-     )
+    ${CORE_SOURCE}
+    ${SCENE_SOURCE}
+    ${MAP_CORE_SOURCE}
+    ${MAP_UTILS_SOURCE}
+    ${MAP_PROPERTIES_SOURCE}
+    ${MAP_OTHER_SOURCE}
+)
+
 list(APPEND GAME_HEADER
-     Classes/AppDelegate.h
-     Classes/HelloWorldScene.h
-     )
+    ${CORE_HEADER}
+    ${SCENE_HEADER}
+    ${MAP_CORE_HEADER}
+    ${MAP_UTILS_HEADER}
+    ${MAP_PROPERTIES_HEADER}
+    ${MAP_OTHER_HEADER}
+)
 
 if(ANDROID)
     # change APP_NAME to the share library name for Android, it's value depend on AndroidManifest.xml
