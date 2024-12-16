@@ -25,16 +25,20 @@
 
 cmake_minimum_required(VERSION 3.1)
 
-set(APP_NAME TemplateCpp)
+set(APP_NAME COCOS)
+
+add_definitions(-DADA_LOGGING=1)
 
 
 # 设置C++标准
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # 指定使用GCC 13编译器
 set(CMAKE_C_COMPILER /usr/bin/gcc-13)
 set(CMAKE_CXX_COMPILER /usr/bin/g++-13)
+set(CMAKE_BUILD_TYPE Debug)
+
 
 project(${APP_NAME})
 
@@ -62,21 +66,26 @@ include_directories(
         Classes/map
         Classes/map/core
         Classes/map/utils
-        Classes/map/events
         Classes/map/builder
         Classes/map/state
+        Classes/map/config          # 添加此行
+        Classes/map/loader
         ${COCOS2DX_ROOT_PATH}/cocos/audio/include/
 )
 # Scene module
 set(SCENE_SOURCE
     Classes/scenes/BaseScene.cpp
-    Classes/scenes/GameScene.cpp
+    Classes/GameScene.cpp
     Classes/HelloWorldScene.cpp
+    Classes/MyScene.cpp
+    Classes/PhysicsTestScene.cpp
 )
 set(SCENE_HEADER
     Classes/scenes/BaseScene.h
-    Classes/scenes/GameScene.h
+    Classes/GameScene.h
     Classes/HelloWorldScene.h
+    Classes/MyScene.h
+    Classes/PhysicsTestScene.h
 )
 
 # Map modules
@@ -84,41 +93,48 @@ set(MAP_CORE_SOURCE
     Classes/map/core/MapManager.cpp
     Classes/map/core/MapLayer.cpp
     Classes/map/core/GameMap.cpp
-    Classes/map/core/Tile.cpp
+    #Classes/map/core/Tile.cpp
+    Classes/map/core/MapManager.cpp
 )
 set(MAP_CORE_HEADER
     Classes/map/core/MapManager.h
     Classes/map/core/MapLayer.h
     Classes/map/core/GameMap.h
-    Classes/map/core/Tile.h
+    #Classes/map/core/Tile.h
+    Classes/map/core/MapManager.h
+    
 )
 
 set(MAP_UTILS_SOURCE
     Classes/map/utils/MapUtils.cpp
+    Classes/map/utils/LayerRenderer.cpp
+    Classes/map/utils/LayerRendererFactory.cpp
+    Classes/map/utils/GameObject.cpp
 )
 set(MAP_UTILS_HEADER
     Classes/map/utils/MapUtils.h
     Classes/map/utils/MapConstants.h
+    Classes/map/utils/LayerRenderer.h
+    Classes/map/utils/LayerRendererFactory.h
+    Classes/map/utils/GameObject.h
 )
 
-set(MAP_PROPERTIES_SOURCE
-    Classes/map/properties/MapProperties.cpp
-    Classes/map/properties/TileProperties.cpp
+set(MAP_CONFIG_SOURCE
+    Classes/map/config/FarmConfigManager.cpp
 )
-set(MAP_PROPERTIES_HEADER
-    Classes/map/properties/MapProperties.h
-    Classes/map/properties/TileProperties.h
+set(MAP_CONFIG_HEADER
+    Classes/map/config/FarmConfigManager.h
 )
 
 set(MAP_OTHER_SOURCE
     Classes/map/builder/MapBuilder.cpp
     Classes/map/state/TileState.cpp
-    Classes/map/events/MapEventManager.cpp
+    Classes/map/loader/MapLoader.cpp
 )
 set(MAP_OTHER_HEADER
     Classes/map/builder/MapBuilder.h
     Classes/map/state/TileState.h
-    Classes/map/events/MapEventManager.h
+    Classes/map/loader/MapLoader.h
 )
 
 # Core module
@@ -135,7 +151,7 @@ list(APPEND GAME_SOURCE
     ${SCENE_SOURCE}
     ${MAP_CORE_SOURCE}
     ${MAP_UTILS_SOURCE}
-    ${MAP_PROPERTIES_SOURCE}
+    ${MAP_CONFIG_SOURCE}
     ${MAP_OTHER_SOURCE}
 )
 
@@ -144,7 +160,7 @@ list(APPEND GAME_HEADER
     ${SCENE_HEADER}
     ${MAP_CORE_HEADER}
     ${MAP_UTILS_HEADER}
-    ${MAP_PROPERTIES_HEADER}
+    ${MAP_CONFIG_HEADER}
     ${MAP_OTHER_HEADER}
 )
 
@@ -227,4 +243,66 @@ endif()
 
 if(LINUX OR WINDOWS)
     cocos_copy_target_res(${APP_NAME} COPY_TO ${APP_RES_DIR} FOLDERS ${GAME_RES_FOLDER})
+endif()
+
+# 添加到主CMakeLists.txt文件中
+
+# 定义FMOD库路径
+set(FMOD_LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cocos2d/external/linux-specific/fmod/prebuilt/64-bit)
+
+# 添加自定义命令来维护符号链接
+add_custom_command(
+    TARGET ${APP_NAME} PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E remove -f ${FMOD_LIB_DIR}/libfmod.so.6
+    COMMAND ${CMAKE_COMMAND} -E create_symlink libfmod.so ${FMOD_LIB_DIR}/libfmod.so.6
+    COMMENT "Recreating FMOD symbolic link"
+)
+
+
+# 确保FMOD库被正确复制到目标目录
+if(LINUX)
+    add_custom_command(
+        TARGET ${APP_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${FMOD_LIB_DIR}/libfmod.so
+            ${APP_BIN_DIR}/libfmod.so
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${FMOD_LIB_DIR}/libfmod.so.6
+            ${APP_BIN_DIR}/libfmod.so.6
+        COMMENT "Copying FMOD libraries to target directory"
+    )
+endif()
+
+# 在你的主 CMakeLists.txt 中添加
+set(CHIPMUNK_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/cocos2d/external/chipmunk/include")
+set(CHIPMUNK_LIBRARY "${CMAKE_SOURCE_DIR}/cocos2d/external/chipmunk/prebuilt/linux/64-bit/libchipmunk.a")
+
+# 确保这些变量被正确设置
+message(STATUS "CHIPMUNK_INCLUDE_DIR: ${CHIPMUNK_INCLUDE_DIR}")
+message(STATUS "CHIPMUNK_LIBRARY: ${CHIPMUNK_LIBRARY}")
+
+if(USE_CHIPMUNK)
+    message(STATUS "Configuring Chipmunk physics engine...")
+    set(CHIPMUNK_FOUND TRUE)
+    set(CHIPMUNK_LIBRARIES ${CHIPMUNK_LIBRARY})
+    set(CHIPMUNK_INCLUDE_DIRS ${CHIPMUNK_INCLUDE_DIR})
+endif()
+
+# 强制每次构建时复制Resources文件
+if(LINUX OR WINDOWS)
+    # 删除旧的Resources目录
+    add_custom_command(
+        TARGET ${APP_NAME} PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E remove_directory ${APP_RES_DIR}
+        COMMENT "Removing old Resources directory"
+    )
+
+    # 复制新的Resources目录
+    add_custom_command(
+        TARGET ${APP_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory 
+            ${CMAKE_CURRENT_SOURCE_DIR}/Resources 
+            ${APP_RES_DIR}
+        COMMENT "Copying Resources directory to target"
+    )
 endif()

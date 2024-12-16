@@ -1,16 +1,24 @@
+// MapConstants.h
 #ifndef __MAP_CONSTANTS_H__
 #define __MAP_CONSTANTS_H__
 
-enum class LayerType {
-  TERRAIN,  // 地形层
-  BUILDING, // 建筑层
-  DECORATE, // 装饰层
-  COLLISION // 碰撞层
+#include "cocos2d.h"
+
+namespace MapConstants {
+// GameTypes.h 或 MapTypes.h
+enum class MapType {
+  NONE,
+  FARM,     // 农场
+  PLAZA,    // 广场
+  SHOP,     // 商店
+  HOMESTEAD // 家园
 };
+} // namespace MapConstants
 
-// 地图配置常量
-const int TILE_SIZE = 32;          // 瓦片大小
-const int DEFAULT_MAP_WIDTH = 50;  // 默认地图宽度
-const int DEFAULT_MAP_HEIGHT = 50; // 默认地图高度
-
+struct LayerProperties {
+  bool base = false;       // 可以走
+  bool boundary = false;   // 不可走且无物理属性
+  bool physical = false;   // 有物理属性
+  bool penetrable = false; // 可穿过且会隐身
+};
 #endif

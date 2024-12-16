@@ -1,42 +1,48 @@
-#ifndef __MAP_MANAGER_H__
-#define __MAP_MANAGER_H__
-
 #include "GameMap.h"
+#include "MapBuilder.h"
+#include "MapConstants.h"
+#include "MapLoader.h"
 #include "cocos2d.h"
-#include <string>
-#include <unordered_map>
-
-USING_NS_CC;
-
 class MapManager {
-public:
-  // 获取单例实例
-  static MapManager *getInstance();
-
-  // 加载地图
-  bool loadMap(const std::string &mapId);
-
-  // 获取当前地图
-  GameMap *getCurrentMap() { return m_currentMap; }
-
-  // 切换地图
-  bool switchMap(const std::string &mapId);
-
-  // 保存地图状态
-  void saveMapState();
-
-  // 清理资源
-  void clearMapResources();
-
 private:
-  MapManager() {}; // 私有构造函数
-  ~MapManager() {};
-  MapManager(const MapManager &) = delete;
-  MapManager &operator=(const MapManager &) = delete;
+  // 单例实现
+  static MapManager *instance;
+  MapManager();
+  virtual ~MapManager();
 
-  static MapManager *s_instance;
-  GameMap *m_currentMap;
-  std::unordered_map<std::string, GameMap *> m_mapCache;
+  // 核心组件
+  std::unique_ptr<MapLoader> mapLoader;   // 负责加载tmx地图
+  std::unique_ptr<MapBuilder> mapBuilder; // 负责构建地图实例
+  std::unique_ptr<GameMap> currentMap;    // 当前活跃的地图
+  cocos2d::Follow *cameraFollow;          // 相机跟随动作
+
+public:
+  static MapManager *getInstance();
+  static void destroyInstance();
+
+  // 初始化
+  bool init();
+
+  // 地图加载流程控制
+  bool loadMap(const std::string &tmxPath, MapConstants::MapType type);
+  void unloadCurrentMap();
+
+  // 地图访问
+  GameMap *getCurrentMap() const { return currentMap.get(); }
+  cocos2d::TMXTiledMap *getCurrentTMXMap() const;
+  //  MapConstants::MapType getCurrentMapType() const;
+
+  // 相机控制 (通过cocos2d的Follow Action实现)
+  void setupCamera(cocos2d::Node *target); // 设置相机跟随目标(通常是玩家)
+  void stopCamera();                       // 停止相机跟随
+
+  // 视野范围判定
+  bool isInViewport(const cocos2d::Vec2 &position) const;
+  cocos2d::Rect getViewport() const;
+
+  // 地图查询接口(代理到GameMap)
+  // bool isWalkable(const cocos2d::Vec2 &position) const;
+  // bool hasPhysical(const cocos2d::Vec2 &position) const;
+  // bool isBoundary(const cocos2d::Vec2 &position) const;
+  // bool isTransparent(const cocos2d::Vec2 &position) const;
 };
-
-#endif

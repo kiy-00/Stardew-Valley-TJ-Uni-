@@ -23,8 +23,10 @@
  ****************************************************************************/
 
 #include "AppDelegate.h"
+#include "GameScene.h"
 #include "HelloWorldScene.h"
-#include "scenes/GameScene.h"
+#include "MyScene.h"
+#include "PhysicsTestScene.h"
 
 // #define USE_AUDIO_ENGINE 1
 // #define USE_SIMPLE_AUDIO_ENGINE 1
@@ -44,10 +46,15 @@ using namespace CocosDenshion;
 
 USING_NS_CC;
 
-static cocos2d::Size designResolutionSize = cocos2d::Size(480, 320);
-static cocos2d::Size smallResolutionSize = cocos2d::Size(480, 320);
-static cocos2d::Size mediumResolutionSize = cocos2d::Size(1024, 768);
-static cocos2d::Size largeResolutionSize = cocos2d::Size(2048, 1536);
+// 修改设计分辨率为地图尺寸
+static cocos2d::Size designResolutionSize =
+    cocos2d::Size(3200, 3200); // 与地图像素大小一致
+static cocos2d::Size smallResolutionSize =
+    cocos2d::Size(1280, 720); // 小屏幕（备用）
+static cocos2d::Size mediumResolutionSize =
+    cocos2d::Size(1920, 1080); // 中等屏幕（备用）
+static cocos2d::Size largeResolutionSize =
+    cocos2d::Size(2560, 1440); // 大屏幕（备用）
 
 AppDelegate::AppDelegate() {}
 
@@ -59,84 +66,73 @@ AppDelegate::~AppDelegate() {
 #endif
 }
 
-// if you want a different context, modify the value of glContextAttrs
-// it will affect all platforms
+// 如果需要不同的上下文，修改 glContextAttrs 的值
 void AppDelegate::initGLContextAttrs() {
-  // set OpenGL context attributes:
-  // red,green,blue,alpha,depth,stencil,multisamplesCount
+  // 设置 OpenGL 上下文属性：
+  // red, green, blue, alpha, depth, stencil, multisamplesCount
   GLContextAttrs glContextAttrs = {8, 8, 8, 8, 24, 8, 0};
 
   GLView::setGLContextAttrs(glContextAttrs);
 }
 
-// if you want to use the package manager to install more packages,
-// don't modify or remove this function
+// 如果使用包管理器安装更多包，不要修改或删除此函数
 static int register_all_packages() {
-  return 0; // flag for packages manager
+  return 0; // 包管理器的标志
 }
 
 bool AppDelegate::applicationDidFinishLaunching() {
-  // initialize director
+  // 初始化 director
   auto director = Director::getInstance();
   auto glview = director->getOpenGLView();
   if (!glview) {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) ||                               \
     (CC_TARGET_PLATFORM == CC_PLATFORM_MAC) ||                                 \
     (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX)
-    glview = GLViewImpl::createWithRect(
-        "SVTU", cocos2d::Rect(0, 0, designResolutionSize.width,
-                              designResolutionSize.height));
+
+    glview =
+        GLViewImpl::createWithRect("SVTU", cocos2d::Rect(0, 0, 1920, 1080));
 #else
     glview = GLViewImpl::create("SVTU");
 #endif
     director->setOpenGLView(glview);
   }
 
-  // turn on display FPS
+  // 清除纹理缓存（如果需要）
+  // director->getTextureCache()->removeAllTextures();
+
+  // 清除精灵帧缓存（如果需要）
+  // SpriteFrameCache::getInstance()->removeSpriteFrames();
+
+  // 打开显示 FPS
   director->setDisplayStats(true);
 
-  // set FPS. the default value is 1.0/60 if you don't call this
+  // 设置 FPS。默认值是 1.0/60，如果不调用此函数
   director->setAnimationInterval(1.0f / 60);
 
-  // Set the design resolution
-  glview->setDesignResolutionSize(designResolutionSize.width,
-                                  designResolutionSize.height,
-                                  ResolutionPolicy::NO_BORDER);
+  // 设置设计分辨率
+  glview->setDesignResolutionSize(3200, 3200, ResolutionPolicy::NO_BORDER);
   auto frameSize = glview->getFrameSize();
-  // if the frame's height is larger than the height of medium size.
-  if (frameSize.height > mediumResolutionSize.height) {
-    director->setContentScaleFactor(
-        MIN(largeResolutionSize.height / designResolutionSize.height,
-            largeResolutionSize.width / designResolutionSize.width));
-  }
-  // if the frame's height is larger than the height of small size.
-  else if (frameSize.height > smallResolutionSize.height) {
-    director->setContentScaleFactor(
-        MIN(mediumResolutionSize.height / designResolutionSize.height,
-            mediumResolutionSize.width / designResolutionSize.width));
-  }
-  // if the frame's height is smaller than the height of medium size.
-  else {
-    director->setContentScaleFactor(
-        MIN(smallResolutionSize.height / designResolutionSize.height,
-            smallResolutionSize.width / designResolutionSize.width));
-  }
+
+  // 设置内容缩放因子（可选，根据需要调整）
+  // 由于设计分辨率与地图大小一致，这里可以将 contentScaleFactor 设置为 1
+  director->setContentScaleFactor(1.0f);
 
   register_all_packages();
 
-  // create a scene. it's an autorelease object
-  // auto scene = HelloWorld::createScene();
+  // 创建并运行初始场景
+  // auto scene = HelloWorldScene::createScene();
 
   auto scene = GameScene::createScene();
+  // auto scene = MyScene::createScene();
+  // auto scene = PhysicsTestScene::createScene();
 
-  // run
+  // 运行场景
   director->runWithScene(scene);
 
   return true;
 }
 
-// This function will be called when the app is inactive. Note, when receiving a
-// phone call it is invoked.
+// 当应用程序进入后台时调用。注意，当接收到电话时会调用此函数。
 void AppDelegate::applicationDidEnterBackground() {
   Director::getInstance()->stopAnimation();
 
@@ -148,7 +144,7 @@ void AppDelegate::applicationDidEnterBackground() {
 #endif
 }
 
-// this function will be called when the app is active again
+// 当应用程序重新进入前台时调用
 void AppDelegate::applicationWillEnterForeground() {
   Director::getInstance()->startAnimation();
 
