@@ -1,56 +1,44 @@
 // SpritePathManager.cpp
 #include "SpritePathManager.h"
 
-std::string SpritePathManager::getSpritePath(MapType mapType,
-                                             const std::string &subType,
-                                             const std::string &layerName,
-                                             const std::string &season) {
-  switch (mapType) {
-  case MapType::FARM:
-    return getFarmSpritePath(subType, layerName, season);
-  case MapType::INDOOR:
-    return getIndoorSpritePath(layerName);
-  case MapType::COMMUNITY:
-    return getCommunitySpritePath(layerName);
-  case MapType::MINE:
-    return getMineSpritePath(layerName);
-  default:
-    return "";
-  }
-}
-
-std::string SpritePathManager::getFarmSpritePath(const std::string &farmType,
-                                                 const std::string &layerName,
+std::string SpritePathManager::getFarmSpritePath(const std::string &layerName,
+                                                 const std::string &farmType,
                                                  const std::string &season) {
-  static const std::unordered_map<std::string, std::string> layerToAssetType = {
-      {"house", "house/house_1"},           {"myhouse", "myhouse/myhouse_1"},
-      {"obj_fb_2", "obj_forbidden/tree_2"}, {"obj_mv_1", "obj_move/bushes_1"},
-      {"static_1", "static/size_1"},        {"static_4", "static/size_4"},
-      {"static_5", "static/size_5"}};
-
-  auto it = layerToAssetType.find(layerName);
-  if (it == layerToAssetType.end()) {
+  // 处理静态资源
+  if (isStaticLayer(layerName)) {
+    if (layerName == "static_1") {
+      return "maps/farm/" + farmType + "/asset/static/size_1/boat.png";
+    }
+    if (layerName == "static_4") {
+      return "maps/farm/" + farmType + "/asset/static/size_4/floor.png";
+    }
+    if (layerName == "static_5") {
+      return "maps/farm/" + farmType + "/asset/static/size_5/bushes.png";
+    }
     return "";
   }
 
-  if (isStaticAsset(layerName)) {
-    return "maps/farm/" + farmType + "/asset/" + it->second + ".png";
+  // 处理季节性资源
+  if (layerName == "house") {
+    return "maps/farm/" + farmType + "/asset/house/house_1/" + season +
+           "/house_1_1.png";
+  }
+  if (layerName == "myhouse") {
+    return "maps/farm/" + farmType + "/asset/myhouse/myhouse_1/" + season +
+           "/myhouse_1_1.png";
+  }
+  if (layerName == "obj_fb_2") {
+    return "maps/farm/" + farmType + "/asset/obj_forbidden/tree_2/" + season +
+           "/tree_2_1.png";
+  }
+  if (layerName == "obj_mv_1") {
+    return "maps/farm/" + farmType + "/asset/obj_move/bushes_1/" + season +
+           "/bushes_1_1.png";
   }
 
-  return "maps/farm/" + farmType + "/asset/" + it->second + "/" + season + "/" +
-         layerName + "_1.png";
+  return "";
 }
 
-std::string
-SpritePathManager::getIndoorSpritePath(const std::string &layerName) {
-  return "maps/indoor/asset/" + layerName + ".png";
-}
-
-std::string
-SpritePathManager::getCommunitySpritePath(const std::string &layerName) {
-  return "maps/community/asset/" + layerName + ".png";
-}
-
-std::string SpritePathManager::getMineSpritePath(const std::string &layerName) {
-  return "maps/mine/asset/" + layerName + ".png";
+bool SpritePathManager::isStaticLayer(const std::string &layerName) {
+  return layerName.find("static_") == 0;
 }

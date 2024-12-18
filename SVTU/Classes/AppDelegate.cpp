@@ -197,11 +197,13 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
   // auto scene = HelloWorldScene::createScene();
 
-  auto scene = GameScene::createScene();
+  // auto scene = GameScene::createScene();
 
   // auto scene = MyScene::createScene();
 
   // auto scene = PhysicsTestScene::createScene();
+
+  auto scene = HelloWorldScene::createScene();
 
   // 运行场景
 

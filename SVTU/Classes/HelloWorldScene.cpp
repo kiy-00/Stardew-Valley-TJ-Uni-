@@ -1,256 +1,170 @@
-﻿// TestScene.cpp
-
+﻿// HelloWorldScene.cpp
 #include "HelloWorldScene.h"
-
-
+#include "FarmMapRenderer.h"
+#include "SpritePathManager.h"
 
 USING_NS_CC;
 
-
-
-// 创建场景
-
 Scene *HelloWorldScene::createScene() { return HelloWorldScene::create(); }
 
-
-
-// 初始化方法
-
 bool HelloWorldScene::init() {
-
-  if (!Scene::initWithPhysics()) {
-
+  if (!Scene::init()) {
     return false;
-
   }
 
+  currentMapType = "island";
+  currentSeason = "spring";
 
-
-  // 设置物理世界的重力为零（因为我们希望精灵在平面上移动）
-
-  this->getPhysicsWorld()->setGravity(Vec2(1, 1));
-
-
-
-  // 启用物理调试绘制
-
-  this->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
-
-
-
-  // 获取屏幕尺寸
-
-  Size visibleSize = Director::getInstance()->getVisibleSize();
-
-  Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-
-
-  // 创建静态精灵（房屋）
-
-  auto houseSprite = Sprite::create("HelloWorld.png");
-
-  if (!houseSprite) {
-
-    CCLOG("无法加载 HelloWorld.png 作为房屋精灵！");
-
+  // 初始化地图
+  if (!initMap()) {
     return false;
-
   }
 
-  houseSprite->setPosition(Vec2(visibleSize.width / 2 + origin.x,
-
-                                visibleSize.height / 2 + origin.y));
-
-  houseSprite->setScale(1.0f); // 根据需要调整缩放比例
-
-
-
-  // 创建物理体积并绑定到房屋精灵
-
-  auto housePhysicsBody = PhysicsBody::createBox(
-
-      houseSprite->getContentSize() * houseSprite->getScale(),
-
-      PhysicsMaterial(1.0f, 0.5f, 0.5f)); // 根据需求调整物理材料参数
-
-  housePhysicsBody->setDynamic(true);     // 静态物体
-
-  housePhysicsBody->setCategoryBitmask(0x01);          // 类别掩码
-
-  housePhysicsBody->setCollisionBitmask(0x02);         // 碰撞掩码
-
-  housePhysicsBody->setContactTestBitmask(0xFFFFFFFF); // 接触测试掩码
-
-
-
-  houseSprite->setPhysicsBody(housePhysicsBody);
-
-
-
-  // 添加房屋精灵到场景
-
-  this->addChild(houseSprite);
-
-  CCLOG("房屋精灵已创建并添加到场景，位置: (%.2f, %.2f)",
-
-        houseSprite->getPosition().x, houseSprite->getPosition().y);
-
-
-
-  // 创建动态精灵（玩家）
-
-  playerSprite = Sprite::create("HelloWorld.png");
-
-  if (!playerSprite) {
-
-    CCLOG("无法加载 HelloWorld.png 作为玩家精灵！");
-
+  // 初始化玩家
+  if (!initPlayer()) {
     return false;
-
   }
 
-  playerSprite->setPosition(
+  // 设置测试菜单
+  setupTestMenu();
 
-      Vec2(visibleSize.width / 2 + origin.x,
-
-           visibleSize.height / 2 + origin.y + 200)); // 放置在房屋上方
-
-  playerSprite->setScale(0.5f); // 根据需要调整缩放比例
-
-
-
-  // 创建物理体积并绑定到玩家精灵
-
-  auto playerPhysicsBody = PhysicsBody::createBox(
-
-      playerSprite->getContentSize() * playerSprite->getScale(),
-
-      PhysicsMaterial(1.0f, 0.5f, 0.5f)); // 根据需求调整物理材料参数
-
-  playerPhysicsBody->setDynamic(true);    // 动态物体
-
-  playerPhysicsBody->setCategoryBitmask(0x02);          // 类别掩码
-
-  playerPhysicsBody->setCollisionBitmask(0x01);         // 碰撞掩码
-
-  playerPhysicsBody->setContactTestBitmask(0xFFFFFFFF); // 接触测试掩码
-
-
-
-  playerSprite->setPhysicsBody(playerPhysicsBody);
-
-
-
-  // 添加玩家精灵到场景
-
-  this->addChild(playerSprite);
-
-  CCLOG("玩家精灵已创建并添加到场景，位置: (%.2f, %.2f)",
-
-        playerSprite->getPosition().x, playerSprite->getPosition().y);
-
-
-
-  // 设置键盘输入监听
-
+  // 设置键盘控制
   setupKeyboard();
 
-
-
-  // 启用每帧更新（如果需要额外逻辑）
-
+  // 开启更新
   this->scheduleUpdate();
 
+  return true;
+}
 
+bool HelloWorldScene::initMap() {
+  // 加载地图
+  tmxMap = TMXTiledMap::create("maps/farm/island/island_spring.tmx");
+  if (!tmxMap) {
+    CCLOG("Failed to load map");
+    return false;
+  }
+  this->addChild(tmxMap);
+
+  // 使用渲染器渲染地图
+  FarmMapRenderer::getInstance()->renderMap(tmxMap);
 
   return true;
-
 }
 
-
-
-// 设置键盘输入
-
-void HelloWorldScene::setupKeyboard() {
-
-  auto keyboardListener = EventListenerKeyboard::create();
-
-
-
-  keyboardListener->onKeyPressed =
-
-      CC_CALLBACK_2(HelloWorldScene::onKeyPressed, this);
-
-
-
-  _eventDispatcher->addEventListenerWithSceneGraphPriority(keyboardListener,
-
-                                                           this);
-
-}
-
-
-
-void HelloWorldScene::onKeyPressed(EventKeyboard::KeyCode keyCode,
-
-                                   Event *event) {
-
-  float impulse = 50.0f; // 调整冲量大小
-
-  Vec2 direction = Vec2::ZERO;
-
-
-
-  switch (keyCode) {
-
-  case EventKeyboard::KeyCode::KEY_W:
-
-    direction = Vec2(0, 1);
-
-    break;
-
-  case EventKeyboard::KeyCode::KEY_S:
-
-    direction = Vec2(0, -1);
-
-    break;
-
-  case EventKeyboard::KeyCode::KEY_A:
-
-    direction = Vec2(-1, 0);
-
-    break;
-
-  case EventKeyboard::KeyCode::KEY_D:
-
-    direction = Vec2(1, 0);
-
-    break;
-
-  default:
-
-    return;
-
+bool HelloWorldScene::initPlayer() {
+  playerSprite = Sprite::create("HelloWorld.png");
+  if (!playerSprite) {
+    return false;
   }
 
+  playerSprite->setScale(0.2f);
+  playerSprite->setAnchorPoint(Vec2(0.5f, 0.5f));
+  playerSprite->setPosition(Vec2(800, 800));
+  tmxMap->addChild(playerSprite, 999); // 确保玩家在最上层
 
-
-  direction = direction.getNormalized();
-
-  playerSprite->getPhysicsBody()->applyImpulse(direction * impulse);
-
-  CCLOG("应用冲量: (%f, %f)", direction.x * impulse, direction.y * impulse);
-
+  return true;
 }
 
+void HelloWorldScene::setupTestMenu() {
+  auto visibleSize = Director::getInstance()->getVisibleSize();
+  Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+  // 创建季节切换按钮
+  std::vector<std::string> seasons = {"spring", "summer", "fall", "winter"};
+  float buttonY = origin.y + visibleSize.height - 30;
+  float buttonX = origin.x + 100;
 
-// 每帧更新（当前不需要额外逻辑）
+  for (const auto &season : seasons) {
+    auto button = MenuItemLabel::create(
+        Label::createWithTTF(season, "fonts/arial.ttf", 20),
+        [this, season](Ref *sender) { switchSeason(season); });
+    button->setPosition(Vec2(buttonX, buttonY));
+    buttonX += 100;
+
+    auto menu = Menu::create(button, nullptr);
+    menu->setPosition(Vec2::ZERO);
+    this->addChild(menu);
+  }
+}
+
+void HelloWorldScene::switchSeason(const std::string &season) {
+  if (currentSeason == season)
+    return;
+
+  currentSeason = season;
+
+  // 更新地图和渲染器
+  std::string mapPath = "maps/farm/island/island_" + season + ".tmx";
+  auto newMap = TMXTiledMap::create(mapPath);
+  if (newMap) {
+    // 保存原地图信息
+    Vec2 oldPos = tmxMap->getPosition();
+    Vec2 playerPos = playerSprite->getPosition();
+
+    // 替换地图
+    this->removeChild(tmxMap);
+    this->addChild(newMap);
+    newMap->setPosition(oldPos);
+    tmxMap = newMap;
+
+    // 重新渲染地图
+    FarmMapRenderer::getInstance()->renderMap(tmxMap);
+
+    // 恢复玩家位置
+    playerSprite->removeFromParent();
+    tmxMap->addChild(playerSprite, 999);
+    playerSprite->setPosition(playerPos);
+  }
+}
+
+void HelloWorldScene::setupKeyboard() {
+  auto listener = EventListenerKeyboard::create();
+  listener->onKeyPressed = CC_CALLBACK_2(HelloWorldScene::onKeyPressed, this);
+  _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+}
+
+void HelloWorldScene::onKeyPressed(EventKeyboard::KeyCode keyCode,
+                                   Event *event) {
+  float moveDistance = 32.0f;
+  Vec2 currentPos = playerSprite->getPosition();
+  Vec2 targetPos = currentPos;
+
+  switch (keyCode) {
+  case EventKeyboard::KeyCode::KEY_W:
+    targetPos.y += moveDistance;
+    break;
+  case EventKeyboard::KeyCode::KEY_S:
+    targetPos.y -= moveDistance;
+    break;
+  case EventKeyboard::KeyCode::KEY_A:
+    targetPos.x -= moveDistance;
+    break;
+  case EventKeyboard::KeyCode::KEY_D:
+    targetPos.x += moveDistance;
+    break;
+  default:
+    return;
+  }
+
+  auto moveAction = MoveTo::create(0.2f, targetPos);
+  playerSprite->runAction(moveAction);
+}
 
 void HelloWorldScene::update(float dt) {
+  if (!playerSprite || !tmxMap)
+    return;
 
-  // 可以在这里添加额外的更新逻辑
+  // 更新相机跟随玩家
+  auto camera = this->getDefaultCamera();
+  Size mapSize = tmxMap->getContentSize();
+  Size visibleSize = Director::getInstance()->getVisibleSize();
+  Vec2 playerPos = playerSprite->getPosition();
 
+  float x = clampf(playerPos.x, visibleSize.width / 2,
+                   mapSize.width - visibleSize.width / 2);
+  float y = clampf(playerPos.y, visibleSize.height / 2,
+                   mapSize.height - visibleSize.height / 2);
+
+  camera->setPosition(Vec2(x, y));
 }
-
