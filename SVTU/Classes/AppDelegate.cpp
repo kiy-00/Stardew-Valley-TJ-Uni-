@@ -48,7 +48,7 @@ USING_NS_CC;
 
 // 修改设计分辨率为地图尺寸
 static cocos2d::Size designResolutionSize =
-    cocos2d::Size(3200, 3200); // 与地图像素大小一致
+    cocos2d::Size(1600, 1600); // 改为地图实际大小
 static cocos2d::Size smallResolutionSize =
     cocos2d::Size(1280, 720); // 小屏幕（备用）
 static cocos2d::Size mediumResolutionSize =
@@ -90,7 +90,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX)
 
     glview =
-        GLViewImpl::createWithRect("SVTU", cocos2d::Rect(0, 0, 1920, 1080));
+        GLViewImpl::createWithRect("SVTU", cocos2d::Rect(0, 0, 1600, 1600));
 #else
     glview = GLViewImpl::create("SVTU");
 #endif
@@ -109,8 +109,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
   // 设置 FPS。默认值是 1.0/60，如果不调用此函数
   director->setAnimationInterval(1.0f / 60);
 
-  // 设置设计分辨率
-  glview->setDesignResolutionSize(3200, 3200, ResolutionPolicy::NO_BORDER);
+  // 设置设计分辨率,使用 SHOW_ALL 策略确保地图完整显示且不变形
+  glview->setDesignResolutionSize(1600, 1600, ResolutionPolicy::SHOW_ALL);
   auto frameSize = glview->getFrameSize();
 
   // 设置内容缩放因子（可选，根据需要调整）

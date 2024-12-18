@@ -64,8 +64,8 @@ void LayerRenderer::renderObjectLayer(cocos2d::TMXObjectGroup *objectGroup,
                          : 0.0f;
 
       // 打印调试信息
-      // CCLOG("传递给创建精灵的数据:");
-      // CCLOG("位置: (%.2f, %.2f), 尺寸: %.2f x %.2f", x, y, width, height);
+      CCLOG("传递给创建精灵的数据:");
+      CCLOG("位置: (%.2f, %.2f), 尺寸: %.2f x %.2f", x, y, width, height);
 
       // 创建精灵
       auto sprite = cocos2d::Sprite::create(spritePath);
@@ -76,40 +76,40 @@ void LayerRenderer::renderObjectLayer(cocos2d::TMXObjectGroup *objectGroup,
         cocos2d::Size spriteSize = sprite->getContentSize();
 
         // 计算缩放比例以匹配对象的尺寸
-        float scaleX = (width > 0) ? width / spriteSize.width : 1.0f;
-        float scaleY = (height > 0) ? height / spriteSize.height : 1.0f;
-        sprite->setScale(scaleX, scaleY);
-        CCLOG("精灵缩放比例: scaleX = %.2f, scaleY = %.2f", scaleX, scaleY);
+        // float scaleX = (width > 0) ? width / spriteSize.width : 1.0f;
+        // float scaleY = (height > 0) ? height / spriteSize.height : 1.0f;
+        // sprite->setScale(scaleX, scaleY);
+        // CCLOG("精灵缩放比例: scaleX = %.2f, scaleY = %.2f", scaleX, scaleY);
 
         // 设置精灵的位置
         sprite->setPosition(cocos2d::Vec2(x, y + height));
         CCLOG("已设置精灵位置，具体为：(%.2f, %.2f)", x, y);
 
-        // 设置 Z 顺序，确保在基础层之上
-        sprite->setLocalZOrder(1);
+        // // 设置 Z 顺序，确保在基础层之上
+        // sprite->setLocalZOrder(1);
 
-        // 创建基本对象
-        GameObject *gameObject = new BasicObject(sprite);
+        // // 创建基本对象
+        // GameObject *gameObject = new BasicObject(sprite);
 
-        // 应用装饰器
-        if (layerProps.physical) {
-          GameObject *physicsObject = new PhysicsAdder(gameObject);
-          gameObject = physicsObject;
-        }
+        // // 应用装饰器
+        // if (layerProps.physical) {
+        //   GameObject *physicsObject = new PhysicsAdder(gameObject);
+        //   gameObject = physicsObject;
+        // }
 
-        if (layerProps.boundary) {
-          GameObject *boundaryObject = new BoundaryAdder(gameObject);
-          gameObject = boundaryObject;
-        }
+        // if (layerProps.boundary) {
+        //   GameObject *boundaryObject = new BoundaryAdder(gameObject);
+        //   gameObject = boundaryObject;
+        // }
 
         // 调用渲染
-        gameObject->render();
+        // gameObject->render();
 
         // 添加精灵到地图
-        tmxMap->addChild(sprite, 1000);
+        tmxMap->addChild(sprite, 100);
 
         // 清理内存
-        delete gameObject;
+        // delete gameObject;
 
         // 添加调试边框（可选）
         auto debugRectSprite = cocos2d::DrawNode::create();

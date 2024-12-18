@@ -19,7 +19,7 @@
    eJzt18EOhCAMRVGi/v83u2LTFIrYwit5N+nORU+EjFNKbI8xWaIDKzqwogMrOrDK6LiVyebQDCMONM9pjtG96fBv9gxZ0zqjdNi7e+6/0+Ft6HnoONcRubfl6T1DB+fkWfG7RMc/x5d279/zRDhWvffo71s68B2R3+xRtRx/Pbv/+0U5orvEeJlWO2Te7wbNMXsf0ByWDc0h74t1Z6oHzaGl2erI89V6Dj3pyBodWNGBFR1Y0THWCx3GDvg=
   </data>
  </layer>
- <objectgroup id="8" name="static_1">
+ <objectgroup id="8" name="static_1" locked="1">
   <object id="345" gid="11" x="248.333" y="656" width="90" height="56"/>
   <object id="346" gid="11" x="423" y="393.333" width="90" height="56"/>
   <object id="347" gid="11" x="1347" y="308" width="90" height="56"/>

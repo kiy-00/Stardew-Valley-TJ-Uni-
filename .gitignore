@@ -6,6 +6,9 @@
 # vscode
 .vscode/
 
+# 暂时注释README
+README.md
+
 # build
 build/
 

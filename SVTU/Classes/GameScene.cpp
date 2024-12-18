@@ -12,29 +12,30 @@ bool GameScene::init() {
     return false;
   }
 
-  // 初始化地图
-  if (!initTileMap()) {
+  // 直接加载并添加地图到场景
+  tmxMap = TMXTiledMap::create("maps/farm/island/island_spring.tmx");
+  if (!tmxMap) {
     return false;
   }
-  CCLOG("地图已加载");
+  this->addChild(tmxMap);
+
+  // 计算地图居中位置
+  // auto visibleSize = Director::getInstance()->getVisibleSize();
+  // auto origin = Director::getInstance()->getVisibleOrigin();
+  // float x = origin.x + (visibleSize.width - tmxMap->getContentSize().width) /
+  // 2; float y =
+  //     origin.y + (visibleSize.height - tmxMap->getContentSize().height) / 2;
+  // tmxMap->setPosition(Vec2(x, y));
 
   // 初始化玩家
   if (!initPlayer()) {
     return false;
   }
 
-  // 获取农场配置
-  FarmTypeConfig islandConfig =
-      FarmConfigManager::getInstance()->getFarmConfig("island");
+  loadObjectLayers();
 
-  // 对父容器进行缩放（例如放大两倍）
-  float scaleFactor = 2.0f;
-  mapContainer->setScale(scaleFactor);
-  mapContainer->setPosition(Vec2(0, 0));
-  CCLOG("已对地图容器进行缩放，缩放比例: %.2f", scaleFactor);
-
-  // 设置相机
-  setupCamera();
+  // // 设置相机
+  // setupCamera();
 
   // 设置键盘输入
   setupKeyboard();
@@ -42,126 +43,16 @@ bool GameScene::init() {
   return true;
 }
 
-// GameScene.cpp
-
-bool GameScene::initTileMap() {
-  // 创建父容器节点
-  mapContainer = cocos2d::Node::create();
-  this->addChild(mapContainer);
-
-  // 加载瓦片地图
-  tmxMap = cocos2d::TMXTiledMap::create("maps/farm/island/island_spring.tmx");
-  if (tmxMap) {
-    // 设置锚点和位置
-    tmxMap->setAnchorPoint(cocos2d::Vec2(0, 0));
-    tmxMap->setPosition(cocos2d::Vec2(0, 0));
-    baseLayer = tmxMap->getLayer("base");
-
-    // 将地图添加到父容器
-    mapContainer->addChild(tmxMap);
-    // this->addChild(tmxMap);
-    tmxMap->setName("tmxMap");
-
-    // 获取地图和图块尺寸（可选，用于调试）
-    cocos2d::Size mapSizeInTiles = tmxMap->getMapSize();
-    cocos2d::Size tileSize = tmxMap->getTileSize();
-    float mapPixelWidth = mapSizeInTiles.width * tileSize.width;
-    float mapPixelHeight = mapSizeInTiles.height * tileSize.height;
-
-    // 绘制地图边界（可选，用于调试）
-    auto border = cocos2d::DrawNode::create();
-    cocos2d::Vec2 vertices[4] = {cocos2d::Vec2(0, 0),
-                                 cocos2d::Vec2(mapPixelWidth, 0),
-                                 cocos2d::Vec2(mapPixelWidth, mapPixelHeight),
-                                 cocos2d::Vec2(0, mapPixelHeight)};
-    border->drawPoly(vertices, 4, true, cocos2d::Color4F::GREEN);
-    tmxMap->addChild(border, 100); // 确保边框在最上层
-
-    // 加载房屋精灵
-    // loadHouseSprites();
-
-    loadObjectLayers();
-
-    return true;
-  } else {
-    CCLOG("加载地图失败，当前工作目录: %s", cocos2d::FileUtils::getInstance()
-                                                ->getDefaultResourceRootPath()
-                                                .c_str());
-    return false;
-  }
-}
-
 bool GameScene::initPlayer() {
-  // 创建玩家精灵
-  player = cocos2d::Sprite::create("HelloWorld.png");
-  player->setScale(0.2f); // 设置缩放比例
+  player = Sprite::create("HelloWorld.png");
+  player->setScale(0.2f);
   if (player) {
-    // CCLOG("initPlayer: 玩家精灵已创建，名称: %s", player->getName().c_str());
-    // 设置锚点为左下角
-    player->setAnchorPoint(cocos2d::Vec2(0, 0));
-
-    // 设置玩家初始位置为地图中心
-    player->setPosition(cocos2d::Vec2(1600, 1600));
-    // 创建一个动态的物理体积
-    auto physicsBody = cocos2d::PhysicsBody::createBox(
-        player->getContentSize(),
-        cocos2d::PhysicsMaterial(1.0f, 0.5f, 0.5f) // 根据需求调整物理材料参数
-    );
-    physicsBody->setDynamic(false);        // 动态物体
-    physicsBody->setCategoryBitmask(0x01); // 类别掩码
-    // physicsBody->setCollisionBitmask(0x02);         // 与房屋碰撞
-    physicsBody->setCollisionBitmask(0xFFFFFFF);    // 与房屋碰撞
-    physicsBody->setContactTestBitmask(0xFFFFFFFF); // 接触测试掩码
-
-    // CCLOG("玩家已添加物理体积。");
-
-    // 将物理体积添加到玩家
-    // this->addComponent(physicsBody);
-    player->setPhysicsBody(physicsBody);
-
-    if (player->getPhysicsBody()) {
-      CCLOG("玩家精灵已成功添加物理体积。");
-    } else {
-      CCLOG("玩家精灵未能添加物理体积！");
-    }
-
-    // 将玩家添加到父容器
-    mapContainer->addChild(player);
-    // this->addChild(player);
-    // tmxMap->addChild(player, 1000);
-    // CCLOG("玩家精灵已创建并添加到场景，初始位置: (1600, 1600)");
-
-    // 验证玩家位置是否在地图范围内
-    cocos2d::Size mapSizeInTiles = tmxMap->getMapSize();
-    cocos2d::Size tileSize = tmxMap->getTileSize();
-    float mapPixelWidth = mapSizeInTiles.width * tileSize.width;
-    float mapPixelHeight = mapSizeInTiles.height * tileSize.height;
-    cocos2d::Vec2 playerPos = player->getPosition();
-    // CCLOG("玩家位置验证: x = %.2f, y = %.2f", playerPos.x, playerPos.y);
-    if (playerPos.x < 0 || playerPos.x > mapPixelWidth || playerPos.y < 0 ||
-        playerPos.y > mapPixelHeight) {
-      CCLOG("警告: 玩家初始位置超出地图范围!");
-    }
-
-    // 获取精灵的原始尺寸
-    cocos2d::Size spriteSize = player->getContentSize();
-
-    // 添加调试边框（可选）
-    auto debugRect = cocos2d::DrawNode::create();
-    cocos2d::Vec2 vertices[4] = {
-        cocos2d::Vec2(0, 0), cocos2d::Vec2(spriteSize.width, 0),
-        cocos2d::Vec2(spriteSize.width, spriteSize.height),
-        cocos2d::Vec2(0, spriteSize.height)};
-    debugRect->drawRect(vertices[0], vertices[1], vertices[2], vertices[3],
-                        cocos2d::Color4F::BLUE);
-    player->addChild(debugRect);
-    // CCLOG("已为玩家添加调试边框");
-
-    return true;
-  } else {
-    CCLOG("创建玩家精灵失败");
-    return false;
+    player->setAnchorPoint(Vec2(0, 0));
+    player->setPosition(Vec2(800, 800)); // 设置到地图中心位置
+    this->addChild(player); // 直接添加到场景而不是mapContainer
+    // ...existing code...
   }
+  return true;
 }
 
 void GameScene::setupCamera() {
@@ -174,6 +65,7 @@ void GameScene::setupCamera() {
   // 启用每帧更新
   this->scheduleUpdate();
 }
+
 void GameScene::movePlayerRandomly(float dt) {
   if (!player || !tmxMap)
     return;
@@ -292,57 +184,29 @@ void GameScene::createHouseSprite(TMXTiledMap *map, int gid, float x, float y,
 }
 
 void GameScene::update(float dt) {
-  // 调用父类的更新方法
   Scene::update(dt);
 
-  // 获取默认摄像机
+  if (!player || !tmxMap)
+    return;
+
   auto camera = this->getDefaultCamera();
 
-  // 获取地图尺寸
-  cocos2d::Size mapSizeInTiles = tmxMap->getMapSize();
-  cocos2d::Size tileSize = tmxMap->getTileSize();
-  float mapWidth =
-      mapSizeInTiles.width * tileSize.width * mapContainer->getScale();
-  float mapHeight =
-      mapSizeInTiles.height * tileSize.height * mapContainer->getScale();
+  // 获取地图实际尺寸
+  Size mapSize = tmxMap->getContentSize();
+  Size visibleSize = Director::getInstance()->getVisibleSize();
 
-  // 获取可视区域尺寸
-  cocos2d::Size visibleSize =
-      cocos2d::Director::getInstance()->getVisibleSize();
-  float halfWidth = visibleSize.width / 2;
-  float halfHeight = visibleSize.height / 2;
+  // 获取玩家位置
+  Vec2 playerPos = player->getPosition();
 
-  // 获取玩家位置并考虑缩放
-  cocos2d::Vec2 playerPos = player->getPosition() * mapContainer->getScale();
+  // 限制相机范围
+  float x = clampf(playerPos.x, visibleSize.width / 2,
+                   mapSize.width - visibleSize.width / 2);
+  float y = clampf(playerPos.y, visibleSize.height / 2,
+                   mapSize.height - visibleSize.height / 2);
 
-  // 限制摄像机位置，使其不超出地图边界
-  float minX = halfWidth;
-  float maxX = mapWidth - halfWidth;
-  float minY = halfHeight;
-  float maxY = mapHeight - halfHeight;
-
-  float posX = playerPos.x;
-  float posY = playerPos.y;
-
-  // 防止摄像机超出左、下边界
-  if (posX < minX) {
-    posX = minX;
-  }
-  if (posY < minY) {
-    posY = minY;
-  }
-
-  // 防止摄像机超出右、上边界
-  if (posX > maxX) {
-    posX = maxX;
-  }
-  if (posY > maxY) {
-    posY = maxY;
-  }
-
-  // 设置摄像机位置
-  camera->setPosition(cocos2d::Vec2(posX, posY));
+  camera->setPosition(Vec2(x, y));
 }
+
 // 自定义绘制方法
 void GameScene::draw(Renderer *renderer, const Mat4 &transform,
                      uint32_t flags) {
@@ -506,7 +370,7 @@ void GameScene::draw(Renderer *renderer, const Mat4 &transform,
 
 //   // 遍历每个图块，添加边界碰撞
 //   for (int x = 0; x < mapSize.width; ++x) {
-//     for (int y = 0; y < mapSize.height; ++y) {
+//     for (int y = 0; x < mapSize.height; ++y) {
 //       int gid = layer->getTileGIDAt(cocos2d::Vec2(x, y));
 //       if (gid != 0) { // 有图块
 //                       // 获取图块属性（如果有）
@@ -598,7 +462,7 @@ void GameScene::addPhysicalToLayer(TMXLayer *layer) {
   // Size tileSize = layer->getTileSize();
 
   // for (int x = 0; x < mapSize.width; ++x) {
-  //   for (int y = 0; y < mapSize.height; ++y) {
+  //   for (int y = 0; x < mapSize.height; ++y) {
   //     int gid = layer->getTileGIDAt(Vec2(x, y));
   //     if (gid != 0) { // 有图块
   //       // 获取图块属性（如果有）
@@ -679,18 +543,74 @@ void GameScene::loadObjectLayers() {
                                            "obj_mv_1", "static_1", "static_4",
                                            "static_5"};
 
-  // 获取农场配置
-  FarmTypeConfig islandConfig =
-      FarmConfigManager::getInstance()->getFarmConfig("island");
+  // 获取农场配置并添加错误检查
+  auto configManager = FarmConfigManager::getInstance();
+  if (!configManager) {
+    CCLOG("FarmConfigManager实例获取失败");
+    return;
+  }
+
+  FarmTypeConfig islandConfig;
+  try {
+    islandConfig = configManager->getFarmConfig("island");
+  } catch (const std::exception &e) {
+    CCLOG("获取农场配置失败: %s", e.what());
+    return;
+  }
+
   for (const auto &layerName : objectLayers) {
-    std::string spritePath = LayerRendererFactory::getSpritePath(layerName);
-    auto objectGroup = map->getObjectGroup(layerName);
-    if (!spritePath.empty()) {
-      LayerRenderer::renderObjectLayer(
-          objectGroup, map, layerName, spritePath,
-          islandConfig.layers.objectLayers[layerName]);
-    } else {
-      CCLOG("未找到对象层 '%s' 的精灵路径。", layerName.c_str());
+    try {
+      CCLOG("开始处理图层: %s", layerName.c_str());
+
+      auto objectGroup = map->getObjectGroup(layerName);
+      if (!objectGroup) {
+        CCLOG("未找到对象组: %s", layerName.c_str());
+        continue;
+      }
+
+      // 检查对象组是否为空
+      auto objects = objectGroup->getObjects();
+      if (objects.empty()) {
+        CCLOG("对象组 %s 中没有对象", layerName.c_str());
+        continue;
+      }
+
+      std::string spritePath = LayerRendererFactory::getSpritePath(layerName);
+      if (spritePath.empty()) {
+        CCLOG("未找到对象层 '%s' 的精灵路径", layerName.c_str());
+        continue;
+      }
+
+      // 验证文件是否存在
+      if (!FileUtils::getInstance()->isFileExist(spritePath)) {
+        CCLOG("精灵文件不存在: %s", spritePath.c_str());
+        continue;
+      }
+
+      // 检查配置是否存在
+      if (islandConfig.layers.objectLayers.find(layerName) ==
+          islandConfig.layers.objectLayers.end()) {
+        CCLOG("在配置中未找到图层 %s 的属性", layerName.c_str());
+        continue;
+      }
+
+      // 安全地获取图层属性
+      const auto &layerProps = islandConfig.layers.objectLayers.at(layerName);
+
+      CCLOG("准备渲染图层 %s", layerName.c_str());
+      CCLOG("对象数量: %zu", objects.size());
+
+      LayerRenderer::renderObjectLayer(objectGroup, map, layerName, spritePath,
+                                       layerProps);
+
+      CCLOG("图层 %s 处理完成", layerName.c_str());
+
+    } catch (const std::exception &e) {
+      CCLOG("处理图层 %s 时发生错误: %s", layerName.c_str(), e.what());
+    } catch (...) {
+      CCLOG("处理图层 %s 时发生未知错误", layerName.c_str());
     }
   }
+
+  CCLOG("所有图层处理完成");
 }
