@@ -96,68 +96,6 @@ void GameScene::movePlayerRandomly(float dt) {
   player->runAction(sequence);
 }
 
-void GameScene::createHouseSprite(TMXTiledMap *map, int gid, float x, float y,
-                                  float width, float height) {
-  // 假设 gid=5 对应 "spring.png"
-  std::string spriteFile = "maps/farm/island/asset/house/house_1/spring.png";
-
-  // 创建精灵
-  auto sprite = Sprite::create(spriteFile);
-  if (sprite) {
-    // 设置锚点为左下角
-    sprite->setAnchorPoint(Vec2(0, 0));
-
-    // 获取精灵的原始尺寸
-    Size spriteSize = sprite->getContentSize();
-
-    // 获取地图尺寸和图块尺寸
-    Size mapSizeInTiles = map->getMapSize();
-    Size tileSize = map->getTileSize();
-    float mapPixelWidth = mapSizeInTiles.width * tileSize.width;
-    float mapPixelHeight = mapSizeInTiles.height * tileSize.height;
-
-    // 计算缩放比例以匹配对象的尺寸
-    float scaleX = (width > 0) ? width / spriteSize.width : 1.0f;
-    float scaleY = (height > 0) ? height / spriteSize.height : 1.0f;
-    sprite->setScale(scaleX, scaleY);
-
-    // 计算对象的正确位置
-    // Cocos2d-x 的 y 坐标需要进行转换
-    float correctedY = y;
-    float correctedX = x;
-
-    // 设置精灵的位置
-    sprite->setPosition(Vec2(correctedX, correctedY));
-
-    // 设置 Z 顺序，确保房屋在基础层之上
-    sprite->setLocalZOrder(1);
-
-    // 将精灵添加到地图节点
-    map->addChild(sprite);
-
-    if (sprite->getPhysicsBody()) {
-      CCLOG("房屋精灵已成功添加物理体积。");
-    } else {
-      CCLOG("房屋精灵未能添加物理体积！");
-    }
-
-    // 添加调试边框（可选）
-    auto debugRect = DrawNode::create();
-    Vec2 vertices[4] = {Vec2(0, 0), Vec2(width, 0), Vec2(width, height),
-                        Vec2(0, height)};
-    debugRect->drawRect(vertices[0], vertices[1], vertices[2], vertices[3],
-                        Color4F::RED);
-    sprite->addChild(debugRect);
-
-    // 添加位置标记（可选）
-    auto marker = DrawNode::create();
-    marker->drawDot(Vec2(correctedX, correctedY), 5, Color4F::BLUE);
-    map->addChild(marker, 200); // 确保标记在房屋精灵之上
-  } else {
-    CCLOG("无法创建精灵，文件: %s", spriteFile.c_str());
-  }
-}
-
 void GameScene::update(float dt) {
   Scene::update(dt);
 
