@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>frames</key>
+        <dict>
+            <key>tree_2_1.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{100,131}</string>
+                <key>spriteSourceSize</key>
+                <string>{100,131}</string>
+                <key>textureRect</key>
+                <string>{{0,0},{100,131}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
+        </dict>
+        <key>metadata</key>
+        <dict>
+            <key>format</key>
+            <integer>3</integer>
+            <key>pixelFormat</key>
+            <string>RGBA8888</string>
+            <key>premultiplyAlpha</key>
+            <false/>
+            <key>realTextureFileName</key>
+            <string>tree_2_summer.png</string>
+            <key>size</key>
+            <string>{100,131}</string>
+            <key>smartupdate</key>
+            <string>$TexturePacker:SmartUpdate:fa0662eb500fe5b055e1f19d6181f5ab:3c23bf0742c1af5aa5c23901918cb57c:e035bed6a90d311f88c3d106c549e373$</string>
+            <key>textureFileName</key>
+            <string>tree_2_summer.png</string>
+        </dict>
+    </dict>
+</plist>
