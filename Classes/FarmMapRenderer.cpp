@@ -13,31 +13,31 @@ FarmMapRenderer *FarmMapRenderer::getInstance() {
   return instance;
 }
 
-void FarmMapRenderer::renderMap(TMXTiledMap *map, const std::string &season) {
+void FarmMapRenderer::renderMap(TMXTiledMap *map, const std::string &season, const std::string &mapType) {
   if (!map) {
     CCLOG("地图未正确加载。");
     return;
   }
 
-  renderTileLayers(map, season);
-  renderObjectLayers(map, season);
-  renderStaticObjectLayers(map, season);
+  renderTileLayers(map, season, mapType);
+  renderObjectLayers(map, season, mapType);
+  renderStaticObjectLayers(map, season, mapType);
 }
 
-void FarmMapRenderer::renderTileLayers(TMXTiledMap *map, const std::string &season) {
+void FarmMapRenderer::renderTileLayers(TMXTiledMap *map, const std::string &season, const std::string& mapType) {
   // 处理基础图层的渲染
   auto configManager = FarmConfigManager::getInstance();
   if (!configManager)
     return;
 
   try {
-    auto config = configManager->getFarmConfig("island");
+    auto config = configManager->getFarmConfig(mapType);
   } catch (const std::exception &e) {
     CCLOG("渲染图块层时发生错误: %s", e.what());
   }
 }
 
-void FarmMapRenderer::renderObjectLayers(TMXTiledMap *map, const std::string &season) {
+void FarmMapRenderer::renderObjectLayers(TMXTiledMap *map, const std::string &season, const std::string& mapType) {
   // 获取农场配置
   auto configManager = FarmConfigManager::getInstance();
   if (!configManager) {
@@ -47,7 +47,7 @@ void FarmMapRenderer::renderObjectLayers(TMXTiledMap *map, const std::string &se
 
   FarmTypeConfig config;
   try {
-    config = configManager->getFarmConfig("island");
+    config = configManager->getFarmConfig(mapType);
   } catch (const std::exception &e) {
     CCLOG("获取农场配置失败: %s", e.what());
     return;
@@ -78,8 +78,8 @@ void FarmMapRenderer::renderObjectLayers(TMXTiledMap *map, const std::string &se
       // 使用传入的season参数
       
       std::string spritePath =
-          SpritePathManager::getIslandSpritePath(layerName, // 层名称
-                                               "island",  // 农场类型
+          SpritePathManager::getFarmSpritePath(layerName, // 层名称
+                                               mapType,  // 农场类型
                                                season     // 使用传入的季节参数
           );
           
@@ -115,13 +115,13 @@ void FarmMapRenderer::renderObjectLayers(TMXTiledMap *map, const std::string &se
   }
 }
 
-void FarmMapRenderer::renderStaticObjectLayers(TMXTiledMap *map, const std::string &season) {
+void FarmMapRenderer::renderStaticObjectLayers(TMXTiledMap *map, const std::string &season, const std::string& mapType) {
   auto configManager = FarmConfigManager::getInstance();
   if (!configManager)
     return;
 
   try {
-    auto config = configManager->getFarmConfig("island");
+    auto config = configManager->getFarmConfig(mapType);
   } catch (const std::exception &e) {
     CCLOG("渲染静态对象层时发生错误: %s", e.what());
   }

@@ -27,12 +27,41 @@ public:
     void updateInventoryDisplay();
     void onSlotClicked(int row, int col);
     void selectItemFromInventory(int index);
+    bool getIsInventoryOpen() const { return isInventoryOpen; }
+    void setIsInventoryOpen(bool open) { isInventoryOpen = open; }
+
+    const std::string& getName() const { return m_name; }
+    void setName(const std::string& name) { m_name = name; }
+    const std::string& getGender() const { return m_gender; }
+    void setGender(const std::string& gender) { m_gender = gender; }
+    const int getMoney() const { return m_money; }
+    void setMoney(int money) { m_money = money; }
+    int getHealth() const { return m_health; }
+    void setHealth(int health) { m_health = health; }
+    int getEnergy() const { return m_energy; }
+    void setEnergy(int energy) { m_energy = energy; }
+    Inventory* getInventory() const { return inventory; }
+    std::pair<int, int> getSelectedSlot() const { return selectedSlot; }
+    void setSelectedSlot(int first, int second) { selectedSlot = std::make_pair(first, second); }
+
+    int getDirection() const { return m_direction; }
+    void setDirection(int direction) { m_direction = direction; }
+    bool isMoving() const { return m_isMoving; }
+    void setMoving(bool moving) { m_isMoving = moving; }
+
 
     // 物品系统
     Item* getSelectedItem();
     bool reduceSelectedItemQuantity(int quantity, bool status);
     cocos2d::Sprite* getHeldItemSprite() const;
+   
+    //制造系统
     void toggleSlotImage();
+    bool getIsSlotImageOpen() const { return isSlotImageOpen; }
+    void setIsSlotImageOpen(bool open) { isSlotImageOpen = open; }
+
+   
+  
 
     // 新增：透明度控制
     void updateVisibility(bool isPenetrable) {
