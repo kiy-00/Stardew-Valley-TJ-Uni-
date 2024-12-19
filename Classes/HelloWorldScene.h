@@ -3,6 +3,7 @@
 
 #include "FarmMapManager.h"
 #include "cocos2d.h"
+#include "User.h"
 
 class HelloWorldScene : public cocos2d::Scene {
 public:
@@ -17,8 +18,7 @@ private:
   std::string currentMapType;
   std::string currentSeason;
 
-  // 玩家相关
-  cocos2d::Sprite *playerSprite;
+  User* player;
 
   // 初始化函数
   bool initMap();
@@ -33,5 +33,10 @@ private:
 
   // 更新函数
   void update(float dt) override;
-  void updatePlayerVisibility(const cocos2d::Vec2 &position);
+ 
+  // 新增函数声明
+  void initInventory();
+  void setupMouse();
+  void onMouseClick(cocos2d::EventMouse* event);
+  void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 };
