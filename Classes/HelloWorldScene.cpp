@@ -37,7 +37,18 @@ bool HelloWorldScene::init() {
     setupKeyboard();
     this->scheduleUpdate();
 
+    // 初始化交互管理器
+    interactionManager = FarmInteractionManager::getInstance();
+    interactionManager->init(this, player, farmMapManager);
+    
+    // 添加更新回调
+    this->schedule([this](float dt) {
+        interactionManager->update(dt);
+    }, 0.1f, "interaction_update");
+
+    // 设置测试
     setupSeasonTest();
+    // setupWeatherTest();  // 暂时注释掉天气测试
 
     return true;
 }
@@ -182,6 +193,9 @@ void HelloWorldScene::onSeasonChanged(const std::string &newSeason) {
         CCLOG("Failed to re-init map with new season: %s", newSeason.c_str());
         return;
     }
+    
+    // 通知交互管理器
+    interactionManager->onSeasonChanged(newSeason);
 }
 
 void HelloWorldScene::setupSeasonTest() {
@@ -216,4 +230,31 @@ void HelloWorldScene::switchToNextSeason(float dt) {
 void HelloWorldScene::updateSeasonLabel(const std::string& season) {
     std::string text = "Current Season: " + season;
     seasonLabel->setString(text);
+}
+
+void HelloWorldScene::setupWeatherTest() {
+    currentWeatherIndex = 0;
+    
+    // 创建天气显示标签
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    weatherLabel = Label::createWithTTF("Current Weather: Sunny", "fonts/Marker Felt.ttf", 24);
+    weatherLabel->setPosition(Vec2(visibleSize.width/2, visibleSize.height - 60));
+    this->addChild(weatherLabel, 1000);
+    
+    // 设置定时器，每20秒切换一次天气
+    this->schedule(CC_SCHEDULE_SELECTOR(HelloWorldScene::switchToNextWeather), 20.0f);
+    
+    // 初始通知
+    interactionManager->onWeatherChanged("sunny");
+}
+
+void HelloWorldScene::switchToNextWeather(float dt) {
+    currentWeatherIndex = (currentWeatherIndex + 1) % weathers.size();
+    std::string newWeather = weathers[currentWeatherIndex];
+    
+    // 更新标签
+    weatherLabel->setString("Current Weather: " + newWeather);
+    
+    // 通知交互管理器
+    interactionManager->onWeatherChanged(newWeather);
 }

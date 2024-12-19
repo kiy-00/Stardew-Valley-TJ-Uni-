@@ -2,6 +2,7 @@
 #pragma once
 
 #include "FarmMapManager.h"
+#include "FarmInteractionManager.h"  // 添加交互管理器头文件
 #include "cocos2d.h"
 #include "User.h"
 
@@ -48,4 +49,13 @@ private:
   void setupSeasonTest();
   void switchToNextSeason(float dt);
   void updateSeasonLabel(const std::string& season);
+
+  // 新增天气相关
+  FarmInteractionManager* interactionManager;
+  void setupWeatherTest();
+  void switchToNextWeather(float dt);
+  cocos2d::Label* weatherLabel;
+  int currentWeatherIndex;
+  std::vector<std::string> weathers = {"sunny", "cloudy", "rainy"};
+  float currentGameTime = 6.0f; // 游戏开始时间为早上6点
 };
