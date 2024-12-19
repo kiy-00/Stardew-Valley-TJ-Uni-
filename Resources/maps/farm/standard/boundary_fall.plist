@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>frames</key>
+        <dict>
+            <key>boundary_stone.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{32,32}</string>
+                <key>spriteSourceSize</key>
+                <string>{32,32}</string>
+                <key>textureRect</key>
+                <string>{{0,0},{32,32}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
+        </dict>
+        <key>metadata</key>
+        <dict>
+            <key>format</key>
+            <integer>3</integer>
+            <key>pixelFormat</key>
+            <string>RGBA8888</string>
+            <key>premultiplyAlpha</key>
+            <false/>
+            <key>realTextureFileName</key>
+            <string>boundary_fall.png</string>
+            <key>size</key>
+            <string>{32,32}</string>
+            <key>smartupdate</key>
+            <string>$TexturePacker:SmartUpdate:4e8a2c44488d2ecaa0d157feef207d3f:6faf1ebf9195b9841d0dce3df4e296c5:0b9ea296eb3cc8babb0daf0ac3d5c46d$</string>
+            <key>textureFileName</key>
+            <string>boundary_fall.png</string>
+        </dict>
+    </dict>
+</plist>

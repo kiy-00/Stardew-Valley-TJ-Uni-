@@ -1,0 +1,261 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "standard_summer.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "全部文件 (*)",
+    "fileStates": {
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/arable.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/base_spring.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/base_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/boat.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/boundary_spring.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/boundary_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/bushes.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/bushes_1_spring.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/bushes_1_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/floor.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/house_1_spring.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/house_1_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/island_spring.tmx": {
+            "scale": 0.7338749999999999,
+            "selectedLayer": 8,
+            "viewCenter": {
+                "x": 799.8637370124341,
+                "y": 799.8637370124341
+            }
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/island_summer.tmx": {
+            "scale": 0.7338749999999999,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 799.8637370124341,
+                "y": 799.8637370124341
+            }
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/myhouse_1_spring.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/myhouse_1_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/stone.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/tree_2_spring.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/tree_2_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "arable.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "arable_2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "base_fall.tsx": {
+            "scaleInDock": 1
+        },
+        "base_spring.tsx": {
+            "scaleInDock": 0.9977,
+            "scaleInEditor": 1
+        },
+        "base_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "base_winter.tsx": {
+            "scaleInDock": 1
+        },
+        "boundary_fall.tsx": {
+            "scaleInDock": 1
+        },
+        "boundary_spring.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "boundary_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "boundary_winter.tsx": {
+            "scaleInDock": 1
+        },
+        "bushes_1_winter.tsx": {
+            "scaleInDock": 1
+        },
+        "house_1_fall.tsx": {
+            "scaleInDock": 1
+        },
+        "house_1_spring.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "house_1_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "house_1_winter.tsx": {
+            "scaleInDock": 1
+        },
+        "myhouse_1_fall.tsx": {
+            "scaleInDock": 1
+        },
+        "myhouse_1_spring.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "myhouse_1_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "myhouse_1_winter.tsx": {
+            "scaleInDock": 1
+        },
+        "obj_forbidden_tree_fall.tsx": {
+            "scaleInDock": 1
+        },
+        "obj_forbidden_tree_spring.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "obj_forbidden_tree_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "obj_forbidden_tree_winter.tsx": {
+            "scaleInDock": 1
+        },
+        "obj_move_bushes_fall.tsx": {
+            "scaleInDock": 1
+        },
+        "obj_move_bushes_spring.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "obj_move_bushes_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "obj_move_bushes_winter.tsx": {
+            "scaleInDock": 1
+        },
+        "standard_fall.tmx": {
+            "scale": 0.7338749999999999,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 799.8637370124341,
+                "y": 799.8637370124341
+            }
+        },
+        "standard_spring.tmx": {
+            "expandedObjectLayers": [
+                10,
+                7,
+                11,
+                8,
+                9
+            ],
+            "scale": 0.7338749999999999,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 799.8637370124341,
+                "y": 800.545051950264
+            }
+        },
+        "standard_summer.tmx": {
+            "scale": 0.558125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 799.104143337066,
+                "y": 799.1041433370661
+            }
+        },
+        "standard_winter.tmx": {
+            "scale": 0.558125,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 799.104143337066,
+                "y": 960.3583426651737
+            }
+        },
+        "static_2_stone.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "static_3_cobblestone.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "static_4_flower.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.imagePath": "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard",
+    "map.fixedSize": true,
+    "map.height": 50,
+    "map.lastUsedFormat": "tmx",
+    "map.layerDataFormat": "3",
+    "map.orientation": 1,
+    "map.tileHeight": 32,
+    "map.tileWidth": 32,
+    "map.width": 50,
+    "openFiles": [
+        "standard_spring.tmx",
+        "standard_summer.tmx",
+        "standard_winter.tmx",
+        "standard_fall.tmx"
+    ],
+    "project": "standard.tiled-project",
+    "recentFiles": [
+        "standard_spring.tmx",
+        "standard_fall.tmx",
+        "standard_winter.tmx",
+        "standard_summer.tmx",
+        "base_spring.tsx",
+        "arable.tsx",
+        "myhouse_1_spring.tsx",
+        "house_1_spring.tsx",
+        "obj_move_bushes_spring.tsx",
+        "obj_forbidden_tree_spring.tsx",
+        "static_2_stone.tsx",
+        "static_3_cobblestone.tsx"
+    ],
+    "tileset.embedInMap": false,
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.margin": 0,
+    "tileset.spacing": 0,
+    "tileset.tileSize": {
+        "height": 32,
+        "width": 32
+    },
+    "tileset.transparentColor": "#ff00ff",
+    "tileset.type": 0,
+    "tileset.useTransparentColor": false
+}

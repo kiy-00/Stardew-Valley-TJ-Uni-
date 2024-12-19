@@ -117,6 +117,119 @@
               {"id": "merchant", "position": [15, 15]},
               {"id": "fisher", "position": [5, 25]}
           ]
+      },
+      "standard": {
+          "tmx_path": "maps/farm/standard/standard.tmx",
+          "display_name": "标准农场",
+          "collision_config": "configs/maps/farm_collisions/standard.json",
+          "farm_properties": {
+              "max_crop_slots": 33,
+              "water_source": true,
+              "initial_unlocked": true
+          },
+          "layers": {
+              "tile_layers": {
+                  "boundary": {
+                      "boundary": true,
+                      "physical": false,
+                      "base": false,
+                      "penetrable": false,
+                      "arable": false,
+                      "fishing":true
+                  },
+                  "base": {
+                      "boundary": false,
+                      "physical": false,
+                      "base": true,
+                      "penetrable": false,
+                      "arable": false,
+                      "fishing":false
+                  },
+                  "arable": {
+                      "boundary": false,
+                      "physical": false,
+                      "base": false,
+                      "penetrable": false,
+                      "arable": true,
+                      "fishing":false
+                  }
+              },
+              "object_layers": {
+                  "house": {
+                      "boundary": false,
+                      "physical": true,
+                      "base": false,
+                      "penetrable": false
+                  },
+                  "myhouse": {
+                      "boundary": false,
+                      "physical": true,
+                      "base": false,
+                      "penetrable": false
+                  },
+                  "obj_fb_2": {
+                      "boundary": false,
+                      "physical": true,
+                      "base": false,
+                      "penetrable": false
+                  },
+                  "obj_mv_1": {
+                      "boundary": false,
+                      "physical": false,
+                      "base": false,
+                      "penetrable": true
+                  },
+                  "static_2": {
+                      "boundary": false,
+                      "physical": true,
+                      "base": false,
+                      "penetrable": false
+                  },
+                  "static_3": {
+                    "boundary": false,
+                    "physical": true,
+                    "base": false,
+                    "penetrable": false
+                  },
+                "static_4": {
+                    "boundary": false,
+                    "physical": false,
+                    "base": false,
+                    "penetrable": true
+                  }
+
+              },
+              "static_object_layers": {
+                  "decoration": {
+                     "boundary": false,
+                     "physical": false,
+                     "base": false,
+                     "penetrable": true
+                  }
+              }
+          },
+          "season_features": {
+              "spring": {
+                  "available_crops": ["strawberry", "potato"],
+                  "special_events": ["spring_harvest"]
+              },
+              "summer": {
+                  "available_crops": ["tomato", "corn"],
+                  "special_events": ["summer_festival"]
+              },
+              "fall": {
+                  "available_crops": ["pumpkin", "carrot"],
+                  "special_events": ["fall_harvest"]
+              },
+              "winter": {
+                  "available_crops": ["winter_berry"],
+                  "special_events": ["winter_gathering"]
+              }
+          },
+          "npc_spawn_points": [
+              {"id": "merchant", "position": [15, 15]},
+              {"id": "fisher", "position": [5, 25]}
+          ]
       }
   }
 }

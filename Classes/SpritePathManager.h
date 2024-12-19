@@ -5,7 +5,7 @@
 class SpritePathManager {
 public:
   // 只保留农场相关的接口
-  static std::string getFarmSpritePath(
+  static std::string getIslandSpritePath(
       const std::string &layerName, // 层名称，如 "house", "obj_fb_2"
       const std::string &farmType,  // 农场类型，如 "island"
       const std::string &season     // 季节，如 "spring"

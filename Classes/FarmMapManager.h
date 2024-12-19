@@ -41,6 +41,9 @@ public:
   //   int getMaxCropSlots() const;
   //   bool hasWaterSource() const;
   //   bool isInitiallyUnlocked() const;
+  bool checkLayerProperty(const Vec2 &worldPos, const std::string &layerName,
+                          const std::string &property) const;
+  Vec2 worldToTileCoord(const Vec2 &worldPos) const;
 
 private:
   FarmMapManager() : map(nullptr) {}
@@ -50,9 +53,7 @@ private:
   std::string currentFarmType;
   std::string currentSeason;  // 新增：存储当前季节
 
-  bool checkLayerProperty(const Vec2 &worldPos, const std::string &layerName,
-                          const std::string &property) const;
-  Vec2 worldToTileCoord(const Vec2 &worldPos) const;
+ 
 
   // 释放地图资源
   void releaseMap();

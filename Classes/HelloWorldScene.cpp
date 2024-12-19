@@ -65,7 +65,7 @@ bool HelloWorldScene::initPlayer() {
     Vec2 centerPosition = Vec2(mapSize.width / 2, mapSize.height / 2);
 
    
-    player->setAnchorPoint(Vec2(0.5f, 0.5f));
+    player->setAnchorPoint(Vec2(0.5, 0));
     player->setPosition(centerPosition);
 
     // 初始化物理系统
@@ -115,7 +115,7 @@ void HelloWorldScene::setupKeyboard() {
 }
 
 void HelloWorldScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
-    float moveDistance = 32.0f;
+    float moveDistance = 16.0f;
     Vec2 currentPos = player->getPosition();
     Vec2 targetPos = currentPos;
 

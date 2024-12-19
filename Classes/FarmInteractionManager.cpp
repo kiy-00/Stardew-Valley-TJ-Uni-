@@ -14,22 +14,45 @@ bool FarmInteractionManager::init(Scene* scene, User* player, FarmMapManager* ma
     this->player = player;
     this->mapManager = mapManager;
     
-    currentBubble = nullptr;
-    isShowingBubble = false;
-    currentInteraction = InteractionType::NONE;
+    // 初始化指示精灵并设置在屏幕中间
+    fishingSprite = Sprite::create("icons/fishing.png");
+    farmingSprite = Sprite::create("icons/farming.png");
     
-    // 初始化规则
-    InteractionRule fishingRule;
-    fishingRule.message = "按 F 钓鱼";
-    fishingRule.iconPath = "icons/fishing.png";
-    fishingRule.checkRadius = 64.0f;
-    interactionRules[InteractionType::FISHING] = fishingRule;
+    if(fishingSprite) {
+        Size visibleSize = Director::getInstance()->getVisibleSize();
+        Vec2 origin = Director::getInstance()->getVisibleOrigin();
+        fishingSprite->setPosition(Vec2(origin.x + visibleSize.width/2,
+                                      origin.y + visibleSize.height/2));
+        currentScene->addChild(fishingSprite, 1000);
+    }
     
-    InteractionRule farmingRule;
-    farmingRule.message = "按 F 耕地";
-    farmingRule.iconPath = "icons/farming.png";
-    farmingRule.checkRadius = 64.0f;
-    interactionRules[InteractionType::FARMING] = farmingRule;
+    if(farmingSprite) {
+        Size visibleSize = Director::getInstance()->getVisibleSize();
+        Vec2 origin = Director::getInstance()->getVisibleOrigin();
+        farmingSprite->setPosition(Vec2(origin.x + visibleSize.width/2 + 50,  // 稍微偏右一点
+                                      origin.y + visibleSize.height/2));
+        currentScene->addChild(farmingSprite, 1000);
+    }
+    
+    // 初始化调试标签
+    worldPosLabel = Label::createWithTTF("World Pos: ", "fonts/Marker Felt.ttf", 24);
+    tilePosLabel = Label::createWithTTF("Tile Pos: ", "fonts/Marker Felt.ttf", 24);
+    playerPosLabel = Label::createWithTTF("Player Pos: ", "fonts/Marker Felt.ttf", 24);
+    
+    if(worldPosLabel) {
+        worldPosLabel->setPosition(Vec2(150, 120));
+        currentScene->addChild(worldPosLabel, 1000);
+    }
+    
+    if(tilePosLabel) {
+        tilePosLabel->setPosition(Vec2(150, 80));
+        currentScene->addChild(tilePosLabel, 1000);
+    }
+    
+    if(playerPosLabel) {
+        playerPosLabel->setPosition(Vec2(150, 40));
+        currentScene->addChild(playerPosLabel, 1000);
+    }
     
     return true;
 }
@@ -41,62 +64,76 @@ void FarmInteractionManager::update(float dt) {
 
 void FarmInteractionManager::checkPlayerPosition() {
     Vec2 playerPos = player->getPosition();
+    Vec2 tileCoord = mapManager->worldToTileCoord(playerPos);
     
-    // 检查钓鱼点
-    if (mapManager->isFishingSpot(playerPos)) {
-        showInteractionBubble(InteractionType::FISHING, 
-            playerPos + bubbleOffset);
+    // 更新调试信息显示
+    if(worldPosLabel) {
+        std::string worldText = StringUtils::format("World Pos: (%.1f, %.1f)", 
+                                                  playerPos.x, playerPos.y);
+        worldPosLabel->setString(worldText);
     }
-    // 检查可耕种地点
-    else if (mapManager->isArable(playerPos)) {
-        showInteractionBubble(InteractionType::FARMING, 
-            playerPos + bubbleOffset);
+    
+    if(tilePosLabel) {
+        std::string tileText = StringUtils::format("Tile Pos: (%.1f, %.1f)", 
+                                                 tileCoord.x, tileCoord.y);
+        tilePosLabel->setString(tileText);
     }
-    else {
-        hideInteractionBubble();
+    
+    if(playerPosLabel) {
+        std::string playerText = StringUtils::format("Player Pos: (%.1f, %.1f)", 
+                                                   player->getPositionX(), 
+                                                   player->getPositionY());
+        playerPosLabel->setString(playerText);
+    }
+    
+    // 检查钓鱼点，只更新位置
+    if (mapManager->isFishingSpot(playerPos) && fishingSprite) {
+        fishingSprite->setPosition(playerPos + Vec2(0, 50));
+    }
+    
+    // 检查可耕种地点，只更新位置
+    if (mapManager->isArable(playerPos) && farmingSprite) {
+        farmingSprite->setPosition(playerPos + Vec2(0, 50));
     }
 }
 
-void FarmInteractionManager::showInteractionBubble(InteractionType type, const Vec2& position) {
-    if (currentInteraction == type && isShowingBubble) return;
-    
-    const auto& rule = interactionRules[type];
-    createBubble(rule.message, rule.iconPath);
-    
-    if (currentBubble) {
-        currentBubble->setPosition(position);
-        currentInteraction = type;
-        isShowingBubble = true;
-        currentBubble->show();
-    }
+// 注释掉原来的气泡相关代码
+/*
+void FarmInteractionManager::showInteractionBubble(...) {
+    // ...原有代码...
 }
 
 void FarmInteractionManager::hideInteractionBubble() {
-    if (currentBubble && isShowingBubble) {
-        currentBubble->hide();
-        isShowingBubble = false;
-        currentInteraction = InteractionType::NONE;
-    }
+    // ...原有代码...
 }
 
-void FarmInteractionManager::createBubble(const std::string& message, const std::string& iconPath) {
-    if (!currentBubble) {
-        currentBubble = InteractionBubble::create(message, iconPath);
-        if (currentBubble) {
-            currentScene->addChild(currentBubble, 1000);
-        }
-    } else {
-        currentBubble->updateMessage(message);
-    }
+void FarmInteractionManager::createBubble(...) {
+    // ...原有代码...
 }
+*/
 
 void FarmInteractionManager::cleanup() {
-    if (currentBubble) {
-        currentBubble->removeFromParent();
-        currentBubble = nullptr;
+    if(fishingSprite) {
+        fishingSprite->removeFromParent();
+        fishingSprite = nullptr;
     }
-    isShowingBubble = false;
-    currentInteraction = InteractionType::NONE;
+    if(farmingSprite) {
+        farmingSprite->removeFromParent();
+        farmingSprite = nullptr;
+    }
+    
+    if(worldPosLabel) {
+        worldPosLabel->removeFromParent();
+        worldPosLabel = nullptr;
+    }
+    if(tilePosLabel) {
+        tilePosLabel->removeFromParent();
+        tilePosLabel = nullptr;
+    }
+    if(playerPosLabel) {
+        playerPosLabel->removeFromParent();
+        playerPosLabel = nullptr;
+    }
 }
 
-// ... 其他方法的实现 ...
+

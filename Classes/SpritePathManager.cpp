@@ -1,7 +1,7 @@
 ﻿// SpritePathManager.cpp
 #include "SpritePathManager.h"
 
-std::string SpritePathManager::getFarmSpritePath(const std::string &layerName,
+std::string SpritePathManager::getIslandSpritePath(const std::string &layerName,
                                                  const std::string &farmType,
                                                  const std::string &season) {
   // 处理静态资源

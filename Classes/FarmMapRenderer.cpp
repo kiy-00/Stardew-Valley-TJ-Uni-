@@ -76,11 +76,17 @@ void FarmMapRenderer::renderObjectLayers(TMXTiledMap *map, const std::string &se
       }
 
       // 使用传入的season参数
+      
       std::string spritePath =
-          SpritePathManager::getFarmSpritePath(layerName, // 层名称
+          SpritePathManager::getIslandSpritePath(layerName, // 层名称
                                                "island",  // 农场类型
                                                season     // 使用传入的季节参数
           );
+          
+
+      //std::string spritePath =
+
+
 
       if (spritePath.empty()) {
         CCLOG("未找到对象层 '%s' 的精灵路径", layerName.c_str());

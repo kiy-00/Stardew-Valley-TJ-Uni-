@@ -53,6 +53,12 @@ private:
     InteractionType currentInteraction;
     bool isShowingBubble;
     Vec2 bubbleOffset = Vec2(0, 50);
+    Sprite* fishingSprite;
+    Sprite* farmingSprite;
+
+    Label* worldPosLabel;
+    Label* tilePosLabel;
+    Label* playerPosLabel;
 };
 
 #endif

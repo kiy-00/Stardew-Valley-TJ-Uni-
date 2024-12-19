@@ -65,7 +65,8 @@ Vec2 FarmMapManager::worldToTileCoord(const Vec2 &worldPos) const {
     return Vec2::ZERO;
 
   Size tileSize = map->getTileSize();
-  return Vec2(worldPos.x / tileSize.width,
+  // 修正 X 坐标的计算，减去一个瓦片的宽度
+  return Vec2((worldPos.x - tileSize.width) / tileSize.width,
               (map->getMapSize().height * tileSize.height - worldPos.y) /
                   tileSize.height);
 }
@@ -237,10 +238,43 @@ bool FarmMapManager::isArable(const Vec2 &worldPos) const {
 }
 
 bool FarmMapManager::isFishingSpot(const Vec2 &worldPos) const {
-  for (const auto &[layerName, props] : farmConfig.layers.tileLayers) {
-    if (props.fishing && checkLayerProperty(worldPos, layerName, "fishing")) {
-      return true;
+  if (!map) return false;
+  
+  Vec2 centerTile = worldToTileCoord(worldPos);
+  
+  // 检查以当前位置为中心的3x3范围
+  for (int offsetX = -1; offsetX <= 1; offsetX++) {
+    for (int offsetY = -1; offsetY <= 1; offsetY++) {
+      Vec2 checkTile(centerTile.x + offsetX, centerTile.y + offsetY);
+      
+      // 检查坐标是否在地图范围内
+      if (checkTile.x < 0 || checkTile.y < 0 ||
+          checkTile.x >= map->getMapSize().width ||
+          checkTile.y >= map->getMapSize().height) {
+        continue;
+      }
+
+      int tileLayerCount = 0;
+      TMXLayer* fishingLayer = nullptr;
+      
+      // 遍历所有瓦片图层
+      for (const auto &[layerName, props] : farmConfig.layers.tileLayers) {
+        auto layer = map->getLayer(layerName);
+        if (layer && layer->getTileGIDAt(checkTile)) {
+          tileLayerCount++;
+          // 如果这个图层有钓鱼属性，记住它
+          if (props.fishing) {
+            fishingLayer = layer;
+          }
+        }
+      }
+      
+      // 如果只有一个图层有瓦片，且是钓鱼图层
+      if (tileLayerCount == 1 && fishingLayer != nullptr) {
+        return true;
+      }
     }
   }
+  
   return false;
 }
