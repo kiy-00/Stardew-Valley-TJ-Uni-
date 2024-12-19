@@ -1,5 +1,5 @@
-// FarmMapManager.h
-#pragma once
+#ifndef FARM_MAP_MANAGER_H
+#define FARM_MAP_MANAGER_H
 #include "FarmConfigManager.h"
 #include "cocos2d.h"
 
@@ -9,7 +9,7 @@ class FarmMapManager {
 public:
   static FarmMapManager *getInstance();
 
-  bool initWithFarmType(const std::string &farmType);
+  bool initWithFarmType(const std::string &farmType, const std::string &season);
   TMXTiledMap *getMap() const { return map; }
 
   // 地图查询接口
@@ -19,17 +19,18 @@ public:
   bool isPhysical(const Vec2 &worldPos) const;
   bool isBase(const Vec2 &worldPos) const;
 
-  // 季节特性接口
-  std::vector<std::string> getAvailableCrops(const std::string &season) const;
-  std::vector<std::string> getSpecialEvents(const std::string &season) const;
+  //   // 季节特性接口
+  //   std::vector<std::string> getAvailableCrops(const std::string &season)
+  //   const; std::vector<std::string> getSpecialEvents(const std::string
+  //   &season) const;
 
-  // NPC相关
-  Vec2 getNPCSpawnPoint(const std::string &npcId) const;
+  //   // NPC相关
+  //   Vec2 getNPCSpawnPoint(const std::string &npcId) const;
 
-  // 农场属性
-  int getMaxCropSlots() const;
-  bool hasWaterSource() const;
-  bool isInitiallyUnlocked() const;
+  //   // 农场属性
+  //   int getMaxCropSlots() const;
+  //   bool hasWaterSource() const;
+  //   bool isInitiallyUnlocked() const;
 
 private:
   FarmMapManager() : map(nullptr) {}
@@ -42,3 +43,4 @@ private:
                           const std::string &property) const;
   Vec2 worldToTileCoord(const Vec2 &worldPos) const;
 };
+#endif

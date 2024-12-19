@@ -1,8 +1,7 @@
 ﻿// HelloWorldScene.h
-#ifndef __HELLOWORLD_SCENE_H__
-#define __HELLOWORLD_SCENE_H__
+#pragma once
 
-#include "FarmMapRenderer.h"
+#include "FarmMapManager.h"
 #include "cocos2d.h"
 
 class HelloWorldScene : public cocos2d::Scene {
@@ -14,27 +13,25 @@ public:
 private:
   // 地图相关
   cocos2d::TMXTiledMap *tmxMap;
+  FarmMapManager *farmMapManager;
   std::string currentMapType;
   std::string currentSeason;
 
-  // 玩家精灵
+  // 玩家相关
   cocos2d::Sprite *playerSprite;
 
   // 初始化函数
   bool initMap();
   bool initPlayer();
-
-  // 键盘控制
+  void setupTestMenu();
   void setupKeyboard();
+
+  // 事件处理
   void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode,
                     cocos2d::Event *event);
+  // void switchSeason(const std::string &season); // 注释掉这行
 
-  // 测试功能
-  void setupTestMenu();
-  void switchSeason(const std::string &season);
-
-  // 更新
-  virtual void update(float dt) override;
+  // 更新函数
+  void update(float dt) override;
+  void updatePlayerVisibility(const cocos2d::Vec2 &position);
 };
-
-#endif // __HELLOWORLD_SCENE_H__

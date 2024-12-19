@@ -1,6 +1,6 @@
 ﻿// FarmConfigManager.cpp
 
-#include "FarmConfigManager.h" // 不要在头文件中包含自身
+#include "FarmConfigManager.h"
 
 #include "cocos2d.h"
 
@@ -8,15 +8,9 @@
 
 #include "json/filereadstream.h"
 
-
-
 using namespace rapidjson;
 
-
-
 FarmConfigManager *FarmConfigManager::instance = nullptr;
-
-
 
 FarmConfigManager *FarmConfigManager::getInstance() {
 
@@ -27,30 +21,31 @@ FarmConfigManager *FarmConfigManager::getInstance() {
     CCLOG("创建 FarmConfigManager 实例");
 
     instance->loadConfigs("configs/maps/farm_types.json"); // 配置文件路径
-
   }
 
   return instance;
-
 }
-
-
 
 const FarmTypeConfig &
-
 FarmConfigManager::getFarmConfig(const std::string &farmType) const {
+  // 打印当前所有可用的农场类型
+  CCLOG("当前可用的农场类型:");
+  for (const auto &[type, config] : farmConfigs) {
+    CCLOG("- %s", type.c_str());
+  }
 
+  CCLOG("正在查找农场类型: %s", farmType.c_str());
   auto it = farmConfigs.find(farmType);
 
-  CCASSERT(it != farmConfigs.end(), "未找到指定的农场类型配置！");
-
-  CCLOG("获取农场类型配置: %s", farmType.c_str());
+  if (it == farmConfigs.end()) {
+    std::string errorMsg = "未找到农场类型 '" + farmType +
+                           "' 的配置！请检查配置文件和传入参数是否匹配。";
+    CCLOG("%s", errorMsg.c_str());
+    CCASSERT(false, errorMsg.c_str());
+  }
 
   return it->second;
-
 }
-
-
 
 std::vector<std::string>
 
@@ -79,20 +74,15 @@ FarmConfigManager::getSeasonEvents(const std::string &farmType,
       CCLOG("农场类型 '%s' 中未找到季节 '%s' 的特殊事件", farmType.c_str(),
 
             season.c_str());
-
     }
 
   } else {
 
     CCLOG("未找到农场类型 '%s' 的配置", farmType.c_str());
-
   }
 
   return {};
-
 }
-
-
 
 std::vector<std::string>
 
@@ -121,26 +111,19 @@ FarmConfigManager::getAvailableCrops(const std::string &farmType,
       CCLOG("农场类型 '%s' 中未找到季节 '%s' 的可种植作物", farmType.c_str(),
 
             season.c_str());
-
     }
 
   } else {
 
     CCLOG("未找到农场类型 '%s' 的配置", farmType.c_str());
-
   }
 
   return {};
-
 }
-
-
 
 void FarmConfigManager::loadConfigs(const std::string &configPath) {
 
   CCLOG("开始加载配置文件: %s", configPath.c_str());
-
-
 
   std::string fullPath =
 
@@ -151,10 +134,7 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
     CCLOG("无法找到配置文件: %s", configPath.c_str());
 
     return;
-
   }
-
-
 
   FILE *fp = fopen(fullPath.c_str(), "rb");
 
@@ -163,10 +143,7 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
     CCLOG("无法打开配置文件: %s", fullPath.c_str());
 
     return;
-
   }
-
-
 
   char readBuffer[65536];
 
@@ -178,8 +155,6 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
 
   fclose(fp);
 
-
-
   if (doc.HasParseError()) {
 
     CCLOG("配置文件解析错误: %s (位置: %zu)", configPath.c_str(),
@@ -187,26 +162,18 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
           doc.GetErrorOffset());
 
     return;
-
   }
-
-
 
   if (!doc.IsObject() || !doc.HasMember("farm_types")) {
 
     CCLOG("配置文件格式错误或缺少 'farm_types' 字段");
 
     return;
-
   }
-
-
 
   const Value &farmTypes = doc["farm_types"];
 
   CCLOG("开始解析农场类型配置，数量: %zu", farmTypes.MemberCount());
-
-
 
   for (auto it = farmTypes.MemberBegin(); it != farmTypes.MemberEnd(); ++it) {
 
@@ -214,15 +181,9 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
 
     CCLOG("解析农场类型: %s", farmType.c_str());
 
-
-
     const Value &config = it->value;
 
-
-
     FarmTypeConfig farmConfig;
-
-
 
     // 解析 tmx_path
 
@@ -235,10 +196,7 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
     } else {
 
       CCLOG("  警告: 'tmx_path' 缺失或不是字符串");
-
     }
-
-
 
     // 解析 display_name
 
@@ -251,10 +209,7 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
     } else {
 
       CCLOG("  警告: 'display_name' 缺失或不是字符串");
-
     }
-
-
 
     // 解析 collision_config
 
@@ -271,10 +226,7 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
     } else {
 
       CCLOG("  警告: 'collision_config' 缺失或不是字符串");
-
     }
-
-
 
     // 解析 farm_properties
 
@@ -299,10 +251,7 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
       } else {
 
         CCLOG("  警告: 'max_crop_slots' 缺失或不是整数");
-
       }
-
-
 
       if (properties.HasMember("water_source") &&
 
@@ -319,10 +268,7 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
       } else {
 
         CCLOG("  警告: 'water_source' 缺失或不是布尔值");
-
       }
-
-
 
       if (properties.HasMember("initial_unlocked") &&
 
@@ -339,24 +285,18 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
       } else {
 
         CCLOG("  警告: 'initial_unlocked' 缺失或不是布尔值");
-
       }
 
     } else {
 
       CCLOG("  警告: 'farm_properties' 缺失或不是对象");
-
     }
-
-
 
     // 解析 layers
 
     if (config.HasMember("layers") && config["layers"].IsObject()) {
 
       const Value &layers = config["layers"];
-
-
 
       // 解析 tile_layers
 
@@ -366,8 +306,6 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
 
         CCLOG("  解析 tile_layers，数量: %zu", tileLayers.MemberCount());
 
-
-
         for (auto layerIt = tileLayers.MemberBegin();
 
              layerIt != tileLayers.MemberEnd(); ++layerIt) {
@@ -376,13 +314,9 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
 
           CCLOG("    解析 tile_layer: %s", layerName.c_str());
 
-
-
           const Value &props = layerIt->value;
 
           LayerProperties lp;
-
-
 
           if (props.HasMember("boundary") && props["boundary"].IsBool()) {
 
@@ -393,10 +327,7 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
           } else {
 
             CCLOG("      警告: 'boundary' 缺失或不是布尔值");
-
           }
-
-
 
           if (props.HasMember("physical") && props["physical"].IsBool()) {
 
@@ -407,10 +338,7 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
           } else {
 
             CCLOG("      警告: 'physical' 缺失或不是布尔值");
-
           }
-
-
 
           if (props.HasMember("base") && props["base"].IsBool()) {
 
@@ -421,10 +349,7 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
           } else {
 
             CCLOG("      警告: 'base' 缺失或不是布尔值");
-
           }
-
-
 
           if (props.HasMember("penetrable") && props["penetrable"].IsBool()) {
 
@@ -435,24 +360,17 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
           } else {
 
             CCLOG("      警告: 'penetrable' 缺失或不是布尔值");
-
           }
-
-
 
           farmConfig.layers.tileLayers[layerName] = lp;
 
           CCLOG("    已添加 tile_layer: %s", layerName.c_str());
-
         }
 
       } else {
 
         CCLOG("  警告: 'tile_layers' 缺失或不是对象");
-
       }
-
-
 
       // 解析 object_layers
 
@@ -464,8 +382,6 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
 
         CCLOG("  解析 object_layers，数量: %zu", objectLayers.MemberCount());
 
-
-
         for (auto layerIt = objectLayers.MemberBegin();
 
              layerIt != objectLayers.MemberEnd(); ++layerIt) {
@@ -474,13 +390,9 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
 
           CCLOG("    解析 object_layer: %s", layerName.c_str());
 
-
-
           const Value &props = layerIt->value;
 
           LayerProperties lp;
-
-
 
           if (props.HasMember("boundary") && props["boundary"].IsBool()) {
 
@@ -491,10 +403,7 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
           } else {
 
             CCLOG("      警告: 'boundary' 缺失或不是布尔值");
-
           }
-
-
 
           if (props.HasMember("physical") && props["physical"].IsBool()) {
 
@@ -505,10 +414,7 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
           } else {
 
             CCLOG("      警告: 'physical' 缺失或不是布尔值");
-
           }
-
-
 
           if (props.HasMember("base") && props["base"].IsBool()) {
 
@@ -519,10 +425,7 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
           } else {
 
             CCLOG("      警告: 'base' 缺失或不是布尔值");
-
           }
-
-
 
           if (props.HasMember("penetrable") && props["penetrable"].IsBool()) {
 
@@ -533,24 +436,17 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
           } else {
 
             CCLOG("      警告: 'penetrable' 缺失或不是布尔值");
-
           }
-
-
 
           farmConfig.layers.objectLayers[layerName] = lp;
 
           CCLOG("    已添加 object_layer: %s", layerName.c_str());
-
         }
 
       } else {
 
         CCLOG("  警告: 'object_layers' 缺失或不是对象");
-
       }
-
-
 
       // 解析 static_object_layers
 
@@ -564,8 +460,6 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
 
               staticObjectLayers.MemberCount());
 
-
-
         for (auto layerIt = staticObjectLayers.MemberBegin();
 
              layerIt != staticObjectLayers.MemberEnd(); ++layerIt) {
@@ -574,13 +468,9 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
 
           CCLOG("    解析 static_object_layer: %s", layerName.c_str());
 
-
-
           const Value &props = layerIt->value;
 
           LayerProperties lp;
-
-
 
           if (props.HasMember("boundary") && props["boundary"].IsBool()) {
 
@@ -591,10 +481,7 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
           } else {
 
             CCLOG("      警告: 'boundary' 缺失或不是布尔值");
-
           }
-
-
 
           if (props.HasMember("physical") && props["physical"].IsBool()) {
 
@@ -605,10 +492,7 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
           } else {
 
             CCLOG("      警告: 'physical' 缺失或不是布尔值");
-
           }
-
-
 
           if (props.HasMember("base") && props["base"].IsBool()) {
 
@@ -619,10 +503,7 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
           } else {
 
             CCLOG("      警告: 'base' 缺失或不是布尔值");
-
           }
-
-
 
           if (props.HasMember("penetrable") && props["penetrable"].IsBool()) {
 
@@ -633,30 +514,22 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
           } else {
 
             CCLOG("      警告: 'penetrable' 缺失或不是布尔值");
-
           }
-
-
 
           farmConfig.layers.staticObjectLayers[layerName] = lp;
 
           CCLOG("    已添加 static_object_layer: %s", layerName.c_str());
-
         }
 
       } else {
 
         CCLOG("  警告: 'static_object_layers' 缺失或不是对象");
-
       }
 
     } else {
 
       CCLOG("  警告: 'layers' 缺失或不是对象");
-
     }
-
-
 
     // 解析 season_features
 
@@ -668,8 +541,6 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
 
       CCLOG("  解析 season_features，数量: %zu", seasons.MemberCount());
 
-
-
       for (auto seasonIt = seasons.MemberBegin();
 
            seasonIt != seasons.MemberEnd(); ++seasonIt) {
@@ -678,13 +549,9 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
 
         CCLOG("    解析季节: %s", season.c_str());
 
-
-
         const Value &features = seasonIt->value;
 
         FarmTypeConfig::SeasonFeatures sf;
-
-
 
         // 解析 available_crops
 
@@ -705,18 +572,13 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
             } else {
 
               CCLOG("      警告: 'available_crops' 中存在非字符串项");
-
             }
-
           }
 
         } else {
 
           CCLOG("      警告: 'available_crops' 缺失或不是数组");
-
         }
-
-
 
         // 解析 special_events
 
@@ -739,32 +601,23 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
             } else {
 
               CCLOG("      警告: 'special_events' 中存在非字符串项");
-
             }
-
           }
 
         } else {
 
           CCLOG("      警告: 'special_events' 缺失或不是数组");
-
         }
-
-
 
         farmConfig.seasonFeatures[season] = sf;
 
         CCLOG("    已添加季节特性: %s", season.c_str());
-
       }
 
     } else {
 
       CCLOG("  警告: 'season_features' 缺失或不是对象");
-
     }
-
-
 
     // 解析 npc_spawn_points
 
@@ -776,15 +629,11 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
 
       CCLOG("  解析 npc_spawn_points，数量: %zu", npcs.Size());
 
-
-
       for (auto npcIt = npcs.Begin(); npcIt != npcs.End(); ++npcIt) {
 
         if (npcIt->IsObject()) {
 
           FarmTypeConfig::NPCSpawnPoint npc;
-
-
 
           if (npcIt->HasMember("id") && (*npcIt)["id"].IsString()) {
 
@@ -795,10 +644,7 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
           } else {
 
             CCLOG("    警告: NPC 缺少 'id' 或 'id' 不是字符串");
-
           }
-
-
 
           if ((*npcIt).HasMember("position") &&
 
@@ -819,10 +665,7 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
           } else {
 
             CCLOG("    警告: NPC 'position' 缺失、不是数组或数组长度不足");
-
           }
-
-
 
           farmConfig.npcSpawnPoints.emplace_back(npc);
 
@@ -831,32 +674,22 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
         } else {
 
           CCLOG("    警告: 'npc_spawn_points' 中存在非对象项");
-
         }
-
       }
 
     } else {
 
       CCLOG("  警告: 'npc_spawn_points' 缺失或不是数组");
-
     }
-
-
 
     // 存储配置
 
     farmConfigs[farmType] = farmConfig;
 
     CCLOG("加载农场类型配置完成: %s", farmType.c_str());
-
   }
-
-
 
   CCLOG("所有农场类型配置已加载完成，共加载 %zu 个农场类型",
 
         farmConfigs.size());
-
 }
-

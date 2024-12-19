@@ -1,5 +1,6 @@
 ﻿// HelloWorldScene.cpp
 #include "HelloWorldScene.h"
+#include "FarmMapManager.h"
 #include "FarmMapRenderer.h"
 #include "SpritePathManager.h"
 
@@ -12,36 +13,34 @@ bool HelloWorldScene::init() {
     return false;
   }
 
-  currentMapType = "island";
-  currentSeason = "spring";
+  // 更新初始化参数
+  std::string farmMapType = "island";
+  std::string season = "spring";
 
-  // 初始化地图
-  if (!initMap()) {
+  // 初始化地图管理器
+  farmMapManager = FarmMapManager::getInstance();
+  if (!farmMapManager->initWithFarmType(farmMapType, season)) {
+    CCLOG("Failed to init FarmMapManager");
     return false;
   }
 
-  // 初始化玩家
-  if (!initPlayer()) {
+  // 初始化其他组件
+  if (!initMap() || !initPlayer()) {
     return false;
   }
 
-  // 设置测试菜单
   setupTestMenu();
-
-  // 设置键盘控制
   setupKeyboard();
-
-  // 开启更新
   this->scheduleUpdate();
 
   return true;
 }
 
 bool HelloWorldScene::initMap() {
-  // 加载地图
-  tmxMap = TMXTiledMap::create("maps/farm/island/island_spring.tmx");
+  // 直接从 FarmMapManager 获取地图
+  tmxMap = farmMapManager->getMap();
   if (!tmxMap) {
-    CCLOG("Failed to load map");
+    CCLOG("Failed to get map from FarmMapManager");
     return false;
   }
   this->addChild(tmxMap);
@@ -63,60 +62,22 @@ bool HelloWorldScene::initPlayer() {
   playerSprite->setPosition(Vec2(800, 800));
   tmxMap->addChild(playerSprite, 999); // 确保玩家在最上层
 
+  // 设置初始透明度
+  updatePlayerVisibility(playerSprite->getPosition());
+
   return true;
 }
 
+// 删除季节切换按钮
 void HelloWorldScene::setupTestMenu() {
-  auto visibleSize = Director::getInstance()->getVisibleSize();
-  Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-  // 创建季节切换按钮
-  std::vector<std::string> seasons = {"spring", "summer", "fall", "winter"};
-  float buttonY = origin.y + visibleSize.height - 30;
-  float buttonX = origin.x + 100;
-
-  for (const auto &season : seasons) {
-    auto button = MenuItemLabel::create(
-        Label::createWithTTF(season, "fonts/arial.ttf", 20),
-        [this, season](Ref *sender) { switchSeason(season); });
-    button->setPosition(Vec2(buttonX, buttonY));
-    buttonX += 100;
-
-    auto menu = Menu::create(button, nullptr);
-    menu->setPosition(Vec2::ZERO);
-    this->addChild(menu);
-  }
+  // 空实现,不再需要切换按钮
 }
 
+/* 注释掉季节切换函数
 void HelloWorldScene::switchSeason(const std::string &season) {
-  if (currentSeason == season)
-    return;
-
-  currentSeason = season;
-
-  // 更新地图和渲染器
-  std::string mapPath = "maps/farm/island/island_" + season + ".tmx";
-  auto newMap = TMXTiledMap::create(mapPath);
-  if (newMap) {
-    // 保存原地图信息
-    Vec2 oldPos = tmxMap->getPosition();
-    Vec2 playerPos = playerSprite->getPosition();
-
-    // 替换地图
-    this->removeChild(tmxMap);
-    this->addChild(newMap);
-    newMap->setPosition(oldPos);
-    tmxMap = newMap;
-
-    // 重新渲染地图
-    FarmMapRenderer::getInstance()->renderMap(tmxMap);
-
-    // 恢复玩家位置
-    playerSprite->removeFromParent();
-    tmxMap->addChild(playerSprite, 999);
-    playerSprite->setPosition(playerPos);
-  }
+    // ...existing code...
 }
+*/
 
 void HelloWorldScene::setupKeyboard() {
   auto listener = EventListenerKeyboard::create();
@@ -147,8 +108,25 @@ void HelloWorldScene::onKeyPressed(EventKeyboard::KeyCode keyCode,
     return;
   }
 
-  auto moveAction = MoveTo::create(0.2f, targetPos);
-  playerSprite->runAction(moveAction);
+  // 检查目标位置是否可移动
+  if (farmMapManager->isWalkable(targetPos) ||
+      farmMapManager->isPenetrable(targetPos)) {
+    auto moveAction = MoveTo::create(0.2f, targetPos);
+    auto callback = CallFunc::create(
+        [this, targetPos]() { updatePlayerVisibility(targetPos); });
+    auto sequence = Sequence::create(moveAction, callback, nullptr);
+    playerSprite->runAction(sequence);
+  }
+}
+
+void HelloWorldScene::updatePlayerVisibility(const Vec2 &position) {
+  if (farmMapManager->isPenetrable(position)) {
+    // 在可穿透区域设置半透明
+    playerSprite->setOpacity(128);
+  } else {
+    // 在普通区域恢复完全不透明
+    playerSprite->setOpacity(255);
+  }
 }
 
 void HelloWorldScene::update(float dt) {

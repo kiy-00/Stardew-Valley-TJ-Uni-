@@ -1,7 +1,7 @@
 {
   "farm_types": {
       "island": {
-          "tmx_path": "maps/farm/island.tmx",
+          "tmx_path": "maps/farm/island/island.tmx",
           "display_name": "岛屿农场",
           "collision_config": "configs/maps/farm_collisions/island.json",
           "farm_properties": {
