@@ -19,11 +19,6 @@ def generate_tsx_file(source_tsx, target_season):
     new_filename = source_filename.replace('spring', target_season)
     new_tsx_path = os.path.join(source_dir, new_filename)
     
-    # Don't overwrite existing files
-    if os.path.exists(new_tsx_path):
-        print(f"TSX file {new_tsx_path} already exists. Skipping.")
-        return new_filename
-    
     # Parse source tsx
     tree = ET.parse(source_tsx)
     root = tree.getroot()
@@ -39,7 +34,7 @@ def generate_tsx_file(source_tsx, target_season):
     if 'name' in root.attrib:
         root.attrib['name'] = root.attrib['name'].replace('spring', target_season)
     
-    # Write new tsx file
+    # Write tsx file, overwriting if exists
     tree.write(new_tsx_path, encoding='UTF-8', xml_declaration=True)
     print(f"Generated TSX file: {new_tsx_path}")
     return new_filename
@@ -63,11 +58,6 @@ def generate_season_map(source_map, target_season):
     new_filename = source_filename.replace('spring', target_season)
     new_map_path = os.path.join(source_dir, new_filename)
     
-    # Don't overwrite existing files
-    if os.path.exists(new_map_path):
-        print(f"TMX file {new_map_path} already exists. Skipping.")
-        return
-    
     # Parse source map
     tree = ET.parse(source_map)
     root = tree.getroot()
@@ -83,7 +73,7 @@ def generate_season_map(source_map, target_season):
                     new_tsx_filename = generate_tsx_file(source_tsx_path, target_season)
                     tileset.attrib['source'] = new_tsx_filename
     
-    # Write new map file
+    # Write map file, overwriting if exists
     tree.write(new_map_path, encoding='UTF-8', xml_declaration=True)
     print(f"Generated TMX file: {new_map_path}")
 

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="357">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="14" nextobjectid="383">
  <tileset firstgid="1" source="boundary_fall.tsx" />
  <tileset firstgid="2" source="base_fall.tsx" />
  <tileset firstgid="5" source="myhouse_1_fall.tsx" />
@@ -9,6 +9,8 @@
  <tileset firstgid="9" source="floor.tsx" />
  <tileset firstgid="10" source="bushes.tsx" />
  <tileset firstgid="11" source="boat.tsx" />
+ <tileset firstgid="12" source="stone.tsx" />
+ <tileset firstgid="13" source="arable.tsx" />
  <layer id="2" name="boundary" width="50" height="50">
   <data encoding="base64" compression="zlib">
    eJztwwEJAAAMBKH7/qWXY6DgqqmqqqqqqqqqqurzBwHpCcU=
@@ -17,6 +19,11 @@
  <layer id="1" name="base" width="50" height="50">
   <data encoding="base64" compression="zlib">
    eJzt18EOhCAMRVGi/v83u2LTFIrYwit5N+nORU+EjFNKbI8xWaIDKzqwogMrOrDK6LiVyebQDCMONM9pjtG96fBv9gxZ0zqjdNi7e+6/0+Ft6HnoONcRubfl6T1DB+fkWfG7RMc/x5d279/zRDhWvffo71s68B2R3+xRtRx/Pbv/+0U5orvEeJlWO2Te7wbNMXsf0ByWDc0h74t1Z6oHzaGl2erI89V6Dj3pyBodWNGBFR1Y0THWCx3GDvg=
+  </data>
+ </layer>
+ <layer id="13" name="arable" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJztzzENAAAIBLE3gH+7WGBggKRNTsAlAAAAAABsqGHX+QAAAAC+arYrAYc=
   </data>
  </layer>
  <objectgroup id="8" name="static_1" locked="1">
@@ -141,6 +148,32 @@
   <object id="37" gid="8" x="445" y="1165.33" width="127" height="127" />
   <object id="38" gid="8" x="1189" y="704" width="127" height="127" />
   <object id="39" gid="8" x="1230.33" y="733.333" width="127" height="127" />
+ </objectgroup>
+ <objectgroup id="12" name="static_2">
+  <object id="357" gid="12" x="795" y="497.667" width="50" height="53" />
+  <object id="358" gid="12" x="333.667" y="801.667" width="50" height="53" />
+  <object id="360" gid="12" x="401.667" y="1144.33" width="50" height="53" />
+  <object id="361" gid="12" x="591" y="1249.67" width="50" height="53" />
+  <object id="362" gid="12" x="572.333" y="1120.33" width="50" height="53" />
+  <object id="363" gid="12" x="517.667" y="1051" width="50" height="53" />
+  <object id="364" gid="12" x="480.333" y="1019" width="50" height="53" />
+  <object id="365" gid="12" x="1000.33" y="1243" width="50" height="53" />
+  <object id="366" gid="12" x="1341.67" y="731" width="50" height="53" />
+  <object id="367" gid="12" x="1136.33" y="511" width="50" height="53" />
+  <object id="368" gid="12" x="1168.33" y="553.667" width="50" height="53" />
+  <object id="369" gid="12" x="1217.67" y="583" width="50" height="53" />
+  <object id="370" gid="12" x="613.667" y="655" width="50" height="53" />
+  <object id="371" gid="12" x="563" y="824.333" width="50" height="53" />
+  <object id="372" gid="12" x="504.333" y="891" width="50" height="53" />
+  <object id="373" gid="12" x="777.667" y="277.667" width="50" height="53" />
+  <object id="374" gid="12" x="764.333" y="220.333" width="50" height="53" />
+  <object id="375" gid="12" x="1032.33" y="399" width="50" height="53" />
+  <object id="376" gid="12" x="1255" y="855" width="50" height="53" />
+  <object id="377" gid="12" x="1165.67" y="1087" width="50" height="53" />
+  <object id="379" gid="12" x="623" y="1279" width="50" height="53" />
+  <object id="380" gid="12" x="449.667" y="1249.67" width="50" height="53" />
+  <object id="381" gid="12" x="260.333" y="953.667" width="50" height="53" />
+  <object id="382" gid="12" x="277.667" y="811" width="50" height="53" />
  </objectgroup>
  <objectgroup id="7" name="obj_fb_2">
   <object id="7" gid="7" x="616.667" y="390" width="100" height="131" />

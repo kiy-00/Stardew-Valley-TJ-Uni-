@@ -1,4 +1,4 @@
-﻿#ifndef __MAP_LAYER_H__
+﻿﻿#ifndef __MAP_LAYER_H__
 
 #define __MAP_LAYER_H__
 

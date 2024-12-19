@@ -1,4 +1,4 @@
-#ifndef FARM_MAP_MANAGER_H
+﻿#ifndef FARM_MAP_MANAGER_H
 #define FARM_MAP_MANAGER_H
 #include "FarmConfigManager.h"
 #include "cocos2d.h"
@@ -18,6 +18,10 @@ public:
   bool isBoundary(const Vec2 &worldPos) const;
   bool isPhysical(const Vec2 &worldPos) const;
   bool isBase(const Vec2 &worldPos) const;
+
+  // 新增地图查询接口
+  bool isArable(const Vec2 &worldPos) const;
+  bool isFishingSpot(const Vec2 &worldPos) const;
 
   //   // 季节特性接口
   //   std::vector<std::string> getAvailableCrops(const std::string &season)

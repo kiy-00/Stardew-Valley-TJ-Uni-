@@ -1,4 +1,4 @@
-﻿#ifndef __MY_SCENE_H__
+﻿﻿#ifndef __MY_SCENE_H__
 
 #define __MY_SCENE_H__
 

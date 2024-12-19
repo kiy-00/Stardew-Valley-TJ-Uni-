@@ -1,4 +1,4 @@
-// SpritePathManager.cpp
+﻿// SpritePathManager.cpp
 #include "SpritePathManager.h"
 
 std::string SpritePathManager::getFarmSpritePath(const std::string &layerName,
@@ -14,6 +14,9 @@ std::string SpritePathManager::getFarmSpritePath(const std::string &layerName,
     }
     if (layerName == "static_5") {
       return "maps/farm/" + farmType + "/asset/static/size_5/bushes.png";
+    }
+    if (layerName == "static_2") {
+      return "maps/farm/" + farmType + "/asset/static/size_2/stone.png";
     }
     return "";
   }

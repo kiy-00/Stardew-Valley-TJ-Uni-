@@ -1,4 +1,4 @@
-﻿// LayerRenderer.h
+﻿﻿// LayerRenderer.h
 
 #pragma once
 

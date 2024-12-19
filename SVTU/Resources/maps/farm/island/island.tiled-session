@@ -9,9 +9,16 @@
     ],
     "file.lastUsedOpenFilter": "全部文件 (*)",
     "fileStates": {
+        "arable.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "base_spring.tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 1
+        },
+        "base_summer.tsx": {
+            "scaleInDock": 1
         },
         "boat.tsx": {
             "scaleInDock": 1,
@@ -21,6 +28,9 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "boundary_summer.tsx": {
+            "scaleInDock": 1
+        },
         "bushes.tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 1
@@ -29,6 +39,9 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "bushes_1_summer.tsx": {
+            "scaleInDock": 1
+        },
         "floor.tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 1
@@ -36,6 +49,9 @@
         "house_1_spring.tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 1
+        },
+        "house_1_summer.tsx": {
+            "scaleInDock": 1
         },
         "island_fall.tmx": {
             "scale": 0.7338749999999999,
@@ -46,16 +62,19 @@
             }
         },
         "island_spring.tmx": {
+            "expandedObjectLayers": [
+                12
+            ],
             "scale": 0.75,
-            "selectedLayer": 0,
+            "selectedLayer": 2,
             "viewCenter": {
                 "x": 890.6666666666665,
-                "y": 718.6666666666667
+                "y": 822.6666666666667
             }
         },
         "island_summer.tmx": {
             "scale": 0.7338749999999999,
-            "selectedLayer": 0,
+            "selectedLayer": 2,
             "viewCenter": {
                 "x": 799.863737012434,
                 "y": 799.8637370124341
@@ -73,12 +92,22 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "myhouse_1_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "stone.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "tree_2_spring.tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 1
+        },
+        "tree_2_summer.tsx": {
+            "scaleInDock": 1
         }
     },
-    "last.imagePath": "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/asset/static/size_1",
+    "last.imagePath": "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island",
     "map.fixedSize": true,
     "map.height": 50,
     "map.lastUsedFormat": "tmx",
@@ -97,10 +126,16 @@
         "bushes_1_spring.tsx",
         "floor.tsx",
         "bushes.tsx",
-        "boat.tsx"
+        "boat.tsx",
+        "stone.tsx",
+        "arable.tsx",
+        "island_summer.tmx"
     ],
     "project": "island.tiled-project",
     "recentFiles": [
+        "island_summer.tmx",
+        "arable.tsx",
+        "stone.tsx",
         "boat.tsx",
         "bushes.tsx",
         "floor.tsx",
@@ -109,16 +144,15 @@
         "house_1_spring.tsx",
         "myhouse_1_spring.tsx",
         "boundary_spring.tsx",
-        "base_spring.tsx",
-        "island_spring.tmx"
+        "base_spring.tsx"
     ],
     "tileset.embedInMap": false,
     "tileset.lastUsedFormat": "tsx",
     "tileset.margin": 0,
     "tileset.spacing": 0,
     "tileset.tileSize": {
-        "height": 56,
-        "width": 90
+        "height": 32,
+        "width": 32
     },
     "tileset.transparentColor": "#ff00ff",
     "tileset.type": 0,

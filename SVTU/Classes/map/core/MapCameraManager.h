@@ -1,4 +1,4 @@
-﻿// MapCameraManager.h
+﻿﻿// MapCameraManager.h
 
 #ifndef __MAP_CAMERA_MANAGER_H__
 

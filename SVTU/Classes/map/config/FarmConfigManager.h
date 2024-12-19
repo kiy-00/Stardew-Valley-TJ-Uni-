@@ -1,4 +1,4 @@
-﻿// FarmConfigManager.h
+﻿﻿// FarmConfigManager.h
 #ifndef _FARM_CONFIG_MANAGER_H_
 
 #define _FARM_CONFIG_MANAGER_H_

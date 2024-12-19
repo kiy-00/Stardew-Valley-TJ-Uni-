@@ -1,4 +1,4 @@
-// SpritePathManager.h
+﻿// SpritePathManager.h
 #pragma once
 #include <string>
 

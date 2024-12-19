@@ -1,4 +1,4 @@
-﻿// LayerRenderer.cpp
+﻿﻿// LayerRenderer.cpp
 
 #include "LayerRenderer.h"
 

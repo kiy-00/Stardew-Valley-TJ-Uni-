@@ -1,4 +1,4 @@
-// FarmMapManager.cpp
+﻿// FarmMapManager.cpp
 #include "FarmMapManager.h"
 
 static FarmMapManager *instance = nullptr;
@@ -115,6 +115,10 @@ bool FarmMapManager::checkLayerProperty(const Vec2 &worldPos,
           return tileLayerIt->second.base;
         if (property == "penetrable")
           return tileLayerIt->second.penetrable;
+        if (property == "arable")
+          return tileLayerIt->second.arable;
+        if (property == "fishing")
+          return tileLayerIt->second.fishing;
       }
     }
   }
@@ -202,6 +206,24 @@ bool FarmMapManager::isBase(const Vec2 &worldPos) const {
   for (const auto &[layerName, props] : farmConfig.layers.tileLayers) {
     if (checkLayerProperty(worldPos, layerName, "base"))
       return true;
+  }
+  return false;
+}
+
+bool FarmMapManager::isArable(const Vec2 &worldPos) const {
+  for (const auto &[layerName, props] : farmConfig.layers.tileLayers) {
+    if (props.arable && checkLayerProperty(worldPos, layerName, "arable")) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool FarmMapManager::isFishingSpot(const Vec2 &worldPos) const {
+  for (const auto &[layerName, props] : farmConfig.layers.tileLayers) {
+    if (props.fishing && checkLayerProperty(worldPos, layerName, "fishing")) {
+      return true;
+    }
   }
   return false;
 }

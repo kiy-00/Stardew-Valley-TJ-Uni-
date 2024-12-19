@@ -1,4 +1,4 @@
-// FarmMapRenderer.cpp
+﻿// FarmMapRenderer.cpp
 #include "FarmMapRenderer.h"
 #include "FarmConfigManager.h"
 #include "LayerRenderer.h"

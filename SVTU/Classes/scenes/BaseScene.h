@@ -1,4 +1,4 @@
-﻿// Classes/scenes/BaseScene.h
+﻿﻿// Classes/scenes/BaseScene.h
 
 #ifndef __BASE_SCENE_H__
 

@@ -1,4 +1,4 @@
-﻿// FarmConfigManager.cpp
+﻿﻿// FarmConfigManager.cpp
 
 #include "FarmConfigManager.h"
 
@@ -360,6 +360,22 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
           } else {
 
             CCLOG("      警告: 'penetrable' 缺失或不是布尔值");
+          }
+
+          if (props.HasMember("arable") && props["arable"].IsBool()) {
+            lp.arable = props["arable"].GetBool();
+            CCLOG("      arable: %d", lp.arable);
+          } else {
+            lp.arable = false;
+            CCLOG("      arable: 默认为 false");
+          }
+
+          if (props.HasMember("fishing") && props["fishing"].IsBool()) {
+            lp.fishing = props["fishing"].GetBool();
+            CCLOG("      fishing: %d", lp.fishing);
+          } else {
+            lp.fishing = false;
+            CCLOG("      fishing: 默认为 false");
           }
 
           farmConfig.layers.tileLayers[layerName] = lp;

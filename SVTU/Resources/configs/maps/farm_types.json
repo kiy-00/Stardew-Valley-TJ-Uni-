@@ -5,7 +5,7 @@
           "display_name": "岛屿农场",
           "collision_config": "configs/maps/farm_collisions/island.json",
           "farm_properties": {
-              "max_crop_slots": 50,
+              "max_crop_slots": 33,
               "water_source": true,
               "initial_unlocked": true
           },
@@ -15,13 +15,25 @@
                       "boundary": true,
                       "physical": false,
                       "base": false,
-                      "penetrable": false
+                      "penetrable": false,
+                      "arable": false,
+                      "fishing":true
                   },
                   "base": {
                       "boundary": false,
                       "physical": false,
                       "base": true,
-                      "penetrable": false
+                      "penetrable": false,
+                      "arable": false,
+                      "fishing":false
+                  },
+                  "arable": {
+                      "boundary": false,
+                      "physical": false,
+                      "base": false,
+                      "penetrable": false,
+                      "arable": true,
+                      "fishing":false
                   }
               },
               "object_layers": {
@@ -66,14 +78,20 @@
                     "physical": false,
                     "base": false,
                     "penetrable": true
+                  },
+                "static_2": {
+                    "boundary": false,
+                    "physical": true,
+                    "base": false,
+                    "penetrable": false
                   }
               },
               "static_object_layers": {
                   "decoration": {
-                      "boundary": false,
-                      "physical": false,
-                      "base": false,
-                      "penetrable": true
+                     "boundary": false,
+                     "physical": false,
+                     "base": false,
+                     "penetrable": true
                   }
               }
           },

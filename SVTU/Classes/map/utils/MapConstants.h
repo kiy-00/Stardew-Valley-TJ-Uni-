@@ -1,14 +1,10 @@
-﻿// MapConstants.h
+﻿﻿// MapConstants.h
 
 #ifndef __MAP_CONSTANTS_H__
 
 #define __MAP_CONSTANTS_H__
 
-
-
 #include "cocos2d.h"
-
-
 
 namespace MapConstants {
 
@@ -18,11 +14,11 @@ enum class MapType {
 
   NONE,
 
-  FARM,     // 农场
+  FARM, // 农场
 
-  PLAZA,    // 广场
+  PLAZA, // 广场
 
-  SHOP,     // 商店
+  SHOP, // 商店
 
   HOMESTEAD // 家园
 
@@ -30,18 +26,19 @@ enum class MapType {
 
 } // namespace MapConstants
 
-
-
 struct LayerProperties {
 
-  bool base = false;       // 可以走
+  bool base = false; // 可以走
 
-  bool boundary = false;   // 不可走且无物理属性
+  bool boundary = false; // 不可走且无物理属性
 
-  bool physical = false;   // 有物理属性
+  bool physical = false; // 有物理属性
 
   bool penetrable = false; // 可穿过且会隐身
 
+  bool arable = false;
+
+  bool fishing = false;
 };
 
 #endif
