@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>frames</key>
+        <dict>
+            <key>bushes_1_1.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{127,127}</string>
+                <key>spriteSourceSize</key>
+                <string>{127,127}</string>
+                <key>textureRect</key>
+                <string>{{0,0},{127,127}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
+        </dict>
+        <key>metadata</key>
+        <dict>
+            <key>format</key>
+            <integer>3</integer>
+            <key>pixelFormat</key>
+            <string>RGBA8888</string>
+            <key>premultiplyAlpha</key>
+            <false/>
+            <key>realTextureFileName</key>
+            <string>bushes_1_fall.png</string>
+            <key>size</key>
+            <string>{127,127}</string>
+            <key>smartupdate</key>
+            <string>$TexturePacker:SmartUpdate:a13cd4cb487f86d435727edb8f16587b:a4cbeb75c05e27a7b134dbe263493e73:156050669a51fd96a83035ba990798c3$</string>
+            <key>textureFileName</key>
+            <string>bushes_1_fall.png</string>
+        </dict>
+    </dict>
+</plist>
