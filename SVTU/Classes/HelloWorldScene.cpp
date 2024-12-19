@@ -112,15 +112,15 @@ void HelloWorldScene::setupKeyboard() {
 
 void HelloWorldScene::onKeyPressed(EventKeyboard::KeyCode keyCode,
                                    Event *event) {
-  CCLOG("Key pressed: %d", (int)keyCode); // 添加按键日志
+  CCLOG("Key pressed: %d", (int)keyCode);
 
-  float moveDistance = 10.0f; // 减小移动距离使移动更平滑
+  float moveDistance = 32.0f; // 使用瓦片大小作为移动单位
   Vec2 currentPos = playerSprite->getPosition();
   Vec2 targetPos = currentPos;
 
   switch (keyCode) {
   case EventKeyboard::KeyCode::KEY_W:
-  case EventKeyboard::KeyCode::KEY_UP_ARROW: // 添加方向键支持
+  case EventKeyboard::KeyCode::KEY_UP_ARROW:
     targetPos.y += moveDistance;
     break;
   case EventKeyboard::KeyCode::KEY_S:
@@ -139,12 +139,20 @@ void HelloWorldScene::onKeyPressed(EventKeyboard::KeyCode keyCode,
     return;
   }
 
-  // 简化移动逻辑，先不考虑碰撞检测
-  playerSprite->setPosition(targetPos);
-  updatePlayerVisibility(targetPos);
+  // 检查目标位置是否可行走
+  bool canWalk = farmMapManager->isWalkable(targetPos);
+  CCLOG("Attempting to move to (%.2f, %.2f), canWalk: %d", targetPos.x,
+        targetPos.y, canWalk);
 
-  // 记录移动日志
-  CCLOG("Player moved to: (%.2f, %.2f)", targetPos.x, targetPos.y);
+  if (canWalk) {
+    auto moveAction = MoveTo::create(0.2f, targetPos);
+    auto callback = CallFunc::create(
+        [this, targetPos]() { updatePlayerVisibility(targetPos); });
+    auto sequence = Sequence::create(moveAction, callback, nullptr);
+    playerSprite->runAction(sequence);
+  } else {
+    CCLOG("Cannot walk to target position - no base tile found");
+  }
 }
 
 void HelloWorldScene::updatePlayerVisibility(const Vec2 &position) {

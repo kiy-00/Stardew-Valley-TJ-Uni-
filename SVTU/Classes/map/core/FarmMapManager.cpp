@@ -153,20 +153,13 @@ bool FarmMapManager::checkLayerProperty(const Vec2 &worldPos,
 
 // 地图查询接口实现
 bool FarmMapManager::isWalkable(const Vec2 &worldPos) const {
-  // 位置可行走：该位置不是物理障碍且不是边界
-  for (const auto &[layerName, props] : farmConfig.layers.objectLayers) {
-    if (checkLayerProperty(worldPos, layerName, "physical"))
-      return false;
-    if (checkLayerProperty(worldPos, layerName, "boundary"))
-      return false;
-  }
+  // 简化移动判定：只要在基础层上有瓦片就可以行走
   for (const auto &[layerName, props] : farmConfig.layers.tileLayers) {
-    if (checkLayerProperty(worldPos, layerName, "physical"))
-      return false;
-    if (checkLayerProperty(worldPos, layerName, "boundary"))
-      return false;
+    if (props.base && checkLayerProperty(worldPos, layerName, "base")) {
+      return true;
+    }
   }
-  return true;
+  return false;
 }
 
 bool FarmMapManager::isPenetrable(const Vec2 &worldPos) const {
