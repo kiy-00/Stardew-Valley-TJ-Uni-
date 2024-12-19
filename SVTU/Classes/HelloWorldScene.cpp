@@ -29,7 +29,7 @@ bool HelloWorldScene::init() {
     return false;
   }
 
-  setupTestMenu();
+  // setupTestMenu();
   setupKeyboard();
   this->scheduleUpdate();
 
@@ -57,13 +57,27 @@ bool HelloWorldScene::initPlayer() {
     return false;
   }
 
-  playerSprite->setScale(0.2f);
+  // 获取窗口大小和地图大小
+  Size visibleSize = Director::getInstance()->getVisibleSize();
+  Size mapSize = tmxMap->getContentSize();
+
+  // 计算中心位置
+  Vec2 centerPosition = Vec2(mapSize.width / 2, mapSize.height / 2);
+
+  playerSprite->setScale(0.2);
   playerSprite->setAnchorPoint(Vec2(0.5f, 0.5f));
-  playerSprite->setPosition(Vec2(800, 800));
-  tmxMap->addChild(playerSprite, 999); // 确保玩家在最上层
+  playerSprite->setPosition(centerPosition);
+  this->addChild(playerSprite, 999);
 
   // 设置初始透明度
   updatePlayerVisibility(playerSprite->getPosition());
+
+  // 立即更新摄像机位置
+  auto camera = this->getDefaultCamera();
+  camera->setPosition(centerPosition);
+
+  CCLOG("Player initialized at position: (%.2f, %.2f)", centerPosition.x,
+        centerPosition.y);
 
   return true;
 }
@@ -81,42 +95,56 @@ void HelloWorldScene::switchSeason(const std::string &season) {
 
 void HelloWorldScene::setupKeyboard() {
   auto listener = EventListenerKeyboard::create();
+
+  // 添加按键按下事件
   listener->onKeyPressed = CC_CALLBACK_2(HelloWorldScene::onKeyPressed, this);
-  _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+
+  // 添加按键释放事件
+  listener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event *event) {
+    CCLOG("Key released: %d", (int)keyCode);
+  };
+
+  // 使用addEventListenerWithFixedPriority替代
+  _eventDispatcher->addEventListenerWithFixedPriority(listener, 1);
+
+  CCLOG("键盘事件监听器设置完成");
 }
 
 void HelloWorldScene::onKeyPressed(EventKeyboard::KeyCode keyCode,
                                    Event *event) {
-  float moveDistance = 32.0f;
+  CCLOG("Key pressed: %d", (int)keyCode); // 添加按键日志
+
+  float moveDistance = 10.0f; // 减小移动距离使移动更平滑
   Vec2 currentPos = playerSprite->getPosition();
   Vec2 targetPos = currentPos;
 
   switch (keyCode) {
   case EventKeyboard::KeyCode::KEY_W:
+  case EventKeyboard::KeyCode::KEY_UP_ARROW: // 添加方向键支持
     targetPos.y += moveDistance;
     break;
   case EventKeyboard::KeyCode::KEY_S:
+  case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
     targetPos.y -= moveDistance;
     break;
   case EventKeyboard::KeyCode::KEY_A:
+  case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
     targetPos.x -= moveDistance;
     break;
   case EventKeyboard::KeyCode::KEY_D:
+  case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
     targetPos.x += moveDistance;
     break;
   default:
     return;
   }
 
-  // 检查目标位置是否可移动
-  if (farmMapManager->isWalkable(targetPos) ||
-      farmMapManager->isPenetrable(targetPos)) {
-    auto moveAction = MoveTo::create(0.2f, targetPos);
-    auto callback = CallFunc::create(
-        [this, targetPos]() { updatePlayerVisibility(targetPos); });
-    auto sequence = Sequence::create(moveAction, callback, nullptr);
-    playerSprite->runAction(sequence);
-  }
+  // 简化移动逻辑，先不考虑碰撞检测
+  playerSprite->setPosition(targetPos);
+  updatePlayerVisibility(targetPos);
+
+  // 记录移动日志
+  CCLOG("Player moved to: (%.2f, %.2f)", targetPos.x, targetPos.y);
 }
 
 void HelloWorldScene::updatePlayerVisibility(const Vec2 &position) {

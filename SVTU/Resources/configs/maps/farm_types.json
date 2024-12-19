@@ -55,7 +55,7 @@
                       "base": false,
                       "penetrable": false
                   },
-                  "static4": {
+                  "static_4": {
                     "boundary": false,
                     "physical": false,
                     "base": false,

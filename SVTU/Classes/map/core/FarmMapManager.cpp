@@ -84,7 +84,7 @@ bool FarmMapManager::checkLayerProperty(const Vec2 &worldPos,
         float height = objDict["height"].asFloat();
 
         // 检查点是否在对象范围内
-        Rect objRect(x, y, width, height);
+        Rect objRect(x, y + height, width, height);
         if (objRect.containsPoint(worldPos)) {
           if (property == "physical")
             return objLayerIt->second.physical;
@@ -133,7 +133,7 @@ bool FarmMapManager::checkLayerProperty(const Vec2 &worldPos,
         float width = objDict["width"].asFloat();
         float height = objDict["height"].asFloat();
 
-        Rect objRect(x, y, width, height);
+        Rect objRect(x, y + height, width, height);
         if (objRect.containsPoint(worldPos)) {
           if (property == "physical")
             return staticLayerIt->second.physical;
