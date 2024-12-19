@@ -12,6 +12,8 @@ FarmMapManager *FarmMapManager::getInstance() {
 
 bool FarmMapManager::initWithFarmType(const std::string &farmType,
                                       const std::string &season) {
+  currentFarmType = farmType;
+  currentSeason = season;  // 保存初始季节
   // 获取农场配置
   auto configManager = FarmConfigManager::getInstance();
   if (!configManager) {
@@ -41,6 +43,21 @@ bool FarmMapManager::initWithFarmType(const std::string &farmType,
     CCLOG("初始化农场失败: %s", e.what());
     return false;
   }
+}
+
+void FarmMapManager::changeSeason(const std::string &newSeason) {
+    currentSeason = newSeason;  // 更新当前季节
+    // 释放当前地图资源
+    releaseMap();
+    // 重新初始化地图
+    initWithFarmType(currentFarmType, newSeason);
+}
+
+void FarmMapManager::releaseMap() {
+    if (map) {
+        //map->removeFromParent();
+        //map = nullptr;
+    }
 }
 
 Vec2 FarmMapManager::worldToTileCoord(const Vec2 &worldPos) const {

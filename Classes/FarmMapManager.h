@@ -23,6 +23,12 @@ public:
   bool isArable(const Vec2 &worldPos) const;
   bool isFishingSpot(const Vec2 &worldPos) const;
 
+  // 切换季节接口
+  void changeSeason(const std::string &newSeason);
+
+  // 获取当前季节
+  const std::string& getCurrentSeason() const { return currentSeason; }
+
   //   // 季节特性接口
   //   std::vector<std::string> getAvailableCrops(const std::string &season)
   //   const; std::vector<std::string> getSpecialEvents(const std::string
@@ -42,9 +48,13 @@ private:
   TMXTiledMap *map;
   FarmTypeConfig farmConfig;
   std::string currentFarmType;
+  std::string currentSeason;  // 新增：存储当前季节
 
   bool checkLayerProperty(const Vec2 &worldPos, const std::string &layerName,
                           const std::string &property) const;
   Vec2 worldToTileCoord(const Vec2 &worldPos) const;
+
+  // 释放地图资源
+  void releaseMap();
 };
 #endif

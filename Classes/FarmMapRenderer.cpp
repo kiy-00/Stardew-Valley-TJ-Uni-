@@ -13,18 +13,18 @@ FarmMapRenderer *FarmMapRenderer::getInstance() {
   return instance;
 }
 
-void FarmMapRenderer::renderMap(TMXTiledMap *map) {
+void FarmMapRenderer::renderMap(TMXTiledMap *map, const std::string &season) {
   if (!map) {
     CCLOG("地图未正确加载。");
     return;
   }
 
-  renderTileLayers(map);
-  renderObjectLayers(map);
-  renderStaticObjectLayers(map);
+  renderTileLayers(map, season);
+  renderObjectLayers(map, season);
+  renderStaticObjectLayers(map, season);
 }
 
-void FarmMapRenderer::renderTileLayers(TMXTiledMap *map) {
+void FarmMapRenderer::renderTileLayers(TMXTiledMap *map, const std::string &season) {
   // 处理基础图层的渲染
   auto configManager = FarmConfigManager::getInstance();
   if (!configManager)
@@ -37,7 +37,7 @@ void FarmMapRenderer::renderTileLayers(TMXTiledMap *map) {
   }
 }
 
-void FarmMapRenderer::renderObjectLayers(TMXTiledMap *map) {
+void FarmMapRenderer::renderObjectLayers(TMXTiledMap *map, const std::string &season) {
   // 获取农场配置
   auto configManager = FarmConfigManager::getInstance();
   if (!configManager) {
@@ -75,11 +75,11 @@ void FarmMapRenderer::renderObjectLayers(TMXTiledMap *map) {
         continue;
       }
 
-      // 使用新的接口获取精灵路径
+      // 使用传入的season参数
       std::string spritePath =
           SpritePathManager::getFarmSpritePath(layerName, // 层名称
                                                "island",  // 农场类型
-                                               "spring"   // 默认季节
+                                               season     // 使用传入的季节参数
           );
 
       if (spritePath.empty()) {
@@ -109,7 +109,7 @@ void FarmMapRenderer::renderObjectLayers(TMXTiledMap *map) {
   }
 }
 
-void FarmMapRenderer::renderStaticObjectLayers(TMXTiledMap *map) {
+void FarmMapRenderer::renderStaticObjectLayers(TMXTiledMap *map, const std::string &season) {
   auto configManager = FarmConfigManager::getInstance();
   if (!configManager)
     return;

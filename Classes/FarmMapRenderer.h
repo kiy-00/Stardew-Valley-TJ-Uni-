@@ -8,13 +8,13 @@ class FarmMapRenderer {
 public:
   static FarmMapRenderer *getInstance();
 
-  void renderMap(TMXTiledMap *map);
+  void renderMap(TMXTiledMap *map, const std::string &season);
   void updateSeason(const std::string &season);
 
 private:
   FarmMapRenderer() {}
 
-  void renderTileLayers(TMXTiledMap *map);
-  void renderObjectLayers(TMXTiledMap *map);
-  void renderStaticObjectLayers(TMXTiledMap *map);
+  void renderTileLayers(TMXTiledMap *map, const std::string &season);
+  void renderObjectLayers(TMXTiledMap *map, const std::string &season);
+  void renderStaticObjectLayers(TMXTiledMap *map, const std::string &season);
 };

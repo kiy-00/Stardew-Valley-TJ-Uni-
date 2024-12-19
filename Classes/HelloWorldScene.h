@@ -39,4 +39,13 @@ private:
   void setupMouse();
   void onMouseClick(cocos2d::EventMouse* event);
   void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+  void onSeasonChanged(const std::string &newSeason);
+
+  // 季节测试相关
+  cocos2d::Label* seasonLabel;
+  const std::vector<std::string> seasons{"spring", "summer", "fall", "winter"};
+  int currentSeasonIndex;
+  void setupSeasonTest();
+  void switchToNextSeason(float dt);
+  void updateSeasonLabel(const std::string& season);
 };

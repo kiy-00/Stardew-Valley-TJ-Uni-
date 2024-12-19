@@ -37,6 +37,8 @@ bool HelloWorldScene::init() {
     setupKeyboard();
     this->scheduleUpdate();
 
+    setupSeasonTest();
+
     return true;
 }
 
@@ -58,7 +60,7 @@ bool HelloWorldScene::initPlayer() {
     // 初始化物理系统
     player->initPhysics();
 
-    tmxMap->addChild(player, 999);
+    this->addChild(player, 999);
 
     // 初始化相机
     auto camera = this->getDefaultCamera();
@@ -78,23 +80,11 @@ bool HelloWorldScene::initMap() {
   }
   this->addChild(tmxMap);
 
-  // 使用渲染器渲染地图
-  FarmMapRenderer::getInstance()->renderMap(tmxMap);
+  // 传入当前季节参数
+  FarmMapRenderer::getInstance()->renderMap(tmxMap, farmMapManager->getCurrentSeason());
 
   return true;
 }
-
-
-// 删除季节切换按钮
-void HelloWorldScene::setupTestMenu() {
-  // 空实现,不再需要切换按钮
-}
-
-/* 注释掉季节切换函数
-void HelloWorldScene::switchSeason(const std::string &season) {
-    // ...existing code...
-}
-*/
 
 void HelloWorldScene::setupKeyboard() {
   auto listener = EventListenerKeyboard::create();
@@ -175,4 +165,55 @@ void HelloWorldScene::update(float dt) {
         mapSize.height - visibleSize.height / 2);
 
     camera->setPosition(Vec2(x, y));
+}
+
+void HelloWorldScene::onSeasonChanged(const std::string &newSeason) {
+    // 安全地移除当前地图和相关资源
+    if (tmxMap) {
+        tmxMap->removeFromParent();
+        tmxMap = nullptr;
+    }
+    // 更新FarmMapManager中的季节
+    if (farmMapManager) {
+        farmMapManager->changeSeason(newSeason);
+    }
+    // 重新初始化地图
+    if (!initMap()) {
+        CCLOG("Failed to re-init map with new season: %s", newSeason.c_str());
+        return;
+    }
+}
+
+void HelloWorldScene::setupSeasonTest() {
+    currentSeasonIndex = 0;
+    
+    // 创建季节显示标签
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    seasonLabel = Label::createWithTTF("Current Season: Spring", "fonts/Marker Felt.ttf", 24);
+    seasonLabel->setPosition(Vec2(visibleSize.width/2, visibleSize.height - 30));
+    this->addChild(seasonLabel, 1000);
+    
+    this->schedule(CC_SCHEDULE_SELECTOR(HelloWorldScene::switchToNextSeason), 4.0f);
+}
+
+void HelloWorldScene::switchToNextSeason(float dt) {
+    currentSeasonIndex = (currentSeasonIndex + 1) % seasons.size();
+    std::string newSeason = seasons[currentSeasonIndex];
+    
+    // 如果完成一轮循环，回到春季后停止
+    if (currentSeasonIndex == 0) {
+        this->unschedule(CC_SCHEDULE_SELECTOR(HelloWorldScene::switchToNextSeason));
+        CCLOG("Season test completed, returning to spring");
+    }
+    
+    // 更新季节标签
+    updateSeasonLabel(newSeason);
+    
+    // 触发季节切换
+    onSeasonChanged(newSeason);
+}
+
+void HelloWorldScene::updateSeasonLabel(const std::string& season) {
+    std::string text = "Current Season: " + season;
+    seasonLabel->setString(text);
 }
