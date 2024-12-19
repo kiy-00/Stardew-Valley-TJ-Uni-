@@ -1,118 +1,140 @@
-// User.h
 #ifndef __USER_H__
 #define __USER_H__
 
 #include "cocos2d.h"
 #include "Inventory.h"
+#include "Item.h"
+
 
 class User : public cocos2d::Sprite {
 public:
-    static User* create(const std::string& name, const std::string& gender, int health, int energy, int money);
-    bool init(const std::string& name, const std::string& gender, int health, int energy, int money);
+	// 使用指定属性创建User实例
+	static User* create(const std::string& name, const std::string& gender, int health, int energy, int money);
 
-    // 动画相关
-    void loadAnimationFrames();
-    void updateAnimation(float dt);
+	// 初始化用户数据并加载动画帧
+	virtual bool init(const std::string& name, const std::string& gender, int health, int energy, int money);
 
-    // 移动相关
-    void moveDown();
-    void moveUp();
-    void moveLeft();
-    void moveRight();
-    void stopMoving() { m_isMoving = false; }
+	// 角色移动方法，根据方向更新角色状态
+	void moveUp();   // 向上移动
+	void moveDown(); // 向下移动
+	void moveLeft(); // 向左移动
+	void moveRight();// 向右移动
+	void stopMoving() { m_isMoving = false; }
 
-    // 背包系统
-    void toggleInventory();
-    void createInventoryBar();
-    void updateInventoryDisplay();
-    void onSlotClicked(int row, int col);
-    void selectItemFromInventory(int index);
-    bool getIsInventoryOpen() const { return isInventoryOpen; }
-    void setIsInventoryOpen(bool open) { isInventoryOpen = open; }
+	// 定期更新动画，与定时器相结合
+	void updateAnimation(float dt);
 
-    const std::string& getName() const { return m_name; }
-    void setName(const std::string& name) { m_name = name; }
-    const std::string& getGender() const { return m_gender; }
-    void setGender(const std::string& gender) { m_gender = gender; }
-    const int getMoney() const { return m_money; }
-    void setMoney(int money) { m_money = money; }
-    int getHealth() const { return m_health; }
-    void setHealth(int health) { m_health = health; }
-    int getEnergy() const { return m_energy; }
-    void setEnergy(int energy) { m_energy = energy; }
-    Inventory* getInventory() const { return inventory; }
-    std::pair<int, int> getSelectedSlot() const { return selectedSlot; }
-    void setSelectedSlot(int first, int second) { selectedSlot = std::make_pair(first, second); }
+	// 基本属性的getter和setter，用于访问和修改角色的名称、性别、金钱、健康、能量等信息
+	const std::string& getName() const { return m_name; }
+	void setName(const std::string& name) { m_name = name; }
+	const std::string& getGender() const { return m_gender; }
+	void setGender(const std::string& gender) { m_gender = gender; }
+	const int getMoney() const { return m_money; }
+	void setMoney(int money) { m_money = money; }
+	int getHealth() const { return m_health; }
+	void setHealth(int health) { m_health = health; }
+	int getEnergy() const { return m_energy; }
+	void setEnergy(int energy) { m_energy = energy; }
 
-    int getDirection() const { return m_direction; }
-    void setDirection(int direction) { m_direction = direction; }
-    bool isMoving() const { return m_isMoving; }
-    void setMoving(bool moving) { m_isMoving = moving; }
+	// 获取背包对象，以便管理和查询物品
+	Inventory* getInventory() const { return inventory; }
 
+	// 减少选中物品的数量，并根据status更新显示
+	bool reduceSelectedItemQuantity(int quantity, bool status);
 
-    // 物品系统
-    Item* getSelectedItem();
-    bool reduceSelectedItemQuantity(int quantity, bool status);
-    cocos2d::Sprite* getHeldItemSprite() const;
-   
-    //制造系统
-    void toggleSlotImage();
-    bool getIsSlotImageOpen() const { return isSlotImageOpen; }
-    void setIsSlotImageOpen(bool open) { isSlotImageOpen = open; }
+	// 获取和设置当前选中的背包槽位
+	std::pair<int, int> getSelectedSlot() const { return selectedSlot; }
+	void setSelectedSlot(int first, int second) { selectedSlot = std::make_pair(first, second); }
 
-   
-  
+	// 获取和设置角色方向与移动状态
+	int getDirection() const { return m_direction; }
+	void setDirection(int direction) { m_direction = direction; }
+	bool isMoving() const { return m_isMoving; }
+	void setMoving(bool moving) { m_isMoving = moving; }
 
-    // 新增：透明度控制
-    void updateVisibility(bool isPenetrable) {
-        this->setOpacity(isPenetrable ? 128 : 255);
-    }
+	// 背包相关功能：切换背包显示、点击槽位、更新背包显示
+	void toggleInventory();
+	void onSlotClicked(int row, int col);
+	void updateInventoryDisplay();
+	bool getIsInventoryOpen() const { return isInventoryOpen; }
+	void setIsInventoryOpen(bool open) { isInventoryOpen = open; }
 
-    // 新增：物理系统初始化
-    void initPhysics() {
-        cocos2d::Size playerSize = this->getContentSize();
-        auto physicsBody = cocos2d::PhysicsBody::createBox(
-            playerSize,
-            cocos2d::PhysicsMaterial(1.0f, 0.0f, 1.0f)
-        );
+	// 横栏功能：创建物品栏和选择物品
+	void createInventoryBar();
+	void selectItemFromInventory(int index);
 
-        physicsBody->setDynamic(true);
-        physicsBody->setRotationEnable(false);
-        physicsBody->setGravityEnable(false);
-        physicsBody->setCategoryBitmask(0xFFFFFFFF);
-        physicsBody->setCollisionBitmask(0xFFFFFFFF);
-        physicsBody->setContactTestBitmask(0xFFFFFFFF);
-        physicsBody->setEnabled(true);
-        physicsBody->setTag(1);
+	// 获取当前选中物品和其显示精灵
+	Item* getSelectedItem();
+	cocos2d::Sprite* getHeldItemSprite() const;
 
-        this->setPhysicsBody(physicsBody);
-    }
+	// 制造系统：切换槽位图像显示
+	void toggleSlotImage();
+	bool getIsSlotImageOpen() const { return isSlotImageOpen; }
+	void setIsSlotImageOpen(bool open) { isSlotImageOpen = open; }
+
+	// 工具动作相关：执行工具动作（如挥动工具）
+	void performToolAction();
+
+	// 新增：透明度控制
+	void updateVisibility(bool isPenetrable) {
+		this->setOpacity(isPenetrable ? 128 : 255);
+	}
+
+	// 新增：物理系统初始化
+	void initPhysics() {
+		cocos2d::Size playerSize = this->getContentSize();
+		auto physicsBody = cocos2d::PhysicsBody::createBox(
+			playerSize,
+			cocos2d::PhysicsMaterial(1.0f, 0.0f, 1.0f)
+		);
+
+		physicsBody->setDynamic(true);
+		physicsBody->setRotationEnable(false);
+		physicsBody->setGravityEnable(false);
+		physicsBody->setCategoryBitmask(0xFFFFFFFF);
+		physicsBody->setCollisionBitmask(0xFFFFFFFF);
+		physicsBody->setContactTestBitmask(0xFFFFFFFF);
+		physicsBody->setEnabled(true);
+		physicsBody->setTag(1);
+
+		this->setPhysicsBody(physicsBody);
+	}
 
 private:
-    // 基本属性
-    std::string m_name;
-    std::string m_gender;
-    int m_health;
-    int m_energy;
-    int m_money;
+	int m_updateCounter; // 动画更新计数器，用于控制动画帧率
 
-    // 动画相关
-    int m_direction;
-    bool m_isMoving;
-    int m_frameIndex;
-    int m_updateCounter;
-    cocos2d::Vector<cocos2d::SpriteFrame*> m_animationFrames[4];
+	// 基本属性
+	std::string m_name;
+	std::string m_gender;
+	int m_health;
+	int m_energy;
+	int m_money;
 
-    // 背包相关
-    Inventory* inventory;
-    cocos2d::Layer* inventoryLayer;
-    bool isInventoryOpen;
-    std::pair<int, int> selectedSlot;
+	cocos2d::Sprite* heldItemSprite; // 显示手中持有物品的精灵
+	Inventory* inventory;            // 角色的背包
+	cocos2d::Sprite* slotSprite = nullptr; // 制造槽位图像的精灵
 
-    // 物品相关
-    cocos2d::Sprite* heldItemSprite;
-    cocos2d::Sprite* slotSprite;
-    bool isSlotImageOpen;
+	int m_direction;  // 当前角色方向 0下1上2左3右
+	bool m_isMoving;  // 是否处于移动状态
+
+	int m_frameIndex; // 动画帧索引
+	cocos2d::Vector<cocos2d::SpriteFrame*> m_animationFrames[4]; // 存储上下左右四个方向的动画帧
+	bool isInventoryOpen; // 背包是否打开
+	const float slotSize = 30.0f;   // 每个槽位的大小
+	cocos2d::Layer* inventoryLayer = nullptr; // 显示背包的图层
+	std::pair<int, int> selectedSlot = { -1, -1 }; // 当前选中的槽位坐标
+
+	bool isSlotImageOpen = false; // 制造槽位图像是否显示
+
+	bool m_isPerformingToolAction = false; // 是否正在播放工具使用动画
+
+	cocos2d::Sprite* toolActionSprite; // 用于显示工具动作动画的精灵
+
+	// 加载角色行走动画帧
+	void loadAnimationFrames();
+
+	// 根据工具名称和方向获取工具动画帧
+	cocos2d::Vector<cocos2d::SpriteFrame*> getToolAnimationFrames(const std::string& toolName, int direction);
 };
 
-#endif
+#endif // __USER_H__
