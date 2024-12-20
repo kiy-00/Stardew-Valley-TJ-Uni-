@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "FarmMapManager.h"
 #include "FarmInteractionManager.h"
+#include "TimeSeasonSystem.h"  // 添加时间季节系统头文件
 #include "cocos2d.h"
 #include "User.h"
 #include "Inventory.h"
@@ -8,13 +9,9 @@
 
 class FarmScene : public cocos2d::Scene {
 public:
-    // 修改创建场景的静态函数以接受地图类型参数
     static cocos2d::Scene* createScene(const std::string& mapType);
-
-    // 添加初始化函数以接受地图类型参数
     bool init(const std::string& mapType);
 
-    // 创建场景的静态方法
     static FarmScene* create(const std::string& mapType) {
         FarmScene* scene = new (std::nothrow) FarmScene();
         if (scene && scene->init(mapType)) {
@@ -30,13 +27,20 @@ private:
     cocos2d::TMXTiledMap* tmxMap;
     FarmMapManager* farmMapManager;
     std::string currentMapType;
-    std::string currentSeason;
     User* player;
+
+    // 交互管理器
+    FarmInteractionManager* interactionManager;
+
+    // 时间季节系统相关
+    TimeSeasonSystem* timeSystem;
+    cocos2d::Label* timeSeasonLabel;  // 显示时间和季节的标签
+    void updateTimeSeasonLabel();     // 更新时间显示
+    void onSeasonChanged(const std::string& newSeason);
 
     // 初始化函数
     bool initMap();
     bool initPlayer();
-    void setupTestMenu();
     void setupKeyboard();
     void initInventory();
     void setupMouse();
@@ -48,24 +52,6 @@ private:
 
     // 更新函数
     void update(float dt) override;
-
-    // 季节和天气相关
-    void onSeasonChanged(const std::string& newSeason);
-    cocos2d::Label* seasonLabel;
-    const std::vector<std::string> seasons{ "spring", "summer", "fall", "winter" };
-    int currentSeasonIndex;
-    void setupSeasonTest();
-    void switchToNextSeason(float dt);
-    void updateSeasonLabel(const std::string& season);
-
-    // 天气系统
-    FarmInteractionManager* interactionManager;
-    void setupWeatherTest();
-    void switchToNextWeather(float dt);
-    cocos2d::Label* weatherLabel;
-    int currentWeatherIndex;
-    std::vector<std::string> weathers = { "sunny", "cloudy", "rainy" };
-    float currentGameTime = 6.0f;
 
     // 背包系统相关
     bool isInventoryInitialized = false;

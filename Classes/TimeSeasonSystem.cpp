@@ -1,29 +1,35 @@
 // TimeSeasonSystem.cpp
 #include "TimeSeasonSystem.h"
 
-// ¾²Ì¬³ÉÔ±³õÊ¼»¯
+// ï¿½ï¿½Ì¬ï¿½ï¿½Ô±ï¿½ï¿½Ê¼ï¿½ï¿½
 TimeSeasonSystem* TimeSeasonSystem::instance = nullptr;
 const std::vector<std::string> TimeSeasonSystem::SEASON_NAMES = { "spring", "summer", "fall", "winter" };
 
-// ¹¹Ôìº¯Êı
+// ï¿½ï¿½ï¿½ìº¯ï¿½ï¿½
 TimeSeasonSystem::TimeSeasonSystem()
-    : currentTime{ 1, 0, 1, 6, 0 }  // ´ÓµÚÒ»Äê´º¼¾µÚÒ»ÌìÔçÉÏ6µã¿ªÊ¼
-    , timeScale(1.0f)
-    , accumulatedTime(0.0f)
+    : currentTime{ 2024, 0, 1, 0, 0 }  // ç¡®ä¿ä»ç¬¬1å¤©å¼€å§‹ï¼Œè€Œä¸æ˜¯ç¬¬0å¤©
+    , timeScale(67.2f)
     , isRunning(false) {
+    CCLOG("TimeSeasonSystem constructed with: Year %d, Season %d, Day %d, %02d:%02d",
+        currentTime.year, currentTime.season, currentTime.day, 
+        currentTime.hour, currentTime.minute);
 }
 
-// Îö¹¹º¯Êı
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 TimeSeasonSystem::~TimeSeasonSystem() {
     instance = nullptr;
 }
 
-// µ¥Àı»ñÈ¡
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡
 TimeSeasonSystem* TimeSeasonSystem::getInstance() {
     if (!instance) {
         instance = new (std::nothrow) TimeSeasonSystem();
         if (instance && instance->init()) {
             instance->autorelease();
+            // È·ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ğ³ï¿½ï¿½ï¿½
+            if (Director::getInstance()->getRunningScene()) {
+                Director::getInstance()->getRunningScene()->addChild(instance);
+            }
         }
         else {
             CC_SAFE_DELETE(instance);
@@ -32,73 +38,101 @@ TimeSeasonSystem* TimeSeasonSystem::getInstance() {
     return instance;
 }
 
-// ³õÊ¼»¯
+// ï¿½ï¿½Ê¼ï¿½ï¿½
 bool TimeSeasonSystem::init() {
     if (!Node::init()) {
         return false;
     }
 
     loadFromUserDefault();
-
-    // Æô¶¯¸üĞÂ
-    this->scheduleUpdate();
-
+    CCLOG("TimeSeasonSystem initialized");
+    scheduleUpdate(); // ç¡®ä¿æ¯å¸§éƒ½ä¼šè°ƒç”¨ update()
     return true;
 }
 
-// Ê±¼ä¿ØÖÆ·½·¨
+// Ê±ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½ï¿½
 void TimeSeasonSystem::startTime() {
+    CCLOG("TimeSystem starting - timeScale: %.2f", timeScale);
     isRunning = true;
-    this->resume();
+    scheduleUpdate(); 
+    this->schedule(CC_SCHEDULE_SELECTOR(TimeSeasonSystem::update), 1.0f / 60.0f);  // 60fpsï¿½ï¿½ï¿½ï¿½
 }
 
 void TimeSeasonSystem::pauseTime() {
+    CCLOG("TimeSystem paused");
     isRunning = false;
-    this->pause();
+    this->unschedule(CC_SCHEDULE_SELECTOR(TimeSeasonSystem::update));
 }
 
 void TimeSeasonSystem::resumeTime() {
-    isRunning = true;
-    this->resume();
+    CCLOG("TimeSystem resumed");
+    startTime();
 }
 
-// Ê±¼ä¸üĞÂ
+// Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
 void TimeSeasonSystem::update(float dt) {
-    if (!isRunning) return;
+    if (!isRunning) {
+        CCLOG("TimeSystem is not running!");
+        return;
+    }
 
-    // ¼ÆËãÊ±¼äÁ÷ÊÅ
-    // ¼ÙÉè1ÃëÕæÊµÊ±¼ä = 1·ÖÖÓÓÎÏ·Ê±¼ä * timeScale
-    float deltaMinutes = dt * 60.0f * timeScale;
-    updateTime(deltaMinutes);
-}
+    CCLOG("TimeSystem update with dt: %.3f", dt);
+    
+    // ç¡®ä¿dtå’ŒtimeScaleéƒ½æ˜¯æ­£æ•°
+    if (dt <= 0.0f || timeScale <= 0.0f) {
+        CCLOG("Invalid dt or timeScale: dt=%.3f, timeScale=%.3f", dt, timeScale);
+        return;
+    }
 
-void TimeSeasonSystem::updateTime(float deltaMinutes) {
-    GameTime previousTime = currentTime;
+    // ä½¿ç”¨doubleè¿›è¡Œç²¾ç¡®è®¡ç®—
+    double minutesElapsed = dt * 60.0 * static_cast<double>(timeScale);
+    int deltaMinutes = static_cast<int>(std::floor(minutesElapsed));
 
-    // ÀÛ¼Ó·ÖÖÓ²¢´¦Àí½øÎ»
-    accumulatedTime += deltaMinutes;
-    while (accumulatedTime >= 1.0f) {
-        currentTime.minute++;
-        accumulatedTime -= 1.0f;
+    if (deltaMinutes <= 0) return;
 
-        if (currentTime.minute >= MINUTES_PER_HOUR) {
-            currentTime.minute = 0;
-            currentTime.hour++;
+    // æ›´æ–°åˆ†é’Ÿ
+    currentTime.minute += deltaMinutes;
 
-            if (currentTime.hour >= HOURS_PER_DAY) {
-                currentTime.hour = 0;
-                advanceDay();
+    // å¤„ç†æ—¶é—´è¿›ä½
+    while (currentTime.minute >= MINUTES_PER_HOUR) {
+        currentTime.minute -= MINUTES_PER_HOUR;
+        currentTime.hour++;
+
+        if (currentTime.hour >= HOURS_PER_DAY) {
+            currentTime.hour = 0;
+            currentTime.day++;  // å…ˆå¢åŠ å¤©æ•°
+
+            if (currentTime.day > DAYS_PER_SEASON) {
+                currentTime.day = 1;
+                Season oldSeason = static_cast<Season>(currentTime.season);
+                currentTime.season = (currentTime.season + 1) % 4;
+
+                // è°ƒç”¨å­£èŠ‚å˜åŒ–å›è°ƒ
+                if (seasonChangedCallback) {
+                    seasonChangedCallback(SEASON_NAMES[currentTime.season]);
+                }
+
+                CCLOG("Season changed from %s to %s", 
+                    SEASON_NAMES[static_cast<int>(oldSeason)].c_str(),
+                    SEASON_NAMES[currentTime.season].c_str());
+
+                if (currentTime.season == 0) {
+                    currentTime.year++;
+                }
             }
         }
     }
 
-    // ¼ì²é²¢´¥·¢ÊÂ¼ş
-    checkAndNotifyChanges(previousTime);
+    CCLOG("Time updated - Year: %d, Season: %d, Day: %d, %02d:%02d",
+        currentTime.year, currentTime.season, currentTime.day,
+        currentTime.hour, currentTime.minute);
 }
 
 void TimeSeasonSystem::advanceDay() {
     int previousDay = currentTime.day;
     currentTime.day++;
+
+    CCLOG("Day advanced: %d -> %d", previousDay, currentTime.day);
 
     if (currentTime.day > DAYS_PER_SEASON) {
         currentTime.day = 1;
@@ -106,20 +140,27 @@ void TimeSeasonSystem::advanceDay() {
     }
 
     notifyDayChange(previousDay);
+    saveToUserDefault();
 }
 
 void TimeSeasonSystem::advanceSeason() {
     Season previousSeason = static_cast<Season>(currentTime.season);
     currentTime.season = (currentTime.season + 1) % 4;
 
-    if (currentTime.season == 0) {  // ĞÂµÄÒ»Äê
+    CCLOG("Season advanced: %s -> %s",
+        seasonToString(previousSeason).c_str(),  // ä½¿ç”¨å®‰å…¨çš„æ–¹æ³•
+        getCurrentSeasonString().c_str());       // ä½¿ç”¨å®‰å…¨çš„æ–¹æ³•
+
+    if (currentTime.season == 0) {  // ï¿½Âµï¿½Ò»ï¿½ï¿½
         currentTime.year++;
+        CCLOG("Year advanced to: %d", currentTime.year);
     }
 
     notifySeasonChange(previousSeason);
+    saveToUserDefault();
 }
 
-// ÊÂ¼şÍ¨Öª
+// ï¿½Â¼ï¿½Í¨Öª
 void TimeSeasonSystem::notifySeasonChange(Season previousSeason) {
     SeasonChangeEvent event{
         previousSeason,
@@ -131,9 +172,6 @@ void TimeSeasonSystem::notifySeasonChange(Season previousSeason) {
     for (const auto& callback : seasonChangeCallbacks) {
         callback.second(event);
     }
-
-    // ±£´æ×´Ì¬
-    saveToUserDefault();
 }
 
 void TimeSeasonSystem::notifyDayChange(int previousDay) {
@@ -149,13 +187,15 @@ void TimeSeasonSystem::notifyDayChange(int previousDay) {
     }
 }
 
-// ÊÂ¼ş¼àÌı×¢²á
+// ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½×¢ï¿½ï¿½
 void TimeSeasonSystem::addSeasonChangeListener(const std::string& name, const SeasonChangeCallback& callback) {
     seasonChangeCallbacks[name] = callback;
+    CCLOG("Added season change listener: %s", name.c_str());
 }
 
 void TimeSeasonSystem::addDayChangeListener(const std::string& name, const DayChangeCallback& callback) {
     dayChangeCallbacks[name] = callback;
+    CCLOG("Added day change listener: %s", name.c_str());
 }
 
 void TimeSeasonSystem::removeSeasonChangeListener(const std::string& name) {
@@ -166,27 +206,31 @@ void TimeSeasonSystem::removeDayChangeListener(const std::string& name) {
     dayChangeCallbacks.erase(name);
 }
 
-// Ê±¼äÉèÖÃ
+// Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 void TimeSeasonSystem::setTimeScale(float scale) {
-    timeScale = std::max(0.0f, scale);  // ·ÀÖ¹¸ºÊıÊ±¼äÁ÷ËÙ
+    timeScale = std::max(0.0f, scale);
+    CCLOG("Time scale set to: %.2f", timeScale);
 }
 
 void TimeSeasonSystem::setTime(const GameTime& time) {
     GameTime previousTime = currentTime;
-    currentTime = time;
+    
+    // ç¡®ä¿æ‰€æœ‰å€¼éƒ½åœ¨æœ‰æ•ˆèŒƒå›´å†…
+    currentTime.minute = std::clamp(time.minute, 0, MINUTES_PER_HOUR - 1);
+    currentTime.hour = std::clamp(time.hour, 0, HOURS_PER_DAY - 1);
+    currentTime.day = std::clamp(time.day, 1, DAYS_PER_SEASON);  // ä»1å¼€å§‹
+    currentTime.season = std::clamp(time.season, 0, 3);
+    currentTime.year = std::max(1, time.year);  // è‡³å°‘ä»ç¬¬1å¹´å¼€å§‹
 
-    // È·±£ÊıÖµÔÚÓĞĞ§·¶Î§ÄÚ
-    currentTime.minute = std::clamp(currentTime.minute, 0, MINUTES_PER_HOUR - 1);
-    currentTime.hour = std::clamp(currentTime.hour, 0, HOURS_PER_DAY - 1);
-    currentTime.day = std::clamp(currentTime.day, 1, DAYS_PER_SEASON);
-    currentTime.season = std::clamp(currentTime.season, 0, 3);
-    currentTime.year = std::max(1, currentTime.year);
+    CCLOG("Time set to - Year: %d, Season: %d, Day: %d, %02d:%02d",
+        currentTime.year, currentTime.season, currentTime.day,
+        currentTime.hour, currentTime.minute);
 
-    // ¼ì²é²¢´¥·¢ÏàÓ¦ÊÂ¼ş
     checkAndNotifyChanges(previousTime);
+    saveToUserDefault();
 }
 
-// ´æµµÏà¹Ø
+// ï¿½æµµï¿½ï¿½ï¿½
 void TimeSeasonSystem::saveToUserDefault() {
     auto ud = UserDefault::getInstance();
     ud->setIntegerForKey("game_year", currentTime.year);
@@ -200,15 +244,21 @@ void TimeSeasonSystem::saveToUserDefault() {
 
 void TimeSeasonSystem::loadFromUserDefault() {
     auto ud = UserDefault::getInstance();
-    currentTime.year = ud->getIntegerForKey("game_year", 1);
-    currentTime.season = ud->getIntegerForKey("game_season", 0);
-    currentTime.day = ud->getIntegerForKey("game_day", 1);
-    currentTime.hour = ud->getIntegerForKey("game_hour", 6);
-    currentTime.minute = ud->getIntegerForKey("game_minute", 0);
-    timeScale = ud->getFloatForKey("game_time_scale", 1.0f);
+    
+    // è®¾ç½®é»˜è®¤å€¼ï¼Œç¡®ä¿éƒ½æ˜¯æœ‰æ•ˆå€¼
+    currentTime.year = std::max(1, ud->getIntegerForKey("game_year", 2024));
+    currentTime.season = std::clamp(ud->getIntegerForKey("game_season", 0), 0, 3);
+    currentTime.day = std::clamp(ud->getIntegerForKey("game_day", 1), 1, DAYS_PER_SEASON);
+    currentTime.hour = std::clamp(ud->getIntegerForKey("game_hour", 0), 0, HOURS_PER_DAY - 1);
+    currentTime.minute = std::clamp(ud->getIntegerForKey("game_minute", 0), 0, MINUTES_PER_HOUR - 1);
+    timeScale = std::max(0.1f, ud->getFloatForKey("game_time_scale", 67.2f));
+
+    CCLOG("Loaded time - Year: %d, Season: %d, Day: %d, %02d:%02d",
+        currentTime.year, currentTime.season, currentTime.day,
+        currentTime.hour, currentTime.minute);
 }
 
-// ¸¨Öú·½·¨
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 void TimeSeasonSystem::checkAndNotifyChanges(const GameTime& previousTime) {
     if (currentTime.season != previousTime.season) {
         notifySeasonChange(static_cast<Season>(previousTime.season));
@@ -218,14 +268,23 @@ void TimeSeasonSystem::checkAndNotifyChanges(const GameTime& previousTime) {
     }
 }
 
-TimeSeasonSystem::Season TimeSeasonSystem::intToSeason(int seasonInt) {
-    return static_cast<Season>(seasonInt % 4);
-}
-
 std::string TimeSeasonSystem::seasonToString(Season season) {
-    return SEASON_NAMES[static_cast<int>(season)];
+    size_t index = static_cast<size_t>(season);  // ä½¿ç”¨ size_t é¿å…ç¬¦å·æ¯”è¾ƒè­¦å‘Š
+    if (index >= SEASON_NAMES.size()) {
+        return "unknown";
+    }
+    return SEASON_NAMES[index];
 }
 
 std::string TimeSeasonSystem::getCurrentSeasonString() const {
-    return SEASON_NAMES[currentTime.season];
+    size_t index = static_cast<size_t>(currentTime.season);
+    if (index >= SEASON_NAMES.size()) {
+        CCLOG("Invalid season index: %d", currentTime.season);
+        return "spring";
+    }
+    return SEASON_NAMES[index];
+}
+
+void TimeSeasonSystem::setSeasonChangedCallback(const std::function<void(const std::string&)>& callback) {
+    seasonChangedCallback = callback;
 }

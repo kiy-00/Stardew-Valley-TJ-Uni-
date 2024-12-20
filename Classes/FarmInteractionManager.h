@@ -5,6 +5,7 @@
 #include "User.h"
 #include "InteractionBubble.h"
 #include "FarmMapManager.h"
+#include "TimeSeasonSystem.h"  // 添加这一行
 
 USING_NS_CC;
 
@@ -59,7 +60,7 @@ private:
 
     Label* worldPosLabel;
     Label* tilePosLabel;
-    Label* playerPosLabel;
+    cocos2d::Label* timeLabel = nullptr;
 };
 
 #endif

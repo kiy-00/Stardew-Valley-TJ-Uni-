@@ -12,7 +12,7 @@ USING_NS_CC;
 
 class TimeSeasonSystem : public Node {
 public:
-    // ¼¾½ÚÃ¶¾Ù
+    // ï¿½ï¿½ï¿½ï¿½Ã¶ï¿½ï¿½
     enum class Season {
         SPRING,
         SUMMER,
@@ -20,13 +20,13 @@ public:
         WINTER
     };
 
-    // Ê±¼äÏà¹ØµÄ½á¹¹Ìå
+    // Ê±ï¿½ï¿½ï¿½ï¿½ØµÄ½á¹¹ï¿½ï¿½
     struct GameTime {
-        int year;       // ÓÎÏ·Äê·İ
-        int season;     // ¼¾½Ú(0-3)
-        int day;        // µ±Ç°ÈÕÆÚ(1-28)
+        int year;       // ï¿½ï¿½Ï·ï¿½ï¿½ï¿½
+        int season;     // ï¿½ï¿½ï¿½ï¿½(0-3)
+        int day;        // ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½(1-28)
         int hour;       // Ğ¡Ê±(0-23)
-        int minute;     // ·ÖÖÓ(0-59)
+        int minute;     // ï¿½ï¿½ï¿½ï¿½(0-59)
 
         bool operator==(const GameTime& other) const {
             return year == other.year && season == other.season &&
@@ -34,7 +34,7 @@ public:
         }
     };
 
-    // ÊÂ¼şÊı¾İ½á¹¹
+    // ï¿½Â¼ï¿½ï¿½ï¿½ï¿½İ½á¹¹
     struct SeasonChangeEvent {
         Season previousSeason;
         Season newSeason;
@@ -49,27 +49,31 @@ public:
         int year;
     };
 
-    // ´´½¨ºÍ³õÊ¼»¯
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    static Season intToSeason(int seasonInt);
+    static std::string seasonToString(Season season);
+
+    // ï¿½ï¿½ï¿½ï¿½ï¿½Í³ï¿½Ê¼ï¿½ï¿½
     static TimeSeasonSystem* getInstance();
     virtual bool init() override;
 
-    // Ê±¼ä¿ØÖÆ
+    // Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
     void startTime();
     void pauseTime();
     void resumeTime();
 
-    // Ê±¼äºÍ¼¾½Ú»ñÈ¡
+    // Ê±ï¿½ï¿½Í¼ï¿½ï¿½Ú»ï¿½È¡
     const GameTime& getCurrentTime() const { return currentTime; }
     Season getCurrentSeason() const { return static_cast<Season>(currentTime.season); }
     std::string getCurrentSeasonString() const;
     int getCurrentDay() const { return currentTime.day; }
     int getCurrentYear() const { return currentTime.year; }
 
-    // Ê±¼äÉèÖÃ
-    void setTimeScale(float scale); // ÉèÖÃÊ±¼äÁ÷ËÙ
-    void setTime(const GameTime& time); // Ö±½ÓÉèÖÃÊ±¼ä
+    // Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    void setTimeScale(float scale); // ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    void setTime(const GameTime& time); // Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
 
-    // ÊÂ¼ş¼àÌı×¢²á
+    // ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½×¢ï¿½ï¿½
     using SeasonChangeCallback = std::function<void(const SeasonChangeEvent&)>;
     using DayChangeCallback = std::function<void(const DayChangeEvent&)>;
 
@@ -78,15 +82,19 @@ public:
     void removeSeasonChangeListener(const std::string& name);
     void removeDayChangeListener(const std::string& name);
 
-    // ´æµµÏà¹Ø
+    // ï¿½æµµï¿½ï¿½ï¿½
     void saveToUserDefault();
     void loadFromUserDefault();
 
-    // ³£Á¿
+    // ï¿½ï¿½ï¿½ï¿½
     static const int DAYS_PER_SEASON = 28;
     static const int HOURS_PER_DAY = 24;
     static const int MINUTES_PER_HOUR = 60;
     static const std::vector<std::string> SEASON_NAMES;
+    const float REAL_SECONDS_PER_GAME_MINUTE = 1.0f;  // ç°å®1ç§’ = æ¸¸æˆ1åˆ†é’Ÿ
+    const float MINUTES_PER_SEASON = 60.0f;           // æ¸¸æˆ60åˆ†é’Ÿ = 1ä¸ªå­£èŠ‚
+
+    void setSeasonChangedCallback(const std::function<void(const std::string&)>& callback);
 
 protected:
     TimeSeasonSystem();
@@ -95,32 +103,32 @@ protected:
 private:
     static TimeSeasonSystem* instance;
 
-    // ºËĞÄÊı¾İ
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     GameTime currentTime;
     float timeScale;
     float accumulatedTime;
     bool isRunning;
 
-    // »Øµ÷´æ´¢
+    // ï¿½Øµï¿½ï¿½æ´¢
     std::map<std::string, SeasonChangeCallback> seasonChangeCallbacks;
     std::map<std::string, DayChangeCallback> dayChangeCallbacks;
 
-    // ¸üĞÂ·½·¨
+    std::function<void(const std::string&)> seasonChangedCallback;
+
+    // ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½
     void update(float dt) override;
     void updateTime(float deltaMinutes);
 
-    // ÊÂ¼şÍ¨Öª
+    // ï¿½Â¼ï¿½Í¨Öª
     void notifySeasonChange(Season previousSeason);
     void notifyDayChange(int previousDay);
 
-    // Ê±¼ä¼ÆËã¸¨Öú·½·¨
+    // Ê±ï¿½ï¿½ï¿½ï¿½ã¸¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     void advanceDay();
     void advanceSeason();
     void checkAndNotifyChanges(const GameTime& previousTime);
 
-    // ¸¨Öú·½·¨
-    static Season intToSeason(int seasonInt);
-    static std::string seasonToString(Season season);
+    
 };
 
 #endif // __TIME_SEASON_SYSTEM_H__
