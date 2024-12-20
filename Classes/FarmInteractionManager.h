@@ -55,6 +55,7 @@ private:
     Vec2 bubbleOffset = Vec2(0, 50);
     Sprite* fishingSprite;
     Sprite* farmingSprite;
+    Sprite* farmPermitSprite;
 
     Label* worldPosLabel;
     Label* tilePosLabel;

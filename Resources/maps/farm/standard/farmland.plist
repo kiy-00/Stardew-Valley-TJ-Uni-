@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>frames</key>
+        <dict>
+            <key>farmland.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{32,32}</string>
+                <key>spriteSourceSize</key>
+                <string>{32,32}</string>
+                <key>textureRect</key>
+                <string>{{0,0},{32,32}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
+        </dict>
+        <key>metadata</key>
+        <dict>
+            <key>format</key>
+            <integer>3</integer>
+            <key>pixelFormat</key>
+            <string>RGBA8888</string>
+            <key>premultiplyAlpha</key>
+            <false/>
+            <key>realTextureFileName</key>
+            <string>farmland.png</string>
+            <key>size</key>
+            <string>{32,32}</string>
+            <key>smartupdate</key>
+            <string>$TexturePacker:SmartUpdate:444ba9cec70150794c110a4cc1c33183:99b20ee2103c6676fb4ecbe016ed3b10:15eebb99dcb9c1b4828ce4d3522b24f6$</string>
+            <key>textureFileName</key>
+            <string>farmland.png</string>
+        </dict>
+    </dict>
+</plist>

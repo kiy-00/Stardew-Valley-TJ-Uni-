@@ -3,12 +3,68 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "standard_summer.tmx",
+    "activeFile": "",
     "expandedProjectPaths": [
         "."
     ],
     "file.lastUsedOpenFilter": "全部文件 (*)",
     "fileStates": {
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/base.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/boundary.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/cave.tmx": {
+            "scale": 0.73,
+            "selectedLayer": 11,
+            "viewCenter": {
+                "x": 800,
+                "y": 791.7808219178081
+            }
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/emerald.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/gold_ore.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/green_diamond_ore.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/iron_ore.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/lapiz_ore.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/magafruit.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/magaheart.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/monster_awake.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/monster_sleep.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/red_diamond_ore.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/arable.tsx": {
             "scaleInDock": 1
         },
@@ -46,11 +102,11 @@
             "scaleInDock": 1
         },
         "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/island_spring.tmx": {
-            "scale": 0.7338749999999999,
+            "scale": 1.5,
             "selectedLayer": 8,
             "viewCenter": {
-                "x": 799.8637370124341,
-                "y": 799.8637370124341
+                "x": 800,
+                "y": 1410
             }
         },
         "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/island/island_summer.tmx": {
@@ -181,11 +237,11 @@
                 8,
                 9
             ],
-            "scale": 0.7338749999999999,
+            "scale": 0.73,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 799.8637370124341,
-                "y": 800.545051950264
+                "x": 797.2602739726027,
+                "y": 794.5205479452054
             }
         },
         "standard_summer.tmx": {
@@ -217,7 +273,7 @@
             "scaleInEditor": 1
         }
     },
-    "last.imagePath": "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard",
+    "last.imagePath": "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/asset/prize",
     "map.fixedSize": true,
     "map.height": 50,
     "map.lastUsedFormat": "tmx",
@@ -227,33 +283,29 @@
     "map.tileWidth": 32,
     "map.width": 50,
     "openFiles": [
-        "standard_spring.tmx",
-        "standard_summer.tmx",
-        "standard_winter.tmx",
-        "standard_fall.tmx"
     ],
     "project": "standard.tiled-project",
     "recentFiles": [
-        "standard_spring.tmx",
-        "standard_fall.tmx",
-        "standard_winter.tmx",
-        "standard_summer.tmx",
-        "base_spring.tsx",
-        "arable.tsx",
-        "myhouse_1_spring.tsx",
-        "house_1_spring.tsx",
-        "obj_move_bushes_spring.tsx",
-        "obj_forbidden_tree_spring.tsx",
-        "static_2_stone.tsx",
-        "static_3_cobblestone.tsx"
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/cave.tmx",
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/base.tsx",
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/boundary.tsx",
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/emerald.tsx",
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/magafruit.tsx",
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/magaheart.tsx",
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/monster_sleep.tsx",
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/monster_awake.tsx",
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/gold_ore.tsx",
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/iron_ore.tsx",
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/lapiz_ore.tsx",
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/green_diamond_ore.tsx"
     ],
     "tileset.embedInMap": false,
     "tileset.lastUsedFormat": "tsx",
     "tileset.margin": 0,
     "tileset.spacing": 0,
     "tileset.tileSize": {
-        "height": 32,
-        "width": 32
+        "height": 35,
+        "width": 24
     },
     "tileset.transparentColor": "#ff00ff",
     "tileset.type": 0,

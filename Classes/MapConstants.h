@@ -39,6 +39,8 @@ struct LayerProperties {
   bool arable = false;
 
   bool fishing = false;
+
+  bool farmpermit = false;
 };
 
 #endif

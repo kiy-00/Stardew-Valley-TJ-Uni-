@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="169">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="14" nextobjectid="177">
  <tileset firstgid="1" source="base_summer.tsx" />
  <tileset firstgid="3" source="myhouse_1_summer.tsx" />
  <tileset firstgid="4" source="house_1_summer.tsx" />
@@ -9,20 +9,26 @@
  <tileset firstgid="8" source="static_3_cobblestone.tsx" />
  <tileset firstgid="9" source="static_4_flower.tsx" />
  <tileset firstgid="10" source="boundary_summer.tsx" />
- <tileset firstgid="12" source="arable_2.tsx" />
+ <tileset firstgid="11" source="arable_2.tsx" />
+ <tileset firstgid="12" source="farmland.tsx" />
  <layer id="1" name="base" width="50" height="50">
   <data encoding="base64" compression="zlib">
    eJzt1rEOgCAMBFDk/z/ayQWpUHr2SsPQaBzgXksMtZRST51yqCtABoThKXYWhMFi6a2DWHclQ/uOyj8yoZzSGqO1Vw1tbukd5fC0aPaMOpP2+Vd5nq8/LaP9rI6Z82b19c6ARyEcXlm1liwOjY2dHTUPdnarh50V5WFnRDjY+VAWdjariZ3jOHI6drdkcES5z6LyS/cvdk6LY6dzlsGR4b6Y4d6+4mBbVvJGNPX+oV/fInpqeXt2nQ+y92yDtHf0/KhZzPSCOQttv5mz+LLMOmd7stNcIswNYbE4NbNnW9B9iWC4mqfVw+yjZFvtCetcRMvkNa9TeesGXakOnA==
   </data>
  </layer>
+ <layer id="13" name="farmland" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJzt1UEKwCAMRNEcwPuft7hrixbaTWcm/0Fw6yegVQAAAAAA9DNO42osxs2qgY7/pHRMKR1TQgMATQnvZMLftWtw6Hi6u0tHp4aUDmUJu3jToNyS0PGlQbGle4eazh1qOu/CsaNup2IDrg51xgs1
+  </data>
+ </layer>
  <layer id="2" name="boundary" width="50" height="50">
   <data encoding="base64" compression="zlib">
-   eJztl8EKxCAMRD37/x+8eBAWsUvMxO5kyEAoBTPxEbRpb6118XiSda3X35KLeJ9yPOV5Fcmw83xbkRwMUmCYKg4uqXAMKXAo9EPlvlJgGCoOf71f74jvGxyWWTjC/ybHyQyM1LjJ4ZmdvXWiOVC/CBZU//SI7ElkTz05bBze2sXBJTYO9HxE7QH9piF1o3uR+fux8765fs3NPl/N/Ozz7rdP5v+P6cV05yIqDi4pcKicDwUOlVlXhWOoOPikxpGZReWsrxwZWXYMxYHvA823htXzZK8n/n15rvkVfPEBhcAQuQ==
+   eJztl8sKxSAMRF37/x98cXE3YkseY5wODkgpbRJPrTHprbUuPp5kfTfq32Kb8e3leLKLCsmw8lktJAeDFBj+uhxcUuEYUuBQWA+VfKXAMHQ54vHe7jN+KzgstTDC/04OTw2cibGTI1I7R+NkOWZ7hD/EPDIxEWtavSa780LEJtKXsuly8Eltf2TjseQrpH3l+XHPc18M5Hsruy/Xu6v5f6X/6NN1fsbcD3q+NzPHkPVbs3NYpcDBvj+sUuCozrtWRfIxG8epOhGpHfXqCWXnoMZxkiUbn2WvozlOsaD2OANHxpaBY8c/le2zvH2fx/+qj/Iy3FE7fvqLEkk=
   </data>
  </layer>
  <layer id="3" name="arable" width="50" height="50">
   <data encoding="base64" compression="zlib">
-   eJztz7ENwDAMA0ENkP3nDVIYSOHCSUUJdwB7fhUAAEDVtVknu//dek4a0lu+NKS2/GmY1JHWoiOLjiwTGpYpHY8JDcuEhrfu/wEAAIAzNzWMCGU=
+   eJztzzEKwEAMA0H3+f9/Q4qDFFdcUslmBtRrqwAAAKquzTrZ/e/Wc9KQ3vKlIbXlT8OkjrQWHVl0ZJnQsEzpeExoWCY0vHX/DwAAAJy5ATRXB7I=
   </data>
  </layer>
  <objectgroup id="4" name="myhouse">
@@ -46,9 +52,9 @@
   <object id="168" gid="5" x="482.052" y="1117.31" width="127" height="127" />
  </objectgroup>
  <objectgroup id="8" name="obj_fb_2">
-  <object id="16" gid="6" x="1206.37" y="1387.19" width="41" height="90" />
+  <object id="16" gid="6" x="1305.84" y="689.524" width="41" height="90" />
   <object id="48" gid="6" x="1378.06" y="572.338" width="41" height="90" />
-  <object id="50" gid="6" x="1397.14" y="942.973" width="41" height="90" />
+  <object id="50" gid="6" x="1234.99" y="832.6" width="41" height="90" />
   <object id="58" gid="6" x="372.437" y="444.251" width="41" height="90" />
   <object id="59" gid="6" x="386.064" y="1079.24" width="41" height="90" />
   <object id="60" gid="6" x="484.173" y="1319.06" width="41" height="90" />
@@ -98,11 +104,11 @@
   <object id="158" gid="6" x="713.095" y="1068.34" width="41" height="90" />
   <object id="159" gid="6" x="575.469" y="1234.58" width="41" height="90" />
   <object id="160" gid="6" x="490.986" y="1216.86" width="41" height="90" />
-  <object id="161" gid="6" x="1165.49" y="1321.78" width="41" height="90" />
-  <object id="162" gid="6" x="1124.61" y="1182.8" width="41" height="90" />
+  <object id="161" gid="6" x="1360.35" y="851.673" width="41" height="90" />
+  <object id="162" gid="6" x="704.92" y="1314.98" width="41" height="90" />
   <object id="163" gid="6" x="1049.66" y="1312.25" width="41" height="90" />
-  <object id="164" gid="6" x="1157.31" y="1084.69" width="41" height="90" />
-  <object id="165" gid="6" x="1352.17" y="1015.19" width="41" height="90" />
+  <object id="164" gid="6" x="792.125" y="1343.59" width="41" height="90" />
+  <object id="165" gid="6" x="1397.14" y="708.598" width="41" height="90" />
  </objectgroup>
  <objectgroup id="9" name="static_2">
   <object id="67" gid="7" x="100.362" y="396.273" width="50" height="53" />
@@ -114,7 +120,7 @@
   <object id="74" gid="7" x="1407.12" y="210.955" width="50" height="53" />
   <object id="75" gid="7" x="1261.32" y="167.351" width="50" height="53" />
   <object id="76" gid="7" x="1329.45" y="352.669" width="50" height="53" />
-  <object id="77" gid="7" x="1295.39" y="1301.06" width="50" height="53" />
+  <object id="77" gid="7" x="1329.46" y="1369.19" width="50" height="53" />
  </objectgroup>
  <objectgroup id="10" name="static_3">
   <object id="78" gid="8" x="1459.37" y="668.425" width="30" height="25" />
@@ -137,11 +143,6 @@
   <object id="95" gid="8" x="216.647" y="171.065" width="30" height="25" />
  </objectgroup>
  <objectgroup id="11" name="static_4">
-  <object id="96" gid="9" x="519.338" y="664.788" width="16" height="15" />
-  <object id="97" gid="9" x="516.613" y="681.139" width="16" height="15" />
-  <object id="98" gid="9" x="517.975" y="702.941" width="16" height="15" />
-  <object id="99" gid="9" x="527.514" y="734.282" width="16" height="15" />
-  <object id="100" gid="9" x="538.415" y="777.886" width="16" height="15" />
   <object id="101" gid="9" x="588.832" y="862.369" width="16" height="15" />
   <object id="102" gid="9" x="564.305" y="840.567" width="16" height="15" />
   <object id="103" gid="9" x="609.271" y="881.446" width="16" height="15" />
@@ -161,5 +162,13 @@
   <object id="118" gid="9" x="1106.63" y="689.315" width="16" height="15" />
   <object id="119" gid="9" x="1095.73" y="766.985" width="16" height="15" />
   <object id="120" gid="9" x="821.842" y="948.215" width="16" height="15" />
+  <object id="169" gid="9" x="481.184" y="544.876" width="16" height="15" />
+  <object id="170" gid="9" x="415.778" y="604.832" width="16" height="15" />
+  <object id="171" gid="9" x="320.394" y="712.48" width="16" height="15" />
+  <object id="172" gid="9" x="291.779" y="756.084" width="16" height="15" />
+  <object id="173" gid="9" x="325.844" y="787.424" width="16" height="15" />
+  <object id="174" gid="9" x="455.294" y="886.896" width="16" height="15" />
+  <object id="175" gid="9" x="530.239" y="880.083" width="16" height="15" />
+  <object id="176" gid="9" x="496.173" y="889.622" width="16" height="15" />
  </objectgroup>
 </map>

@@ -135,7 +135,8 @@
                       "base": false,
                       "penetrable": false,
                       "arable": false,
-                      "fishing":true
+                      "fishing":true,
+                      "farmpermit":false
                   },
                   "base": {
                       "boundary": false,
@@ -143,7 +144,8 @@
                       "base": true,
                       "penetrable": false,
                       "arable": false,
-                      "fishing":false
+                      "fishing":false,
+                      "farmpermit":false
                   },
                   "arable": {
                       "boundary": false,
@@ -151,7 +153,17 @@
                       "base": false,
                       "penetrable": false,
                       "arable": true,
-                      "fishing":false
+                      "fishing":false,
+                      "farmpermit":false
+                  },
+                  "farmland":{
+                      "boundary": false,
+                      "physical": false,
+                      "base": false,
+                      "penetrable": false,
+                      "arable": false,
+                      "fishing":false,
+                      "farmpermit":true
                   }
               },
               "object_layers": {

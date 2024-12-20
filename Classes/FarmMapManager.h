@@ -23,6 +23,8 @@ public:
   bool isArable(const Vec2 &worldPos) const;
   bool isFishingSpot(const Vec2 &worldPos) const;
 
+  bool isFarmPermit(const Vec2& worldPos) const;
+
   // 切换季节接口
   void changeSeason(const std::string &newSeason);
 

@@ -377,6 +377,15 @@ void FarmConfigManager::loadConfigs(const std::string &configPath) {
             CCLOG("      fishing: 默认为 false");
           }
 
+          if (props.HasMember("farmpermit") && props["farmpermit"].IsBool()) {
+              lp.farmpermit = props["farmpermit"].GetBool();
+              CCLOG("      farmpermit: %d", lp.fishing);
+          }
+          else {
+              lp.farmpermit = false;
+              CCLOG("      farmpermit: 默认为 false");
+          }
+
           farmConfig.layers.tileLayers[layerName] = lp;
 
           CCLOG("    已添加 tile_layer: %s", layerName.c_str());

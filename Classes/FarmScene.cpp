@@ -332,6 +332,11 @@ void FarmScene::onMouseClick(EventMouse* event) {
     else if (row == 0 && col == SLOTS_PER_ROW) {
         player->onSlotClicked(0, SLOTS_PER_ROW);
     }
+    else {
+        if (event->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) {
+            player->performToolAction();
+        }
+    }
 }
 
 void FarmScene::setupKeyboard() {

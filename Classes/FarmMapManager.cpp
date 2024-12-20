@@ -137,6 +137,8 @@ bool FarmMapManager::checkLayerProperty(const Vec2 &worldPos,
           return tileLayerIt->second.arable;
         if (property == "fishing")
           return tileLayerIt->second.fishing;
+        if (property == "farmpermit")
+          return tileLayerIt->second.farmpermit;
       }
     }
   }
@@ -228,14 +230,25 @@ bool FarmMapManager::isBase(const Vec2 &worldPos) const {
   return false;
 }
 
-bool FarmMapManager::isArable(const Vec2 &worldPos) const {
+bool FarmMapManager::isFarmPermit(const Vec2 &worldPos) const {
   for (const auto &[layerName, props] : farmConfig.layers.tileLayers) {
-    if (props.arable && checkLayerProperty(worldPos, layerName, "arable")) {
+    if (props.farmpermit&& checkLayerProperty(worldPos, layerName, "farmpermit")) {
       return true;
     }
   }
   return false;
 }
+
+bool FarmMapManager::isArable(const Vec2& worldPos) const {
+    for (const auto& [layerName, props] : farmConfig.layers.tileLayers) {
+        if (props.arable && checkLayerProperty(worldPos, layerName, "arable")) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
 
 bool FarmMapManager::isFishingSpot(const Vec2 &worldPos) const {
   if (!map) return false;

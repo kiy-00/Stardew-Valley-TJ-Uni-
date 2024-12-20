@@ -17,6 +17,7 @@ bool FarmInteractionManager::init(Scene* scene, User* player, FarmMapManager* ma
     // 初始化指示精灵并设置在屏幕中间
     fishingSprite = Sprite::create("icons/fishing.png");
     farmingSprite = Sprite::create("icons/farming.png");
+    farmPermitSprite = Sprite::create("icons/chicken.png");
     
     if(fishingSprite) {
         Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -29,9 +30,17 @@ bool FarmInteractionManager::init(Scene* scene, User* player, FarmMapManager* ma
     if(farmingSprite) {
         Size visibleSize = Director::getInstance()->getVisibleSize();
         Vec2 origin = Director::getInstance()->getVisibleOrigin();
-        farmingSprite->setPosition(Vec2(origin.x + visibleSize.width/2 + 50,  // 稍微偏右一点
+        farmingSprite->setPosition(Vec2(origin.x + visibleSize.width/2, 
                                       origin.y + visibleSize.height/2));
         currentScene->addChild(farmingSprite, 1000);
+    }
+
+    if (farmPermitSprite) {
+        Size visibleSize = Director::getInstance()->getVisibleSize();
+        Vec2 origin = Director::getInstance()->getVisibleOrigin();
+        farmPermitSprite->setPosition(Vec2(origin.x + visibleSize.width / 2, 
+            origin.y + visibleSize.height / 2));
+        currentScene->addChild(farmPermitSprite, 1000);
     }
     
     // 初始化调试标签
@@ -95,6 +104,12 @@ void FarmInteractionManager::checkPlayerPosition() {
     if (mapManager->isArable(playerPos) && farmingSprite) {
         farmingSprite->setPosition(playerPos + Vec2(0, 50));
     }
+
+    // 检查可养殖点，只更新位置
+    if (mapManager->isFarmPermit(playerPos) && farmPermitSprite) {
+        farmPermitSprite->setPosition(playerPos + Vec2(0, 50));
+    }
+
 }
 
 // 注释掉原来的气泡相关代码
@@ -120,6 +135,11 @@ void FarmInteractionManager::cleanup() {
     if(farmingSprite) {
         farmingSprite->removeFromParent();
         farmingSprite = nullptr;
+    }
+
+    if (farmPermitSprite) {
+        farmPermitSprite->removeFromParent();
+        farmPermitSprite = nullptr;
     }
     
     if(worldPosLabel) {
