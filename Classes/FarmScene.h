@@ -5,7 +5,6 @@
 #include "cocos2d.h"
 #include "User.h"
 #include "Inventory.h"
-#include "ToolItem.h"
 
 class FarmScene : public cocos2d::Scene {
 public:

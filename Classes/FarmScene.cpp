@@ -4,6 +4,7 @@
 #include "FarmMapRenderer.h"
 #include "SpritePathManager.h"
 #include "TimeSeasonSystem.h"
+#include "ToolItem.h"
 
 USING_NS_CC;
 
