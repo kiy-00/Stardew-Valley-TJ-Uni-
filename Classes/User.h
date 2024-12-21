@@ -56,6 +56,7 @@ public:
 	void toggleInventory();
 	void onSlotClicked(int row, int col);
 	void updateInventoryDisplay();
+	void updateHeldItemSprite();
 	bool getIsInventoryOpen() const { return isInventoryOpen; }
 	void setIsInventoryOpen(bool open) { isInventoryOpen = open; }
 

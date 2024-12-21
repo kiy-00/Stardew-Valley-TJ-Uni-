@@ -127,8 +127,8 @@ void FarmScene::updateTimeSeasonLabel() {
     });
 
     // 添加调试日志
-    CCLOG("Time Update - Year: %d, Season: %s, Day: %d, Time: %02d:%02d",
-        time.year, seasonStr.c_str(), time.day, time.hour, time.minute);
+    //CCLOG("Time Update - Year: %d, Season: %s, Day: %d, Time: %02d:%02d",
+    //    time.year, seasonStr.c_str(), time.day, time.hour, time.minute);
 }
 
 bool FarmScene::initMap() {
@@ -323,7 +323,7 @@ void FarmScene::onMouseClick(EventMouse* event) {
 
     // 如果背包打开，强制对鼠标位置的 Y 坐标进行偏移
     if (player->getIsInventoryOpen()) {
-        mousePosition.y += 60;
+        mousePosition.y -= 90;
     }
 
     CCLOG("Mouse Position After Offset: (%.2f, %.2f)", mousePosition.x, mousePosition.y);

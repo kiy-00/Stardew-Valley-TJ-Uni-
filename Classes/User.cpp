@@ -1,6 +1,7 @@
 #include "User.h"
 #include "Item.h"
 #include "cocos2d.h"
+#include "RenderConstants.h"
 
 USING_NS_CC;
 
@@ -228,56 +229,58 @@ void User::toggleInventory() {
     if (!inventoryLayer) {
         isInventoryOpen = true;
         inventoryLayer = cocos2d::Layer::create();
-        auto background = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 180));
-        inventoryLayer->addChild(background);
 
         const int slotsPerRow = 8;
         const int rows = 3;
         const float slotSize = 30.0f;
 
-        float startX = (Director::getInstance()->getVisibleSize().width - (slotsPerRow * slotSize)) / 2;
-        float startY = (Director::getInstance()->getVisibleSize().height - (rows * slotSize)) / 2;
+        // 设置背包整体位置相对于玩家
+		inventoryLayer->setPosition(this->getPosition() + Vec2(-125, 100));
 
-        background->setPosition(0, 0);
+        // 创建半透明背景
+        auto background = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 180));
+        background->setContentSize(cocos2d::Size(slotsPerRow * slotSize + slotSize, rows * slotSize + slotSize));
+        background->setPosition(-slotSize / 2, -slotSize / 2);
+        inventoryLayer->addChild(background);
 
+        // 创建背包槽位
         for (int row = 0; row < rows; ++row) {
             for (int col = 0; col < slotsPerRow; ++col) {
                 auto slot = cocos2d::Sprite::create("pack/slot.png");
                 if (slot) {
-                    slot->setPosition(Vec2(startX + col * slotSize + slotSize / 2, startY + row * slotSize + slotSize / 2));
+                    slot->setPosition(Vec2(col * slotSize + slotSize / 2, row * slotSize + slotSize / 2));
                     inventoryLayer->addChild(slot);
                 }
             }
         }
 
-        auto trashSlot = cocos2d::Sprite::create("pack/slot.png");
+        // 创建丢弃槽（在右侧）
+        auto trashSlot = cocos2d::Sprite::create("pack/garbage.png");
         if (trashSlot) {
-            trashSlot->setPosition(Vec2(startX + slotsPerRow * slotSize + slotSize / 2, startY + slotSize / 2)); // 放在最后一个槽位的右边
+            trashSlot->setPosition(Vec2(slotsPerRow * slotSize + slotSize / 2, slotSize / 2));
             inventoryLayer->addChild(trashSlot);
         }
 
+        // 显示物品
         for (int row = 0; row < rows; ++row) {
             for (int col = 0; col < slotsPerRow; ++col) {
                 auto slotItems = inventory->getItems(row, col);
                 if (!slotItems.empty()) {
                     Item* item = slotItems[0];
                     auto sprite = item->getSprite();
-
                     if (sprite) {
-                        sprite->setPosition(Vec2(startX + col * slotSize + slotSize / 2, startY + row * slotSize + slotSize / 2));
+                        sprite->setPosition(Vec2(col * slotSize + slotSize / 2, row * slotSize + slotSize / 2));
                         inventoryLayer->addChild(sprite);
 
-                        // 获取物品数量
                         int quantity = item->getQuantity();
                         auto quantityLabel = cocos2d::Label::createWithSystemFont(std::to_string(quantity), "Arial", 12);
-                        quantityLabel->setPosition(Vec2(startX + col * slotSize + slotSize - 10, startY + row * slotSize + 10));
+                        quantityLabel->setPosition(Vec2(col * slotSize + slotSize - 10, row * slotSize + 10));
                         inventoryLayer->addChild(quantityLabel);
                     }
                 }
             }
         }
-
-        Director::getInstance()->getRunningScene()->addChild(inventoryLayer, 10, "InventoryLayer");
+        Director::getInstance()->getRunningScene()->addChild(inventoryLayer, FOUR, "InventoryLayer");
     }
     else {
         isInventoryOpen = false;
@@ -298,35 +301,91 @@ void User::toggleInventory() {
 // 根据点击的槽位选择物品或移动物品。
 ////////////////////////////////////////////////////////////
 void User::onSlotClicked(int row, int col) {
-    if (inventoryLayer) {
-        // 检查是否点击垃圾桶槽位 
-        if (row == 0 && col == 8) {
-            // 垃圾桶槽位，删除选中的物品
-            Item* selectedItem = getSelectedItem();
-            if (selectedItem) {
-                // 调用现有的减少数量方法
-                reduceSelectedItemQuantity(selectedItem->getQuantity(), false);
-                updateInventoryDisplay(); // 更新背包显示
-            }
-            return; // 返回，不处理其他槽位
-        }
-        if (inventory->getItems(row, col).empty()) {
-            // 如果当前槽位为空
-            if (selectedSlot.first != -1 && selectedSlot.second != -1) {
-                if (inventory->moveItems(row, col)) {
-                    updateInventoryDisplay(); // 更新显示
-                }
-            }
-        }
-        else {
-            // 选中当前槽位
-            inventory->selectSlot(row, col);
-            selectedSlot = { row, col };
-            CCLOG("选中槽位: 行: %d, 列: %d", selectedSlot.first, selectedSlot.second);
-            Item* selectedItem = getSelectedItem();
-            updateInventoryDisplay();
-        }
-    }
+	if (!inventoryLayer) return;
+
+	// 检查是否点击垃圾桶槽位 
+	if (row == 0 && col == 8) {
+		// 如果当前有选中物品，则将其全部删除
+		if (selectedSlot.first != -1 && selectedSlot.second != -1) {
+			Item* selectedItem = getSelectedItem();
+			if (selectedItem) {
+				reduceSelectedItemQuantity(selectedItem->getQuantity(), false);
+				// 重置选中槽位
+				selectedSlot = { -1, -1 };
+				heldItemSprite->setVisible(false);
+				updateInventoryDisplay();
+			}
+		}
+		return;
+	}
+
+	// 获取当前槽位的物品列表
+	auto slotItems = inventory->getItems(row, col);
+	bool slotEmpty = slotItems.empty() || slotItems[0]->getQuantity() == 0;
+
+	// 情况1：当前未选中任何物品
+	if (selectedSlot.first == -1 && selectedSlot.second == -1) {
+		if (!slotEmpty) {
+			// 选中当前槽位的物品
+			inventory->selectSlot(row, col);
+			selectedSlot = { row, col };
+			updateHeldItemSprite();
+			updateInventoryDisplay();
+		}
+		return;
+	}
+	// 情况2：当前已经选中一个物品
+	if (slotEmpty) {
+		// 将选中物品移动到该空槽位
+		if (inventory->moveItems(row, col)) {
+			selectedSlot = { -1, -1 };
+			heldItemSprite->setVisible(false);
+			updateInventoryDisplay();
+		}
+        return;
+	}
+    else {
+		// 选中新的物品
+		inventory->selectSlot(row, col);
+		selectedSlot = { row, col };
+		updateHeldItemSprite();
+		updateInventoryDisplay();
+	}
+}
+
+////////////////////////////////////////////////////////////
+// updateHeldItemSprite 更新持有物品显示
+// 根据当前是否选中物品更新显示。
+////////////////////////////////////////////////////////////
+void User::updateHeldItemSprite() {
+	Item* selectedItem = getSelectedItem();
+	if (selectedItem) {
+		heldItemSprite->setTexture(selectedItem->getImagePath());
+		heldItemSprite->setVisible(true);
+
+		// 根据当前方向设置物品的位置和朝向
+		switch (m_direction) {
+		case 0: // 下
+			heldItemSprite->setScaleX(1.0f);
+			heldItemSprite->setPosition(Vec2(34, 16));
+			break;
+		case 1: // 上
+			heldItemSprite->setScaleX(1.0f);
+			heldItemSprite->setPosition(Vec2(36, 20));
+			break;
+		case 2: // 左
+			heldItemSprite->setScaleX(-1.0f);
+			heldItemSprite->setPosition(Vec2(12, 15));
+			break;
+		case 3: // 右
+			heldItemSprite->setScaleX(1.0f);
+			heldItemSprite->setPosition(Vec2(28, 15));
+			break;
+		}
+	}
+	else {
+		heldItemSprite->setVisible(false);
+	}
 }
 
 ////////////////////////////////////////////////////////////
@@ -334,62 +393,51 @@ void User::onSlotClicked(int row, int col) {
 // 根据当前背包物品信息重新绘制背包UI。
 ////////////////////////////////////////////////////////////
 void User::updateInventoryDisplay() {
-    // 清除当前显示
-    inventoryLayer->removeAllChildren();
+	if (!inventoryLayer) return;
 
-    // 重新绘制背景
-    const int slotsPerRow = 8; // 每行 8 个格子
-    const int rows = 3; // 3 行
-    const float slotSize = 30.0f; // 每个格子的大小
-    float startX = (Director::getInstance()->getVisibleSize().width - (slotsPerRow * slotSize)) / 2;
-    float startY = (Director::getInstance()->getVisibleSize().height - (rows * slotSize)) / 2;
+	inventoryLayer->removeAllChildren();  // 清除当前显示的所有内容
 
-    // 绘制背景
-    auto background = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 180));
-    background->setPosition(0, 0);  // 背景覆盖整个背包层
-    inventoryLayer->addChild(background);
+	const int slotsPerRow = 8;
+	const int rows = 3;
+	const float slotSize = 30.0f;
 
-    // 创建槽位
-    for (int row = 0; row < rows; ++row) {
-        for (int col = 0; col < slotsPerRow; ++col) {
-            auto slot = cocos2d::Sprite::create("pack/slot.png");
-            if (slot) {
-                // 设置格子的绝对位置
-                slot->setPosition(Vec2(startX + col * slotSize + slotSize / 2,
-                    startY + row * slotSize + slotSize / 2));
-                inventoryLayer->addChild(slot);
-            }
-        }
-    }
+	// 绘制背景
+	auto background = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 180));
+	background->setContentSize(cocos2d::Size(slotsPerRow * slotSize + slotSize, rows * slotSize + slotSize));
+	background->setPosition(-slotSize / 2, -slotSize / 2);
+	inventoryLayer->addChild(background);
 
-    auto trashSlot = cocos2d::Sprite::create("pack/slot.png");
-    if (trashSlot) {
-        trashSlot->setPosition(Vec2(startX + slotsPerRow * slotSize + slotSize / 2, startY + slotSize / 2)); // 放在最后一个槽位的右边
-        inventoryLayer->addChild(trashSlot);
-    }
+	// 绘制背包槽位
+	for (int row = 0; row < rows; ++row) {
+		for (int col = 0; col < slotsPerRow; ++col) {
+			auto slot = cocos2d::Sprite::create("pack/slot.png");
+			slot->setPosition(Vec2(col * slotSize + slotSize / 2, row * slotSize + slotSize / 2));
+			inventoryLayer->addChild(slot);
+		}
+	}
 
-    // 重新绘制物品
-    for (int row = 0; row < rows; ++row) {
-        for (int col = 0; col < slotsPerRow; ++col) {
-            auto slotItems = inventory->getItems(row, col);
-            if (!slotItems.empty()) {
-                Item* item = slotItems[0]; // 获取第一个物品
-                auto sprite = item->getSprite();
-                if (sprite) {
-                    sprite->setPosition(Vec2(startX + col * slotSize + slotSize / 2,
-                        startY + row * slotSize + slotSize / 2));
-                    inventoryLayer->addChild(sprite);
+	// 绘制垃圾桶槽位
+	auto trashSlot = cocos2d::Sprite::create("pack/garbage.png");
+	trashSlot->setPosition(Vec2(slotsPerRow * slotSize + slotSize / 2, slotSize / 2));
+	inventoryLayer->addChild(trashSlot);
 
-                    // 获取并显示物品数量
-                    int quantity = item->getQuantity(); // 使用物品数量而不是槽位大小
-                    auto quantityLabel = cocos2d::Label::createWithSystemFont(std::to_string(quantity), "Arial", 12);
-                    quantityLabel->setPosition(Vec2(startX + col * slotSize + slotSize - 10, // 右下角
-                        startY + row * slotSize + 10));
-                    inventoryLayer->addChild(quantityLabel);
-                }
-            }
-        }
-    }
+	// 重新绘制物品
+	for (int row = 0; row < rows; ++row) {
+		for (int col = 0; col < slotsPerRow; ++col) {
+			auto slotItems = inventory->getItems(row, col);
+			if (!slotItems.empty()) {
+				Item* item = slotItems[0];
+				auto sprite = item->getSprite();
+				sprite->setPosition(Vec2(col * slotSize + slotSize / 2, row * slotSize + slotSize / 2));
+				inventoryLayer->addChild(sprite);
+
+				int quantity = item->getQuantity();
+				auto quantityLabel = cocos2d::Label::createWithSystemFont(std::to_string(quantity), "Arial", 12);
+				quantityLabel->setPosition(Vec2(col * slotSize + slotSize - 10, row * slotSize + 10));
+				inventoryLayer->addChild(quantityLabel);
+			}
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////
@@ -436,7 +484,7 @@ void User::createInventoryBar() {
             }
         }
     }
-    Director::getInstance()->getRunningScene()->addChild(inventoryBarLayer, 10, "InventoryBarLayer");
+    Director::getInstance()->getRunningScene()->addChild(inventoryBarLayer, FOUR, "InventoryBarLayer");
 }
 
 ////////////////////////////////////////////////////////////
