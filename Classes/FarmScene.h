@@ -6,6 +6,8 @@
 #include "User.h"
 #include "Inventory.h"
 #include "FarmlandManager.h"
+#include "WeatherSystem.h"
+
 
 
 class FarmScene : public cocos2d::Scene {
@@ -43,9 +45,26 @@ private:
     void updateTimeSeasonLabel();     // 更新时间显示
     void onSeasonChanged(const std::string& newSeason);
 
+
+
+    //天气系统相关
+    WeatherSystem* weatherSystem;
+    Label* weatherLabel;  // For displaying current weather
+
+    void updateWeatherLabel();
+    void onWeatherChanged(const std::string& newWeather);
+
     // 初始化函数
     bool initMap();
     bool initPlayer();
+    // 新增初始化函数
+    bool initTimeSystem();
+    bool initWeatherSystem();
+    void setupSystemCallbacks();
+    bool createSystemLabels();
+    void setupSystemSchedulers();
+    void startSystems();
+
     void setupKeyboard();
     void initInventory();
     void setupMouse();

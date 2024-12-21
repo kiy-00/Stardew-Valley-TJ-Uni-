@@ -53,14 +53,14 @@ bool TimeSeasonSystem::init() {
 
 // ʱ����Ʒ���
 void TimeSeasonSystem::startTime() {
-    CCLOG("TimeSystem starting - timeScale: %.2f", timeScale);
+    //CCLOG("TimeSystem starting - timeScale: %.2f", timeScale);
     isRunning = true;
     scheduleUpdate(); 
     this->schedule(CC_SCHEDULE_SELECTOR(TimeSeasonSystem::update), 1.0f / 60.0f);  // 60fps����
 }
 
 void TimeSeasonSystem::pauseTime() {
-    CCLOG("TimeSystem paused");
+    //CCLOG("TimeSystem paused");
     isRunning = false;
     this->unschedule(CC_SCHEDULE_SELECTOR(TimeSeasonSystem::update));
 }

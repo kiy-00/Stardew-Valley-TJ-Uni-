@@ -16,7 +16,7 @@ bool FarmInteractionManager::init(Scene* scene, User* player, FarmMapManager* ma
     
     // 初始化时间系统并启动
     auto timeSystem = TimeSeasonSystem::getInstance();
-    if (timeSystem) {
+    if (timeSystem&&timeSystem->getParent()==nullptr) {
         // 确保 timeSystem 在场景中被 scheduleUpdate
         currentScene->addChild(timeSystem, 9999); // 加到场景
         timeSystem->startTime();

@@ -6,6 +6,8 @@
 #include "TimeSeasonSystem.h"
 #include "ToolItem.h"
 #include "RenderConstants.h"
+#include "WeatherSystem.h"
+#include "WeatherEffectManager.h"
 
 USING_NS_CC;
 
@@ -18,65 +20,46 @@ bool FarmScene::init(const std::string& mapType) {
         return false;
     }
 
-    // 获取物理世界并设置
+    // 初始化物理世界
     auto physicsWorld = this->getPhysicsWorld();
     physicsWorld->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
     physicsWorld->setGravity(Vec2::ZERO);
 
     currentMapType = mapType;
 
-    // 初始化时间季节系统 - 修改这部分
-    timeSystem = TimeSeasonSystem::getInstance();
-    // 一个季节大约10秒的时间流速
-    timeSystem->setTimeScale(67.2f);  // 修改时间流速
-    // 设置季节变化回调
-    timeSystem->setSeasonChangedCallback([this](const std::string& newSeason) {
-        CCLOG("Season change callback triggered with season: %s", newSeason.c_str());
-        this->onSeasonChanged(newSeason);
-    });
-    // 立即启动时间系统
-    timeSystem->startTime();
-    // 立即更新一次标签
-    updateTimeSeasonLabel();
-
-    // 提高更新频率
-    this->schedule([this](float dt) {
-        this->updateTimeSeasonLabel();
-        }, 0.1f, "time_update");  // 从0.5秒改为0.1秒
-
-    // 创建时间和季节显示标签 - 修改这部分
-    auto visibleSize = Director::getInstance()->getVisibleSize();
-    timeSeasonLabel = Label::createWithTTF("Loading...", "fonts/Marker Felt.ttf", 24);
-    if (!timeSeasonLabel) {
-        CCLOG("Failed to create timeSeasonLabel");
+    // 按顺序初始化各个系统
+    if (!initTimeSystem() || !initWeatherSystem() || !createSystemLabels()) {
+        CCLOG("Failed to initialize core systems");
         return false;
     }
-    timeSeasonLabel->setPosition(Vec2(visibleSize.width / 2, visibleSize.height - 30));
-    this->addChild(timeSeasonLabel, 1000);
 
+    // 设置回调和调度器
+    setupSystemCallbacks();
+    setupSystemSchedulers();
 
     // 初始化地图管理器
     farmMapManager = FarmMapManager::getInstance();
     if (!farmMapManager->initWithFarmType(mapType, timeSystem->getCurrentSeasonString())) {
-        CCLOG("Failed to init FarmMapManager");
+        // CCLOG("Failed to init FarmMapManager");
         return false;
     }
 
-    // 初始化其他组件
+    // 初始化其他游戏组件
     if (!initMap() || !initPlayer()) {
         return false;
     }
 
+    // 初始化剩余组件
     setupKeyboard();
     setupMouse();
     initInventory();
-    initFarmland();  // 添加这行
+    initFarmland();
 
     // 初始化交互管理器
     interactionManager = FarmInteractionManager::getInstance();
     interactionManager->init(this, player, farmMapManager);
 
-    // 添加交互更新回调
+
     this->schedule([this](float dt) {
         interactionManager->update(dt);
         }, 0.1f, "interaction_update");
@@ -88,21 +71,116 @@ bool FarmScene::init(const std::string& mapType) {
         player->createInventoryBar();
         }, 0.1f, "createInventoryBarKey");
 
-    // 启动时间系统
-    timeSystem->startTime();
+    // 启动所有系统
+    startSystems();
 
     return true;
 }
 
+bool FarmScene::initTimeSystem() {
+    timeSystem = TimeSeasonSystem::getInstance();
+    if (!timeSystem) {
+        CCLOG("Failed to create TimeSeasonSystem");
+        return false;
+    }
+    timeSystem->setName("TimeSeasonSystem");
+    timeSystem->retain();
+    this->addChild(timeSystem);
+    timeSystem->setTimeScale(67.2f);
+    return true;
+}
+
+bool FarmScene::initWeatherSystem() {
+    weatherSystem = WeatherSystem::getInstance();
+    if (!weatherSystem) {
+        CCLOG("Failed to create WeatherSystem");
+        return false;
+    }
+    weatherSystem->setName("WeatherSystem");
+    weatherSystem->retain();
+    this->addChild(weatherSystem);
+    return true;
+}
+
+void FarmScene::setupSystemCallbacks() {
+    // 设置季节变化回调
+    timeSystem->setSeasonChangedCallback([this](const std::string& newSeason) {
+        this->onSeasonChanged(newSeason);
+        });
+
+    // 设置天气变化回调
+    weatherSystem->setWeatherChangedCallback([this](const std::string& newWeather) {
+        this->onWeatherChanged(newWeather);
+        });
+}
+
+bool FarmScene::createSystemLabels() {
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+
+    // 创建时间和季节标签
+    timeSeasonLabel = Label::createWithTTF("Loading...", "fonts/Marker Felt.ttf", 24);
+    if (!timeSeasonLabel) {
+        CCLOG("Failed to create timeSeasonLabel");
+        return false;
+    }
+    timeSeasonLabel->setPosition(Vec2(visibleSize.width / 2, visibleSize.height - 30));
+    this->addChild(timeSeasonLabel, 1000);
+
+    // 创建天气标签
+    weatherLabel = Label::createWithTTF("Weather: Sunny", "fonts/Marker Felt.ttf", 24);
+    if (!weatherLabel) {
+        CCLOG("Failed to create weatherLabel");
+        return false;
+    }
+    weatherLabel->setPosition(Vec2(visibleSize.width / 2, visibleSize.height - 60));
+    this->addChild(weatherLabel, 1000);
+
+    return true;
+}
+
+void FarmScene::setupSystemSchedulers() {
+    // 设置时间标签更新调度器
+    this->schedule([this](float dt) {
+        this->updateTimeSeasonLabel();
+        }, 0.1f, "time_update");
+
+    // 设置天气标签更新调度器
+    this->schedule([this](float dt) {
+        this->updateWeatherLabel();
+        }, 0.1f, "weather_update");
+}
+
+void FarmScene::startSystems() {
+    // 启动时间系统
+    if (timeSystem) {
+        timeSystem->startTime();
+        CCLOG("Time system started successfully");
+    }
+
+    // 启动天气系统
+    if (weatherSystem) {
+        weatherSystem->startWeatherSystem();
+        CCLOG("Weather system started successfully");
+        // 在场景的 init 函数中
+        auto weatherEffectManager = WeatherEffectManager::getInstance();
+        weatherEffectManager->initializeWithScene(this);
+    }
+
+    // 立即更新一次标签
+    updateTimeSeasonLabel();
+    updateWeatherLabel();
+}
+
+
 void FarmScene::updateTimeSeasonLabel() {
     // 添加空指针检查
     if (!timeSeasonLabel) {
-        CCLOG("Warning: timeSeasonLabel is nullptr");
+        //CCLOG("Warning: timeSeasonLabel is nullptr");
         return;
     }
 
     if (!timeSystem) {
-        CCLOG("Warning: timeSystem is nullptr");
+        //CCLOG("Warning: timeSystem is nullptr");
         return;
     }
 
@@ -134,7 +212,7 @@ void FarmScene::updateTimeSeasonLabel() {
 bool FarmScene::initMap() {
     tmxMap = farmMapManager->getMap();
     if (!tmxMap) {
-        CCLOG("Failed to get map from FarmMapManager");
+        //CCLOG("Failed to get map from FarmMapManager");
         return false;
     }
     this->addChild(tmxMap, FIRST);  // 修改这里，使用 FIRST
@@ -148,7 +226,7 @@ bool FarmScene::initMap() {
 }
 
 void FarmScene::onSeasonChanged(const std::string& newSeason) {
-    CCLOG("Season changing to: %s", newSeason.c_str());
+    //CCLOG("Season changing to: %s", newSeason.c_str());
 
     // 安全地移除当前地图和相关资源
     if (tmxMap) {
@@ -170,7 +248,7 @@ void FarmScene::onSeasonChanged(const std::string& newSeason) {
     // 通知交互管理器
     interactionManager->onSeasonChanged(newSeason);
 
-    CCLOG("Season change completed: %s", newSeason.c_str());
+    //CCLOG("Season change completed: %s", newSeason.c_str());
 }
 
 bool FarmScene::initPlayer() {
@@ -226,6 +304,20 @@ void FarmScene::update(float dt) {
     }
 }
 
+// Add new methods to FarmScene.cpp:
+void FarmScene::updateWeatherLabel() {
+    if (!weatherLabel || !weatherSystem) return;
+
+    std::string weatherStr = weatherSystem->getCurrentWeatherString();
+    CCLOG("Current weather: %s", weatherStr.c_str());  // 正确的CCLOG用法
+    weatherLabel->setString("Weather: " + weatherStr);
+}
+
+void FarmScene::onWeatherChanged(const std::string& newWeather) {
+    // Here you can handle weather change effects
+    //
+}
+
 void FarmScene::initInventory() {
     ToolItem* reap = new ToolItem("Reap", "A useful tool.", "tool/reap.png");
     player->getInventory()->addItem(reap);
@@ -235,6 +327,8 @@ void FarmScene::initInventory() {
     player->getInventory()->addItem(hoe);
     ToolItem* pickaxe = new ToolItem("Pickaxe", "A useful tool.", "tool/pickaxe.png");
     player->getInventory()->addItem(pickaxe);
+    ToolItem* kettle = new ToolItem("kettle", "A useful tool.", "tool/kettle.png");
+    player->getInventory()->addItem(kettle);
 
     player->getInventory()->reduceItemQuantity(0, 0, 2);
 }
@@ -296,6 +390,7 @@ std::vector<Vec2> FarmScene::getFarmablePositions() {
     for (float x = 0; x < mapSize.width; x += tileSize.width) {
         for (float y = 0; y < mapSize.height; y += tileSize.height) {
             Vec2 pos(x, y);
+            //这里是世界坐标
             auto renderPos = Vec2(x, y);
             if (farmMapManager->isArable(pos)) {
                 positions.push_back(renderPos);
@@ -375,11 +470,27 @@ void FarmScene::onMouseClick(EventMouse* event) {
             // 获取当前选中的物品
             Item* selectedItem = player->getSelectedItem();
             if (selectedItem) {
-                std::string toolType = selectedItem->getItemType();
-                // 只有当工具是锄头且目标位置可耕种时才执行操作
-                if (toolType == "hoe" && farmMapManager->isArable(targetPos)) {
-                    farmlandManager->handleToolAction(toolType, targetPos, direction);
+                std::string toolType = selectedItem->getName();
+                // 将目标位置转换为瓦片坐标
+                Vec2 tilePos = farmMapManager->worldToTileCoord(targetPos);
+                
+                // 添加更详细的调试信息
+                CCLOG("Tool Action Debug:");
+                CCLOG("Selected Tool Type: %s", toolType.c_str());
+                CCLOG("World Position: (%.2f, %.2f)", targetPos.x, targetPos.y);
+                CCLOG("Tile Position: (%.0f, %.0f)", tilePos.x, tilePos.y);
+                CCLOG("Is Arable: %d", farmMapManager->isArable(targetPos));
+
+                farmlandManager->debugAllFarmlandKeys();
+
+                if (toolType == "Hoe" && farmMapManager->isArable(targetPos)) {
+                    CCLOG("Attempting to handle tool action at position (%.2f, %.2f)", targetPos.x, targetPos.y);
+                    farmlandManager->handleToolAction(toolType, tilePos, direction);
+                } else {
+                    CCLOG("Tool action failed - Conditions not met");
                 }
+            } else {
+                CCLOG("No tool selected");
             }
         }
     }
@@ -397,7 +508,7 @@ void FarmScene::setupKeyboard() {
     // 使用addEventListenerWithFixedPriority替代
     _eventDispatcher->addEventListenerWithFixedPriority(keyboardListener, 1);
 
-    CCLOG("键盘事件监听器设置完成");
+    //CCLOG("键盘事件监听器设置完成");
 }
 
 void FarmScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event) {
@@ -416,6 +527,9 @@ void FarmScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event) {
             break;
     }
 }
+
+
+
 
 
 void FarmScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {

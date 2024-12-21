@@ -17,7 +17,7 @@ bool FarmMapManager::initWithFarmType(const std::string &farmType,
   // 获取农场配置
   auto configManager = FarmConfigManager::getInstance();
   if (!configManager) {
-    CCLOG("FarmConfigManager实例获取失败");
+    //CCLOG("FarmConfigManager实例获取失败");
     return false;
   }
 
@@ -34,13 +34,13 @@ bool FarmMapManager::initWithFarmType(const std::string &farmType,
 
     map = TMXTiledMap::create(mapPath);
     if (!map) {
-      CCLOG("地图加载失败: %s", mapPath.c_str());
+      //CCLOG("地图加载失败: %s", mapPath.c_str());
       return false;
     }
 
     return true;
   } catch (const std::exception &e) {
-    CCLOG("初始化农场失败: %s", e.what());
+    //CCLOG("初始化农场失败: %s", e.what());
     return false;
   }
 }

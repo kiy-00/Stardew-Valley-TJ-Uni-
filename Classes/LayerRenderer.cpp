@@ -5,8 +5,8 @@ void LayerRenderer::renderLayer(cocos2d::TMXLayer* layer,
     const std::string& layerName,
     const std::string& spritePath,
     const LayerProperties& layerProps) {
-    CCLOG("成功渲染普通图层: %s, 精灵路径: %s", layerName.c_str(),
-        spritePath.c_str());
+    ////CCLOG("成功渲染普通图层: %s, 精灵路径: %s", layerName.c_str(),
+    //    spritePath.c_str());
 }
 
 // 渲染对象层
@@ -16,12 +16,12 @@ void LayerRenderer::renderObjectLayer(cocos2d::TMXObjectGroup* objectGroup,
     const std::string& spritePath,
     const LayerProperties& layerProps) {
     if (!objectGroup) {
-        CCLOG("未找到名为 '%s' 的对象组。", layerName.c_str());
+       // CCLOG("未找到名为 '%s' 的对象组。", layerName.c_str());
         return;
     }
 
     const auto& objects = objectGroup->getObjects();
-    CCLOG("找到 %s 对象数量: %zu", layerName.c_str(), objects.size());
+    //CCLOG("找到 %s 对象数量: %zu", layerName.c_str(), objects.size());
 
     for (const auto& obj : objects) {
         cocos2d::ValueMap object = obj.asValueMap();
@@ -39,8 +39,8 @@ void LayerRenderer::renderObjectLayer(cocos2d::TMXObjectGroup* objectGroup,
                 : 0.0f;
 
             // 打印调试信息
-            CCLOG("传递给创建精灵的数据:");
-            CCLOG("位置: (%.2f, %.2f), 尺寸: %.2f x %.2f", x, y, width, height);
+           /* CCLOG("传递给创建精灵的数据:");
+            CCLOG("位置: (%.2f, %.2f), 尺寸: %.2f x %.2f", x, y, width, height);*/
 
             // 创建精灵
             auto sprite = cocos2d::Sprite::create(spritePath);
@@ -52,7 +52,7 @@ void LayerRenderer::renderObjectLayer(cocos2d::TMXObjectGroup* objectGroup,
 
                 // 设置精灵的位置
                 sprite->setPosition(cocos2d::Vec2(x, y + height));
-                CCLOG("已设置精灵位置，具体为：(%.2f, %.2f)", x, y);
+                //CCLOG("已设置精灵位置，具体为：(%.2f, %.2f)", x, y);
 
                 // 添加物理体
                 if (layerProps.physical) {
@@ -71,7 +71,7 @@ void LayerRenderer::renderObjectLayer(cocos2d::TMXObjectGroup* objectGroup,
                     // 将物理体附加到精灵
                     sprite->setPhysicsBody(physicsBody);
 
-                    CCLOG("已添加物理属性到精灵");
+                    //CCLOG("已添加物理属性到精灵");
                 }
 
                 // 添加精灵到地图
@@ -94,10 +94,10 @@ void LayerRenderer::renderObjectLayer(cocos2d::TMXObjectGroup* objectGroup,
                     cocos2d::Color4F::BLUE);
                 tmxMap->addChild(marker, 200); // 确保标记在房屋精灵之上
                 sprite->addChild(debugRectSprite);
-                CCLOG("已添加调试边框到精灵");
+                //CCLOG("已添加调试边框到精灵");
             }
             else {
-                CCLOG("无法加载精灵，路径：%s", spritePath.c_str());
+                //CCLOG("无法加载精灵，路径：%s", spritePath.c_str());
             }
         }
     }

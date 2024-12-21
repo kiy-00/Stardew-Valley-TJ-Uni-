@@ -5,44 +5,58 @@
 
 USING_NS_CC;
 
-class FarmlandTile : public cocos2d::Node {
+class FarmlandTile : public cocos2d::Sprite {
 public:
     enum class State {
-        EMPTY,          // Î´¸ûÖÖ
-        TILLED,         // ÒÑ¸ûµØ
-        WATERED,        // ÒÑ½½Ë®
-        FERTILIZED      // ÒÑÊ©·Ê
+        EMPTY,          // Î´ï¿½ï¿½ï¿½ï¿½
+        TILLED,         // ï¿½Ñ¸ï¿½ï¿½ï¿½
+        WATERED,        // ï¿½Ñ½ï¿½Ë®
+        FERTILIZED      // ï¿½ï¿½Ê©ï¿½ï¿½
     };
 
-    static FarmlandTile* create(const Vec2& position);
+    static FarmlandTile* create(const Vec2& tilePos);
 
     bool init(const Vec2& position);
+    bool initWithTilePosition(const Vec2& tilePos);
 
-    // ×´Ì¬×ª»»·½·¨
-    void till();       // ¸ûµØ
-    void water();      // ½½Ë®
-    void fertilize();  // Ê©·Ê
-    void resetState(); // ÖØÖÃ×´Ì¬
+    // ×´Ì¬×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    void till();       // ï¿½ï¿½ï¿½ï¿½
+    void water();      // ï¿½ï¿½Ë®
+    void fertilize();  // Ê©ï¿½ï¿½
+    void resetState(); // ï¿½ï¿½ï¿½ï¿½×´Ì¬
 
     static void setTileSize(float size);
 
-    // »ñÈ¡µ±Ç°×´Ì¬
+    static float getTileSize() {
+        return tileSize;
+    }
+
+    // ï¿½ï¿½È¡ï¿½ï¿½Ç°×´Ì¬
     State getState() const { return currentState; }
 
-    // »ñÈ¡ÍÁÈÀÊª¶È/·ÊÁ¦µÈÊôĞÔ
+    // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½Êªï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     float getMoisture() const { return moisture; }
     float getFertility() const { return fertility; }
 
-    // ¸üĞÂ×´Ì¬£¨ÀıÈçË®·ÖËæÊ±¼ä¼õÉÙ£©
+    // ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë®ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Ù£ï¿½
     void update(float dt);
+
+    // è½¬æ¢ç“¦ç‰‡åæ ‡åˆ°ä¸–ç•Œåæ ‡
+    static Vec2 tileToWorldPosition(const Vec2& tilePos) {
+        auto tileSize = FarmlandTile::getTileSize();
+        return Vec2(
+            (tilePos.x + 0.5f) * tileSize,
+            (tilePos.y + 0.5f) * tileSize
+        );
+    }
 
 private:
     State currentState;
-    float moisture;    // ÍÁÈÀÊª¶È 0-100
-    float fertility;   // ·ÊÁ¦ 0-100
+    float moisture;    // ï¿½ï¿½ï¿½ï¿½Êªï¿½ï¿½ 0-100
+    float fertility;   // ï¿½ï¿½ï¿½ï¿½ 0-100
 
     static float tileSize;
 
-    // ¸üĞÂÏÔÊ¾
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾
     void updateSprite();
 };

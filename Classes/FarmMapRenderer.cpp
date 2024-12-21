@@ -15,7 +15,7 @@ FarmMapRenderer *FarmMapRenderer::getInstance() {
 
 void FarmMapRenderer::renderMap(TMXTiledMap *map, const std::string &season, const std::string &mapType) {
   if (!map) {
-    CCLOG("地图未正确加载。");
+    //CCLOG("地图未正确加载。");
     return;
   }
 
@@ -33,7 +33,7 @@ void FarmMapRenderer::renderTileLayers(TMXTiledMap *map, const std::string &seas
   try {
     auto config = configManager->getFarmConfig(mapType);
   } catch (const std::exception &e) {
-    CCLOG("渲染图块层时发生错误: %s", e.what());
+    //CCLOG("渲染图块层时发生错误: %s", e.what());
   }
 }
 
@@ -41,7 +41,7 @@ void FarmMapRenderer::renderObjectLayers(TMXTiledMap *map, const std::string &se
   // 获取农场配置
   auto configManager = FarmConfigManager::getInstance();
   if (!configManager) {
-    CCLOG("FarmConfigManager实例获取失败");
+   // CCLOG("FarmConfigManager实例获取失败");
     return;
   }
 
@@ -49,7 +49,7 @@ void FarmMapRenderer::renderObjectLayers(TMXTiledMap *map, const std::string &se
   try {
     config = configManager->getFarmConfig(mapType);
   } catch (const std::exception &e) {
-    CCLOG("获取农场配置失败: %s", e.what());
+    //CCLOG("获取农场配置失败: %s", e.what());
     return;
   }
 
@@ -59,19 +59,19 @@ void FarmMapRenderer::renderObjectLayers(TMXTiledMap *map, const std::string &se
     const auto &layerProps = layerConfig.second;
 
     try {
-      CCLOG("开始处理图层: %s", layerName.c_str());
+     // CCLOG("开始处理图层: %s", layerName.c_str());
 
       // 获取对象组
       auto objectGroup = map->getObjectGroup(layerName);
       if (!objectGroup) {
-        CCLOG("未找到对象组: %s", layerName.c_str());
+       // CCLOG("未找到对象组: %s", layerName.c_str());
         continue;
       }
 
       // 检查对象组是否为空
       auto objects = objectGroup->getObjects();
       if (objects.empty()) {
-        CCLOG("对象组 %s 中没有对象", layerName.c_str());
+       // CCLOG("对象组 %s 中没有对象", layerName.c_str());
         continue;
       }
 
@@ -89,28 +89,28 @@ void FarmMapRenderer::renderObjectLayers(TMXTiledMap *map, const std::string &se
 
 
       if (spritePath.empty()) {
-        CCLOG("未找到对象层 '%s' 的精灵路径", layerName.c_str());
+       // CCLOG("未找到对象层 '%s' 的精灵路径", layerName.c_str());
         continue;
       }
 
       // 验证文件是否存在
       if (!FileUtils::getInstance()->isFileExist(spritePath)) {
-        CCLOG("精灵文件不存在: %s", spritePath.c_str());
+       // CCLOG("精灵文件不存在: %s", spritePath.c_str());
         continue;
       }
 
-      CCLOG("准备渲染图层 %s", layerName.c_str());
-      CCLOG("对象数量: %zu", objects.size());
+     /* CCLOG("准备渲染图层 %s", layerName.c_str());
+      CCLOG("对象数量: %zu", objects.size());*/
 
       LayerRenderer::renderObjectLayer(objectGroup, map, layerName, spritePath,
                                        layerProps);
 
-      CCLOG("图层 %s 处理完成", layerName.c_str());
+    /*  CCLOG("图层 %s 处理完成", layerName.c_str());*/
 
     } catch (const std::exception &e) {
-      CCLOG("处理图层 %s 时发生错误: %s", layerName.c_str(), e.what());
+     /* CCLOG("处理图层 %s 时发生错误: %s", layerName.c_str(), e.what());*/
     } catch (...) {
-      CCLOG("处理图层 %s 时发生未知错误", layerName.c_str());
+    /*  CCLOG("处理图层 %s 时发生未知错误", layerName.c_str());*/
     }
   }
 }
@@ -123,7 +123,7 @@ void FarmMapRenderer::renderStaticObjectLayers(TMXTiledMap *map, const std::stri
   try {
     auto config = configManager->getFarmConfig(mapType);
   } catch (const std::exception &e) {
-    CCLOG("渲染静态对象层时发生错误: %s", e.what());
+   /* CCLOG("渲染静态对象层时发生错误: %s", e.what());*/
   }
 }
 

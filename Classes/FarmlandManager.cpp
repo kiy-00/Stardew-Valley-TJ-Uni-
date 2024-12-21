@@ -1,5 +1,6 @@
 // FarmlandManager.cpp
 #include "FarmlandManager.h"
+#include "FarmMapManager.h"
 
 FarmlandManager* FarmlandManager::instance = nullptr;
 
@@ -12,51 +13,84 @@ bool FarmlandManager::init(cocos2d::Scene* scene, const std::vector<Vec2>& farma
         return false;
     }
     this->farmlandLayer = Layer::create();
-    scene->addChild(farmlandLayer, zOrder);  // 使用传入的 zOrder
+    scene->addChild(farmlandLayer, zOrder);  // 使锟矫达拷锟斤拷锟? zOrder
     this->farmablePositions = farmablePositions;
 
-    // 创建所有可耕种位置的FarmlandTile
-    for (const auto& pos : farmablePositions) {
-        auto tile = FarmlandTile::create(pos);
+    for (const auto& worldPos : farmablePositions) {
+        auto tile = FarmlandTile::create(worldPos);
         if (tile) {
             farmlandLayer->addChild(tile);
-            farmlands[positionToString(pos)] = tile;
+            // 将世界坐标转换为瓦片坐标存储
+            Vec2 tilePos = FarmMapManager::getInstance()->worldToTileCoord(worldPos);
+            std::string key = positionToString(tilePos);
+            CCLOG("Storing farmland at tile position: %s (world: %.1f, %.1f)", 
+                  key.c_str(), worldPos.x, worldPos.y);
+            farmlands[key] = tile;
         }
     }
 
-    // 启动更新调度器，调用 FarmlandManager::update
     farmlandLayer->schedule([this](float dt) {
         this->update(dt);
         }, 1.0f, "farmland_update");
 
     return true;
 }
-void FarmlandManager::handleToolAction(const std::string& toolType, const Vec2& position, int direction) {
-    auto tile = getFarmlandAt(position);
-    if (!tile) return;
+void FarmlandManager::handleToolAction(const std::string& toolType, const Vec2& tilePos, int direction) {
+    CCLOG("FarmlandManager::handleToolAction - Start");
+    CCLOG("Tool Type: %s, Tile Position: (%.0f, %.0f)", 
+        toolType.c_str(), tilePos.x, tilePos.y);
 
-    if (toolType == "hoe") {
+    auto tile = getFarmlandAt(tilePos);
+    if (!tile) {
+        CCLOG("No farmland tile found at tile position!");
+        return;
+    }
+
+    CCLOG("Found farmland tile at position");
+    
+    if (toolType == "Hoe") {
+        CCLOG("Executing till action");
         tile->till();
     }
-    else if (toolType == "wateringcan") {
+    else if (toolType == "Wateringcan") {
+        CCLOG("Executing water action");
         tile->water();
     }
-    else if (toolType == "fertilizer") {
+    else if (toolType == "Fertilizer") {
+        CCLOG("Executing fertilize action");
         tile->fertilize();
     }
+    CCLOG("FarmlandManager::handleToolAction - End");
 }
 
-FarmlandTile* FarmlandManager::getFarmlandAt(const Vec2& position) {
-    auto it = farmlands.find(positionToString(position));
-    return it != farmlands.end() ? it->second : nullptr;
+FarmlandTile* FarmlandManager::getFarmlandAt(const Vec2& tilePos) {
+    CCLOG("Looking for farmland at tile position: %.1f, %.1f", tilePos.x, tilePos.y);
+    
+    // 在周围3x3范围内查找最近的农田
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <= 1; dy++) {
+            Vec2 nearbyPos(std::round(tilePos.x + dx), std::round(tilePos.y + dy));
+            std::string key = positionToString(nearbyPos);
+            
+            auto it = farmlands.find(key);
+            if (it != farmlands.end()) {
+                CCLOG("Found farmland tile at nearby position: %s", key.c_str());
+                return it->second;
+            }
+        }
+    }
+
+    CCLOG("No farmland found near position: %.1f, %.1f", tilePos.x, tilePos.y);
+    return nullptr;
 }
 
-bool FarmlandManager::isFarmable(const Vec2& position) const {
-    return std::find(farmablePositions.begin(), farmablePositions.end(), position) != farmablePositions.end();
+// 辅助方法：将位置转换为字符串键值
+std::string FarmlandManager::positionToString(const Vec2& pos) {
+    return StringUtils::format("%.0f,%.0f", std::round(pos.x), std::round(pos.y));
 }
 
 void FarmlandManager::update(float dt) {
-    // 更新所有耕地状态
+    // 锟斤拷锟斤拷锟斤拷锟叫革拷锟斤拷状态
     for (auto& pair : farmlands) {
         pair.second->update(dt);
     }

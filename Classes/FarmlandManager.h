@@ -20,10 +20,10 @@ public:
     // FarmlandManager.h
     bool init(cocos2d::Scene* scene, const std::vector<Vec2>& farmablePositions, int zOrder);
 
-    // 处理工具使用事件
+    // 锟斤拷锟斤拷锟斤拷锟斤拷使锟斤拷锟铰硷拷
     void handleToolAction(const std::string& toolType, const Vec2& position, int direction);
 
-    // 获取指定位置的耕地状态
+    // 锟斤拷取指锟斤拷位锟矫的革拷锟斤拷状态
     FarmlandTile* getFarmlandAt(const Vec2& position);
 
     std::vector<FarmlandTile*> getallFarmlands()const
@@ -38,22 +38,31 @@ public:
         return lands;
     }
 
-    // 检查位置是否可以耕种
+    // 锟斤拷锟轿伙拷锟斤拷欠锟斤拷锟皆革拷锟斤拷
     bool isFarmable(const Vec2& position) const;
 
-    // 更新所有耕地状态（可用于定时更新）
+    // 锟斤拷锟斤拷锟斤拷锟叫革拷锟斤拷状态锟斤拷锟斤拷锟斤拷锟节讹拷时锟斤拷锟铰ｏ拷
     void update(float dt);
+
+    void debugAllFarmlandKeys() const {
+        for (const auto& land : farmlands) {
+            CCLOG("Farmland key: %s", land.first.c_str());
+        }
+    }
 
 private:
     FarmlandManager() {}
     static FarmlandManager* instance;
 
     cocos2d::Layer* farmlandLayer;
-    std::unordered_map<std::string, FarmlandTile*> farmlands; // 使用string化的坐标作为key
+    std::unordered_map<std::string, FarmlandTile*> farmlands; // 使锟斤拷string锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷为key
     std::vector<Vec2> farmablePositions;
 
-    // 将Vec2转换为string key
+    // 缁熶竴浣跨敤杩欎釜鏂规硶杩涜鍧愭爣杞崲
     std::string positionToString(const Vec2& pos) const {
-        return std::to_string(int(pos.x)) + "," + std::to_string(int(pos.y));
+        return std::to_string(static_cast<int>(pos.x)) + "," + 
+               std::to_string(static_cast<int>(pos.y));
     }
+    
+    std::string positionToString(const Vec2& pos);
 };
