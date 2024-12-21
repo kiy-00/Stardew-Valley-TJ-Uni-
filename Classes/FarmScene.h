@@ -5,6 +5,8 @@
 #include "cocos2d.h"
 #include "User.h"
 #include "Inventory.h"
+#include "FarmlandManager.h"
+
 
 class FarmScene : public cocos2d::Scene {
 public:
@@ -19,6 +21,10 @@ public:
         }
         CC_SAFE_DELETE(scene);
         return nullptr;
+    }
+
+    cocos2d::TMXTiledMap* getMap()const {
+        return this->tmxMap;
     }
 
 private:
@@ -54,4 +60,8 @@ private:
 
     // 背包系统相关
     bool isInventoryInitialized = false;
+
+    FarmlandManager* farmlandManager;
+    void initFarmland();  // 新增初始化耕地的方法
+    std::vector<Vec2> getFarmablePositions(); // 获取可耕种位置
 };

@@ -5,6 +5,7 @@
 #include "SpritePathManager.h"
 #include "TimeSeasonSystem.h"
 #include "ToolItem.h"
+#include "RenderConstants.h"
 
 USING_NS_CC;
 
@@ -69,6 +70,7 @@ bool FarmScene::init(const std::string& mapType) {
     setupKeyboard();
     setupMouse();
     initInventory();
+    initFarmland();  // 添加这行
 
     // 初始化交互管理器
     interactionManager = FarmInteractionManager::getInstance();
@@ -135,8 +137,7 @@ bool FarmScene::initMap() {
         CCLOG("Failed to get map from FarmMapManager");
         return false;
     }
-    this->addChild(tmxMap);
-
+    this->addChild(tmxMap, FIRST);  // 修改这里，使用 FIRST
     FarmMapRenderer::getInstance()->renderMap(
         tmxMap,
         timeSystem->getCurrentSeasonString(),
@@ -185,7 +186,7 @@ bool FarmScene::initPlayer() {
     player->setPosition(centerPosition);
     player->initPhysics();
 
-    this->addChild(player, 999);
+    this->addChild(player, THIRD);  // 修改这里，使用 THIRD
 
     auto camera = this->getDefaultCamera();
     camera->setPosition(centerPosition);
@@ -214,6 +215,15 @@ void FarmScene::update(float dt) {
         mapSize.height - visibleSize.height / 2);
 
     camera->setPosition(Vec2(x, y));
+
+    /* --- 添加背包位置更新逻辑（相对人物显示） --- */
+    if (player->getIsInventoryOpen()) {
+        auto inventoryLayer = Director::getInstance()->getRunningScene()->getChildByName("InventoryLayer");
+        if (inventoryLayer) {
+            Vec2 inventoryOffset = Vec2(-125, 100);
+            inventoryLayer->setPosition(playerPos + inventoryOffset);
+        }
+    }
 }
 
 void FarmScene::initInventory() {
@@ -229,6 +239,72 @@ void FarmScene::initInventory() {
     player->getInventory()->reduceItemQuantity(0, 0, 2);
 }
 
+//初始化耕地
+
+
+void FarmScene::initFarmland() {
+    CCLOG("=== Begin Tile Size Diagnostics ===");
+
+    // 获取基本信息
+    Size tileSize = tmxMap->getTileSize();
+    Size mapSize = tmxMap->getMapSize();
+
+    // 检查地图缩放
+    float mapScaleX = tmxMap->getScaleX();
+    float mapScaleY = tmxMap->getScaleY();
+    CCLOG("Map scale: X=%.2f, Y=%.2f", mapScaleX, mapScaleY);
+
+    // 计算实际瓦片大小（考虑缩放）
+    float actualTileWidth = tileSize.width * mapScaleX;
+    float actualTileHeight = tileSize.height * mapScaleY;
+    CCLOG("Base tile size: %.2f x %.2f", tileSize.width, tileSize.height);
+    CCLOG("Scaled tile size: %.2f x %.2f", actualTileWidth, actualTileHeight);
+
+    // 获取一个示例瓦片的信息
+    auto layer = tmxMap->getLayer("arable");
+    if (layer) {
+        Vec2 testPos(25, 15);
+        auto tileSprite = layer->getTileAt(testPos);
+        if (tileSprite) {
+            Size tileSpriteSize = tileSprite->getContentSize();
+            float tileScaleX = tileSprite->getScaleX();
+            float tileScaleY = tileSprite->getScaleY();
+            CCLOG("Individual tile scale: X=%.2f, Y=%.2f", tileScaleX, tileScaleY);
+            CCLOG("Individual tile content size: %.2f x %.2f", tileSpriteSize.width, tileSpriteSize.height);
+            CCLOG("Individual tile actual size: %.2f x %.2f",
+                tileSpriteSize.width * tileScaleX,
+                tileSpriteSize.height * tileScaleY);
+        }
+    }
+
+    // 创建耕地时也应用相同的缩放
+    auto farmablePositions = getFarmablePositions();
+    farmlandManager = FarmlandManager::getInstance();
+    FarmlandTile::setTileSize(actualTileWidth);  // 使用实际大小
+    farmlandManager->init(this, farmablePositions, SECOND);
+
+    CCLOG("=== End Diagnostics ===");
+}
+
+
+std::vector<Vec2> FarmScene::getFarmablePositions() {
+    std::vector<Vec2> positions;
+    Size mapSize = tmxMap->getContentSize();
+    Size tileSize = tmxMap->getTileSize();
+
+    // 遍历地图上的每个位置
+    for (float x = 0; x < mapSize.width; x += tileSize.width) {
+        for (float y = 0; y < mapSize.height; y += tileSize.height) {
+            Vec2 pos(x, y);
+            auto renderPos = Vec2(x, y);
+            if (farmMapManager->isArable(pos)) {
+                positions.push_back(renderPos);
+                CCLOG("Found arable position at: (%.2f, %.2f)", pos.x, pos.y);
+            }
+        }
+    }
+    return positions;
+}
 // ... [保持原有的键盘和鼠标事件处理代码不变] ...
 
 //输入设备监听
@@ -241,26 +317,70 @@ void FarmScene::setupMouse() {
 
 void FarmScene::onMouseClick(EventMouse* event) {
     float slotSize = 30.0f;
+
+    // 获取原始鼠标位置
     Vec2 mousePosition = event->getLocation();
 
+    // 如果背包打开，强制对鼠标位置的 Y 坐标进行偏移
+    if (player->getIsInventoryOpen()) {
+        mousePosition.y += 60;
+    }
+
+    CCLOG("Mouse Position After Offset: (%.2f, %.2f)", mousePosition.x, mousePosition.y);
+
+    // 计算背包的起始位置
     float startX = (Director::getInstance()->getVisibleSize().width - (8 * slotSize)) / 2;
     float startY = (Director::getInstance()->getVisibleSize().height - (3 * slotSize)) / 2;
 
-    int row = (startY + (3 * slotSize) - mousePosition.y) / slotSize;
-    int col = (mousePosition.x - startX) / slotSize;
+    // 计算点击的槽位
+    int col = static_cast<int>((mousePosition.x - startX) / slotSize);
+    int row = static_cast<int>((startY + (3 * slotSize) - mousePosition.y) / slotSize);
 
-    if (mousePosition.x >= startX && mousePosition.x <= startX + (8 * slotSize) &&
-        mousePosition.y >= startY && mousePosition.y <= startY + (3 * slotSize)) {
-        if (row >= 0 && row < ROWS && col >= 0 && col < SLOTS_PER_ROW) {
-            player->onSlotClicked(row, col);
-        }
+    CCLOG("Clicked Slot: Row = %d, Col = %d", row, col);
+
+    // 点击背包槽位的逻辑
+    if (row >= 0 && row < 3 && col >= 0 && col < 8) {
+        player->onSlotClicked(row, col);
     }
-    else if (row == 0 && col == SLOTS_PER_ROW) {
-        player->onSlotClicked(0, SLOTS_PER_ROW);
+    // 点击垃圾桶槽位
+    else if (row == 0 && col == 8) {
+        player->onSlotClicked(0, 8);
     }
+    // 如果点击背包以外的区域，并且是左键点击，执行工具动作
     else {
         if (event->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) {
             player->performToolAction();
+
+            // 获取玩家位置和朝向
+            Vec2 playerPos = player->getPosition();
+            int direction = player->getDirection();
+
+            // 检查当前位置是否可以耕种
+            Vec2 targetPos = playerPos;
+            switch (direction) {
+                case 0: // 下
+                    targetPos.y -= 32.0f;
+                    break;
+                case 1: // 上
+                    targetPos.y += 32.0f;
+                    break;
+                case 2: // 左
+                    targetPos.x -= 32.0f;
+                    break;
+                case 3: // 右
+                    targetPos.x += 32.0f;
+                    break;
+            }
+
+            // 获取当前选中的物品
+            Item* selectedItem = player->getSelectedItem();
+            if (selectedItem) {
+                std::string toolType = selectedItem->getItemType();
+                // 只有当工具是锄头且目标位置可耕种时才执行操作
+                if (toolType == "hoe" && farmMapManager->isArable(targetPos)) {
+                    farmlandManager->handleToolAction(toolType, targetPos, direction);
+                }
+            }
         }
     }
 }

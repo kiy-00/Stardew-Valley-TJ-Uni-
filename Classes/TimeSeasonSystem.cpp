@@ -10,9 +10,10 @@ TimeSeasonSystem::TimeSeasonSystem()
     : currentTime{ 2024, 0, 1, 0, 0 }  // 确保从第1天开始，而不是第0天
     , timeScale(67.2f)
     , isRunning(false) {
-    CCLOG("TimeSeasonSystem constructed with: Year %d, Season %d, Day %d, %02d:%02d",
+    /*CCLOG("TimeSeasonSystem constructed with: Year %d, Season %d, Day %d, %02d:%02d",
         currentTime.year, currentTime.season, currentTime.day, 
         currentTime.hour, currentTime.minute);
+        */
 }
 
 // ��������
@@ -45,7 +46,7 @@ bool TimeSeasonSystem::init() {
     }
 
     loadFromUserDefault();
-    CCLOG("TimeSeasonSystem initialized");
+    //CCLOG("TimeSeasonSystem initialized");
     scheduleUpdate(); // 确保每帧都会调用 update()
     return true;
 }
@@ -65,22 +66,22 @@ void TimeSeasonSystem::pauseTime() {
 }
 
 void TimeSeasonSystem::resumeTime() {
-    CCLOG("TimeSystem resumed");
+    //CCLOG("TimeSystem resumed");
     startTime();
 }
 
 // ʱ�����
 void TimeSeasonSystem::update(float dt) {
     if (!isRunning) {
-        CCLOG("TimeSystem is not running!");
+        //CCLOG("TimeSystem is not running!");
         return;
     }
 
-    CCLOG("TimeSystem update with dt: %.3f", dt);
+    //CCLOG("TimeSystem update with dt: %.3f", dt);
     
     // 确保dt和timeScale都是正数
     if (dt <= 0.0f || timeScale <= 0.0f) {
-        CCLOG("Invalid dt or timeScale: dt=%.3f, timeScale=%.3f", dt, timeScale);
+        //CCLOG("Invalid dt or timeScale: dt=%.3f, timeScale=%.3f", dt, timeScale);
         return;
     }
 
@@ -123,16 +124,17 @@ void TimeSeasonSystem::update(float dt) {
         }
     }
 
-    CCLOG("Time updated - Year: %d, Season: %d, Day: %d, %02d:%02d",
+    /*CCLOG("Time updated - Year: %d, Season: %d, Day: %d, %02d:%02d",
         currentTime.year, currentTime.season, currentTime.day,
         currentTime.hour, currentTime.minute);
+        */
 }
 
 void TimeSeasonSystem::advanceDay() {
     int previousDay = currentTime.day;
     currentTime.day++;
 
-    CCLOG("Day advanced: %d -> %d", previousDay, currentTime.day);
+    //CCLOG("Day advanced: %d -> %d", previousDay, currentTime.day);
 
     if (currentTime.day > DAYS_PER_SEASON) {
         currentTime.day = 1;
@@ -147,13 +149,15 @@ void TimeSeasonSystem::advanceSeason() {
     Season previousSeason = static_cast<Season>(currentTime.season);
     currentTime.season = (currentTime.season + 1) % 4;
 
+    /*
     CCLOG("Season advanced: %s -> %s",
         seasonToString(previousSeason).c_str(),  // 使用安全的方法
         getCurrentSeasonString().c_str());       // 使用安全的方法
 
+    */
     if (currentTime.season == 0) {  // �µ�һ��
         currentTime.year++;
-        CCLOG("Year advanced to: %d", currentTime.year);
+        //CCLOG("Year advanced to: %d", currentTime.year);
     }
 
     notifySeasonChange(previousSeason);
@@ -190,12 +194,12 @@ void TimeSeasonSystem::notifyDayChange(int previousDay) {
 // �¼�����ע��
 void TimeSeasonSystem::addSeasonChangeListener(const std::string& name, const SeasonChangeCallback& callback) {
     seasonChangeCallbacks[name] = callback;
-    CCLOG("Added season change listener: %s", name.c_str());
+    //CCLOG("Added season change listener: %s", name.c_str());
 }
 
 void TimeSeasonSystem::addDayChangeListener(const std::string& name, const DayChangeCallback& callback) {
     dayChangeCallbacks[name] = callback;
-    CCLOG("Added day change listener: %s", name.c_str());
+    //CCLOG("Added day change listener: %s", name.c_str());
 }
 
 void TimeSeasonSystem::removeSeasonChangeListener(const std::string& name) {
@@ -209,7 +213,7 @@ void TimeSeasonSystem::removeDayChangeListener(const std::string& name) {
 // ʱ������
 void TimeSeasonSystem::setTimeScale(float scale) {
     timeScale = std::max(0.0f, scale);
-    CCLOG("Time scale set to: %.2f", timeScale);
+    //CCLOG("Time scale set to: %.2f", timeScale);
 }
 
 void TimeSeasonSystem::setTime(const GameTime& time) {
@@ -222,9 +226,10 @@ void TimeSeasonSystem::setTime(const GameTime& time) {
     currentTime.season = std::clamp(time.season, 0, 3);
     currentTime.year = std::max(1, time.year);  // 至少从第1年开始
 
-    CCLOG("Time set to - Year: %d, Season: %d, Day: %d, %02d:%02d",
+    /*CCLOG("Time set to - Year: %d, Season: %d, Day: %d, %02d:%02d",
         currentTime.year, currentTime.season, currentTime.day,
         currentTime.hour, currentTime.minute);
+*/
 
     checkAndNotifyChanges(previousTime);
     saveToUserDefault();
@@ -253,9 +258,10 @@ void TimeSeasonSystem::loadFromUserDefault() {
     currentTime.minute = std::clamp(ud->getIntegerForKey("game_minute", 0), 0, MINUTES_PER_HOUR - 1);
     timeScale = std::max(0.1f, ud->getFloatForKey("game_time_scale", 67.2f));
 
-    CCLOG("Loaded time - Year: %d, Season: %d, Day: %d, %02d:%02d",
+    /*CCLOG("Loaded time - Year: %d, Season: %d, Day: %d, %02d:%02d",
         currentTime.year, currentTime.season, currentTime.day,
         currentTime.hour, currentTime.minute);
+        */
 }
 
 // ��������
@@ -279,7 +285,7 @@ std::string TimeSeasonSystem::seasonToString(Season season) {
 std::string TimeSeasonSystem::getCurrentSeasonString() const {
     size_t index = static_cast<size_t>(currentTime.season);
     if (index >= SEASON_NAMES.size()) {
-        CCLOG("Invalid season index: %d", currentTime.season);
+        //CCLOG("Invalid season index: %d", currentTime.season);
         return "spring";
     }
     return SEASON_NAMES[index];
