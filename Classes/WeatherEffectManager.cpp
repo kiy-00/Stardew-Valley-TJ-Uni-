@@ -99,23 +99,32 @@ void WeatherEffectManager::createSnowEffect() {
     auto snow = ParticleSnow::create();
     if (snow) {
         snow->setVisible(true);
+        snow->setEmitterMode(ParticleSystem::Mode::GRAVITY);  // 使用重力模式
         snow->setPosition(Vec2(Director::getInstance()->getWinSize().width / 2,
                              Director::getInstance()->getWinSize().height + 50));
-        snow->setLife(4.0f);
+        snow->setLife(6.0f);
         snow->setLifeVar(1.0f);
-        snow->setEmissionRate(300.0f);    // 增加发射率
-        snow->setStartSize(12.0f);        // 增大雪花尺寸
-        snow->setStartSizeVar(6.0f);
-        snow->setEndSize(4.0f);
-        snow->setEndSizeVar(2.0f);
-        snow->setSpeed(100.0f);
-        snow->setSpeedVar(30.0f);
-        snow->setStartColor(Color4F(1.0f, 1.0f, 1.0f, 1.0f));
-        snow->setEndColor(Color4F(1.0f, 1.0f, 1.0f, 0.3f));
+        snow->setEmissionRate(300.0f);
+        snow->setStartSize(15.0f);        // 增大雪花尺寸
+        snow->setStartSizeVar(8.0f);
+        snow->setEndSize(12.0f);          // 调整结束尺寸
+        snow->setEndSizeVar(4.0f);
+        snow->setSpeed(160.0f);           // 增加下落速度
+        snow->setSpeedVar(50.0f);
+        snow->setGravity(Vec2(0, -100));  // 添加重力
+        snow->setAngle(90);               // 设置角度
+        snow->setAngleVar(10);            // 角度变化范围
+        // 修改为淡蓝色，增加不透明度
+        snow->setStartColor(Color4F(0.7f, 0.8f, 1.0f, 0.9f));  // 淡蓝色起始
+        snow->setEndColor(Color4F(0.7f, 0.8f, 1.0f, 0.7f));    // 淡蓝色结束
         snow->setPosVar(Vec2(Director::getInstance()->getWinSize().width / 2, 0));
         
         currentEffect = snow;
         currentScene->addChild(currentEffect, 9999);
+        
+        // 输出调试信息
+        CCLOG("Snow effect created - Emission Rate: %f, Start Size: %f", 
+              snow->getEmissionRate(), snow->getStartSize());
     }
 }
 
