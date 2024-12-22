@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>frames</key>
+        <dict>
+            <key>Sheep_walk_down_01.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0.5,-1}</string>
+                <key>spriteSize</key>
+                <string>{25,29}</string>
+                <key>spriteSourceSize</key>
+                <string>{32,37}</string>
+                <key>textureRect</key>
+                <string>{{25,0},{25,29}}</string>
+                <key>textureRotated</key>
+                <false/>
+                <key>triangles</key>
+                <string>1 2 3 0 1 3</string>
+                <key>vertices</key>
+                <string>29 34 4 34 4 5 29 5</string>
+                <key>verticesUV</key>
+                <string>50 29 25 29 25 0 50 0</string>
+            </dict>
+            <key>Sheep_walk_down_02.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0.5,-1.5}</string>
+                <key>spriteSize</key>
+                <string>{25,28}</string>
+                <key>spriteSourceSize</key>
+                <string>{32,37}</string>
+                <key>textureRect</key>
+                <string>{{25,29},{25,28}}</string>
+                <key>textureRotated</key>
+                <false/>
+                <key>triangles</key>
+                <string>1 2 3 0 1 3</string>
+                <key>vertices</key>
+                <string>29 34 4 34 4 6 29 6</string>
+                <key>verticesUV</key>
+                <string>50 57 25 57 25 29 50 29</string>
+            </dict>
+            <key>Sheep_walk_down_03.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0.5,-1}</string>
+                <key>spriteSize</key>
+                <string>{25,29}</string>
+                <key>spriteSourceSize</key>
+                <string>{32,37}</string>
+                <key>textureRect</key>
+                <string>{{0,0},{25,29}}</string>
+                <key>textureRotated</key>
+                <false/>
+                <key>triangles</key>
+                <string>1 2 3 0 1 3</string>
+                <key>vertices</key>
+                <string>29 34 4 34 4 5 29 5</string>
+                <key>verticesUV</key>
+                <string>25 29 0 29 0 0 25 0</string>
+            </dict>
+            <key>Sheep_walk_down_04.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0.5,-1.5}</string>
+                <key>spriteSize</key>
+                <string>{25,28}</string>
+                <key>spriteSourceSize</key>
+                <string>{32,37}</string>
+                <key>textureRect</key>
+                <string>{{0,29},{25,28}}</string>
+                <key>textureRotated</key>
+                <false/>
+                <key>triangles</key>
+                <string>1 2 3 0 1 3</string>
+                <key>vertices</key>
+                <string>29 34 4 34 4 6 29 6</string>
+                <key>verticesUV</key>
+                <string>25 57 0 57 0 29 25 29</string>
+            </dict>
+        </dict>
+        <key>metadata</key>
+        <dict>
+            <key>format</key>
+            <integer>3</integer>
+            <key>pixelFormat</key>
+            <string>RGBA8888</string>
+            <key>premultiplyAlpha</key>
+            <false/>
+            <key>realTextureFileName</key>
+            <string>sheep_walk_down.png</string>
+            <key>size</key>
+            <string>{50,57}</string>
+            <key>smartupdate</key>
+            <string>$TexturePacker:SmartUpdate:c414e6ee033ad8fc8fe6816c21ffd4f7:9d9ccaac966367fc8cb9f225f858e68f:591aee115b87a931d3134c9444cafc2d$</string>
+            <key>textureFileName</key>
+            <string>sheep_walk_down.png</string>
+        </dict>
+    </dict>
+</plist>

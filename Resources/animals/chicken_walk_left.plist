@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>frames</key>
+        <dict>
+            <key>Chicken_walk_left_01.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{16,18}</string>
+                <key>spriteSourceSize</key>
+                <string>{16,18}</string>
+                <key>textureRect</key>
+                <string>{{0,17},{16,18}}</string>
+                <key>textureRotated</key>
+                <false/>
+                <key>triangles</key>
+                <string>1 2 3 0 1 3</string>
+                <key>vertices</key>
+                <string>16 18 0 18 0 0 16 0</string>
+                <key>verticesUV</key>
+                <string>16 35 0 35 0 17 16 17</string>
+            </dict>
+            <key>Chicken_walk_left_02.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{15,17}</string>
+                <key>spriteSourceSize</key>
+                <string>{15,17}</string>
+                <key>textureRect</key>
+                <string>{{16,17},{15,17}}</string>
+                <key>textureRotated</key>
+                <false/>
+                <key>triangles</key>
+                <string>1 2 3 0 1 3</string>
+                <key>vertices</key>
+                <string>15 17 0 17 0 0 15 0</string>
+                <key>verticesUV</key>
+                <string>31 34 16 34 16 17 31 17</string>
+            </dict>
+            <key>Chicken_walk_left_03.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{17,17}</string>
+                <key>spriteSourceSize</key>
+                <string>{17,17}</string>
+                <key>textureRect</key>
+                <string>{{0,0},{17,17}}</string>
+                <key>textureRotated</key>
+                <false/>
+                <key>triangles</key>
+                <string>1 2 3 0 1 3</string>
+                <key>vertices</key>
+                <string>17 17 0 17 0 0 17 0</string>
+                <key>verticesUV</key>
+                <string>17 17 0 17 0 0 17 0</string>
+            </dict>
+            <key>Chicken_walk_left_04.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{15,17}</string>
+                <key>spriteSourceSize</key>
+                <string>{15,17}</string>
+                <key>textureRect</key>
+                <string>{{17,0},{15,17}}</string>
+                <key>textureRotated</key>
+                <false/>
+                <key>triangles</key>
+                <string>1 2 3 0 1 3</string>
+                <key>vertices</key>
+                <string>15 17 0 17 0 0 15 0</string>
+                <key>verticesUV</key>
+                <string>32 17 17 17 17 0 32 0</string>
+            </dict>
+        </dict>
+        <key>metadata</key>
+        <dict>
+            <key>format</key>
+            <integer>3</integer>
+            <key>pixelFormat</key>
+            <string>RGBA8888</string>
+            <key>premultiplyAlpha</key>
+            <false/>
+            <key>realTextureFileName</key>
+            <string>chicken_walk_left.png</string>
+            <key>size</key>
+            <string>{32,35}</string>
+            <key>smartupdate</key>
+            <string>$TexturePacker:SmartUpdate:f2c06691c011124df12d4e4d5c3e245d:e923e5f47c43d88e656acf50249d5843:591aee115b87a931d3134c9444cafc2d$</string>
+            <key>textureFileName</key>
+            <string>chicken_walk_left.png</string>
+        </dict>
+    </dict>
+</plist>

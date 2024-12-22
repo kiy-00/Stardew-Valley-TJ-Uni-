@@ -5,9 +5,13 @@
 #include "SpritePathManager.h"
 #include "TimeSeasonSystem.h"
 #include "ToolItem.h"
+#include "RodItem.h"
+#include "BreedItem.h"
 #include "RenderConstants.h"
 #include "WeatherSystem.h"
 #include "WeatherEffectManager.h"
+#include "SimpleAudioEngine.h"
+
 
 USING_NS_CC;
 
@@ -20,14 +24,18 @@ bool FarmScene::init(const std::string& mapType) {
         return false;
     }
 
+   /* auto audioengine = CocosDenshion::SimpleAudioEngine::getInstance();
+    audioengine->preloadBackgroundMusic("bgmusic.mp3");
+    audioengine->playBackgroundMusic("bgmusic.mp3", true);*/
+    //CCLOG("是否成功加载音乐：%d\n", audioengine->isBackgroundMusicPlaying());
+    
+
     // 初始化物理世界
     auto physicsWorld = this->getPhysicsWorld();
     physicsWorld->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
     physicsWorld->setGravity(Vec2::ZERO);
 
     currentMapType = mapType;
-
-
 
     // 按顺序初始化各个系统
     if (!initTimeSystem() || !initWeatherSystem() || !createSystemLabels()) {
@@ -47,8 +55,6 @@ bool FarmScene::init(const std::string& mapType) {
         return false;
     }
 
-
-
     // 初始化剩余组件
     setupKeyboard();
     setupMouse();
@@ -58,7 +64,6 @@ bool FarmScene::init(const std::string& mapType) {
     // 初始化交互管理器
     interactionManager = FarmInteractionManager::getInstance();
     interactionManager->init(this, player, farmMapManager);
-
 
     this->schedule([this](float dt) {
         interactionManager->update(dt);
@@ -71,10 +76,27 @@ bool FarmScene::init(const std::string& mapType) {
         player->createInventoryBar();
         }, 0.1f, "createInventoryBarKey");
 
+    auto audioengine = CocosDenshion::SimpleAudioEngine::getInstance();
+    if (!audioengine) {
+        CCLOG("Failed to get SimpleAudioEngine instance");
+        return false;
+    }
+
+    // 尝试预加载并检查结果
+    audioengine->preloadBackgroundMusic("music/bgmusic.mp3");
+    CCLOG("开始加载音乐文件");
+
+    // 尝试播放并检查结果
+    audioengine->playBackgroundMusic("music/bgmusic.mp3", true);
+
+    // 检查是否正在播放
+    CCLOG("是否正在播放音乐：%d", audioengine->isBackgroundMusicPlaying());
+
+    // 检查音量设置
+    CCLOG("当前音乐音量：%f", audioengine->getBackgroundMusicVolume());
 
     // 启动所有系统
     startSystems();
-
 
     // 设置回调和调度器
     setupSystemCallbacks();
@@ -153,7 +175,6 @@ void FarmScene::setupSystemCallbacks() {
 bool FarmScene::createSystemLabels() {
     auto visibleSize = Director::getInstance()->getVisibleSize();
 
-
     // 创建天气标签
     weatherLabel = Label::createWithTTF("Weather: Sunny", "fonts/Marker Felt.ttf", 24);
     if (!weatherLabel) {
@@ -187,7 +208,6 @@ void FarmScene::startSystems() {
         CCLOG("Weather system started successfully");
         // 在场景的 init 函数中
     }
-
   
     updateWeatherLabel();
 }
@@ -299,25 +319,22 @@ void FarmScene::updateWeatherLabel() {
 
 void FarmScene::onWeatherChanged(const std::string& newWeather) {
     // Here you can handle weather change effects
-    //
 }
 
 void FarmScene::initInventory() {
-    ToolItem* reap = new ToolItem("Reap", "A useful tool.", "tool/reap.png");
-    player->getInventory()->addItem(reap);
-    ToolItem* chop = new ToolItem("Chop", "A useful tool.", "tool/chop.png");
-    player->getInventory()->addItem(chop);
-    ToolItem* hoe = new ToolItem("Hoe", "A useful tool.", "tool/hoe.png");
-    player->getInventory()->addItem(hoe);
-    ToolItem* pickaxe = new ToolItem("Pickaxe", "A useful tool.", "tool/pickaxe.png");
-    player->getInventory()->addItem(pickaxe);
-    ToolItem* kettle = new ToolItem("kettle", "A useful tool.", "tool/kettle.png");
-    player->getInventory()->addItem(kettle);
-
-    player->getInventory()->reduceItemQuantity(0, 0, 2);
+	ToolItem* reap = new ToolItem("Reap", "A useful tool.", "tool/reap.png");
+	player->getInventory()->addItem(reap);
+	ToolItem* chop = new ToolItem("Chop", "A useful tool.", "tool/chop.png");
+	player->getInventory()->addItem(chop);
+	ToolItem* hoe = new ToolItem("Hoe", "A useful tool.", "tool/hoe.png");
+	player->getInventory()->addItem(hoe);
+	ToolItem* pickaxe = new ToolItem("Pickaxe", "A useful tool.", "tool/pickaxe.png");
+	player->getInventory()->addItem(pickaxe);
+	RodItem* rod = new RodItem("Rod", "A useful tool.", "tool/rod.png");
+	player->getInventory()->addItem(rod);
+	ToolItem* kettle = new ToolItem("Kettle", "A useful tool.", "tool/kettle.png");
+	player->getInventory()->addItem(kettle);
 }
-
-//初始化耕地
 
 
 void FarmScene::initFarmland() {
@@ -384,9 +401,6 @@ std::vector<Vec2> FarmScene::getFarmablePositions() {
     }
     return positions;
 }
-// ... [保持原有的键盘和鼠标事件处理代码不变] ...
-
-//输入设备监听
 
 void FarmScene::setupMouse() {
     auto mouseListener = EventListenerMouse::create();
@@ -402,7 +416,7 @@ void FarmScene::onMouseClick(EventMouse* event) {
 
     // 如果背包打开，强制对鼠标位置的 Y 坐标进行偏移
     if (player->getIsInventoryOpen()) {
-        mousePosition.y -= 90;
+        mousePosition.y += 60;
     }
 
     CCLOG("Mouse Position After Offset: (%.2f, %.2f)", mousePosition.x, mousePosition.y);
@@ -428,7 +442,8 @@ void FarmScene::onMouseClick(EventMouse* event) {
     // 如果点击背包以外的区域，并且是左键点击，执行工具动作
     else {
         if (event->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) {
-            player->performToolAction();
+			/* -----新增：执行行为时传入地图管理者---- */
+			player->performAction(farmMapManager);
 
             // 获取玩家位置和朝向
             Vec2 playerPos = player->getPosition();
@@ -470,7 +485,13 @@ void FarmScene::onMouseClick(EventMouse* event) {
                 if (toolType == "Hoe" && farmMapManager->isArable(targetPos)) {
                     CCLOG("Attempting to handle tool action at position (%.2f, %.2f)", targetPos.x, targetPos.y);
                     farmlandManager->handleToolAction(toolType, tilePos, direction);
-                } else {
+                }
+                else if (toolType == "Kettle" && farmMapManager->isArable(targetPos)) {
+
+                    farmlandManager->handleToolAction(toolType, tilePos, direction);
+
+                }
+                else {
                     CCLOG("Tool action failed - Conditions not met");
                 }
             } else {
@@ -513,17 +534,56 @@ void FarmScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event) {
 }
 
 
-
-
-
 void FarmScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
     float moveDistance = 16.0f;
     Vec2 currentPos = player->getPosition();
     Vec2 targetPos = currentPos;
     int index = -1;
 
+    /* ------------------养殖系统-------------- */
+    // 创建动物
     switch (keyCode) {
-        // 数字键选择物品
+	case EventKeyboard::KeyCode::KEY_C: {
+		if (farmMapManager->isFarmPermit(targetPos)) {
+			createAnimal("chicken", targetPos);
+		}
+		break;
+	}
+	case EventKeyboard::KeyCode::KEY_V: {
+		if (farmMapManager->isFarmPermit(targetPos)) {
+			createAnimal("sheep", targetPos);
+		}
+		break;
+	}
+	case EventKeyboard::KeyCode::KEY_M: {
+		interactWithAnimals(targetPos, 50.0f);
+		break;
+	}
+	case EventKeyboard::KeyCode::KEY_G: {
+		pickupNearbyItems(targetPos, 50.0f);
+		break;
+	}
+    }
+
+    /* ----------------物品拾取---------------- */
+	if (keyCode == EventKeyboard::KeyCode::KEY_G) {
+        // 拾取范围半径
+		float pickupRadius = 50.0f; 
+
+		// 获取场景中的所有物品
+		std::vector<Sprite*> items;
+		for (auto child : this->getChildren()) {
+			auto sprite = static_cast<Sprite*>(child);
+			if (sprite && static_cast<Item*>(sprite->getUserData())) { // 检查是否绑定了 Item
+				items.push_back(sprite);
+			}
+		}
+		// 调用玩家拾取方法
+		player->pickupNearbyItems(items, pickupRadius);
+	}
+
+    // 数字键选择物品
+    switch (keyCode) {
         case EventKeyboard::KeyCode::KEY_1:
         case EventKeyboard::KeyCode::KEY_2:
         case EventKeyboard::KeyCode::KEY_3:
@@ -537,7 +597,7 @@ void FarmScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
             player->selectItemFromInventory(index);
             break;
 
-            // 移动控制
+        // 移动控制
         case EventKeyboard::KeyCode::KEY_W:
         case EventKeyboard::KeyCode::KEY_UP_ARROW:
             targetPos.y += moveDistance;
@@ -559,7 +619,7 @@ void FarmScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
             player->moveRight();
             break;
 
-            // 背包和物品控制
+        // 背包和物品控制
         case EventKeyboard::KeyCode::KEY_E:
             if (!player->getIsSlotImageOpen()) {
                 player->toggleInventory();
@@ -601,4 +661,81 @@ void FarmScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
     }
 }
 
+
+/* ----------------养殖系统-------------------- */
+void FarmScene::createAnimal(const std::string& type, const Vec2& playerPos) {
+	Vec2 spawnPos = playerPos - Vec2(30, 0); // 玩家左侧 30 像素
+	Animal* animal = AnimalFactory::createAnimal(type);
+	if (animal) {
+		animal->setPosition(spawnPos);
+		animal->produceCallback = [this](const std::string& itemName, const Vec2& position) {
+			generateItem(itemName, position);
+			};
+		this->addChild(animal, SIX);
+		CCLOG("%s created at position: (%.2f, %.2f)", type.c_str(), spawnPos.x, spawnPos.y);
+	}
+}
+
+
+void FarmScene::interactWithAnimals(const Vec2& playerPos, float interactionRadius) {
+	for (auto child : this->getChildren()) {
+		auto animal = dynamic_cast<Animal*>(child);
+		if (animal && playerPos.distance(animal->getPosition()) <= interactionRadius) {
+			animal->touchAnimal();
+			CCLOG("Interacted with animal: %s", animal->getAnimalType().c_str());
+		}
+	}
+}
+
+//void FarmScene::pickupNearbyItems(const Vec2& playerPos, float pickupRadius) {
+//	for (auto child : this->getChildren()) {
+//		auto sprite = dynamic_cast<Sprite*>(child);
+//		if (sprite && sprite->getName() == "item" && playerPos.distance(sprite->getPosition()) <= pickupRadius) {
+//			auto item = static_cast<Item*>(sprite->getUserData());
+//			if (item) {
+//				player->getInventory()->addItem(item);
+//				sprite->removeFromParent();
+//				CCLOG("Picked up item: %s", item->getName().c_str());
+//			}
+//		}
+//	}
+//}
+
+void FarmScene::pickupNearbyItems(const Vec2& playerPos, float pickupRadius) {
+	std::vector<Node*> itemsToRemove; // 临时容器，存储待移除的节点
+
+	// 遍历场景中的所有子节点
+	for (auto child : this->getChildren()) {
+		auto sprite = dynamic_cast<Sprite*>(child);
+		if (sprite && sprite->getName() == "item" && playerPos.distance(sprite->getPosition()) <= pickupRadius) {
+			auto item = static_cast<Item*>(sprite->getUserData());
+			if (item) {
+				player->getInventory()->addItem(item);
+				itemsToRemove.push_back(sprite); // 收集待移除的节点
+				CCLOG("Picked up item: %s", item->getName().c_str());
+			}
+		}
+	}
+
+	// 批量移除已收集的节点
+	for (auto itemNode : itemsToRemove) {
+		itemNode->removeFromParent(); // 移除节点
+	}
+}
+
+void FarmScene::generateItem(const std::string& itemName, const Vec2& position) {
+	std::string itemPath = "animals/" + itemName;
+	Sprite* itemSprite = Sprite::create(itemPath);
+	if (itemSprite) {
+		itemSprite->setPosition(position);
+		itemSprite->setName("item");
+
+		// 绑定 Item 对象
+		BreedItem* item = new BreedItem(itemName, "Produced by animal", itemPath);
+		itemSprite->setUserData(static_cast<void*>(item));
+
+		this->addChild(itemSprite, FIFTH);
+		CCLOG("Generated item: %s at (%.2f, %.2f)", itemName.c_str(), position.x, position.y);
+	}
+}
 

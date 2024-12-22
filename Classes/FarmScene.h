@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "FarmMapManager.h"
 #include "FarmInteractionManager.h"
-#include "TimeSeasonSystem.h"  // 添加时间季节系统头文件
+#include "TimeSeasonSystem.h"
 #include "TimeEffectManager.h"
 #include "cocos2d.h"
 #include "User.h"
@@ -9,8 +9,8 @@
 #include "FarmlandManager.h"
 #include "WeatherSystem.h"
 #include "WeatherEffectManager.h"
-
-
+#include "RenderConstants.h"
+#include "AnimalFactory.h"
 
 
 class FarmScene : public cocos2d::Scene {
@@ -48,8 +48,6 @@ private:
     void updateTimeSeasonLabel();     // 更新时间显示
     void onSeasonChanged(const std::string& newSeason);
 
-
-
     //天气系统相关
     WeatherSystem* weatherSystem;
     WeatherEffectManager* weatherEffectManager;
@@ -61,7 +59,6 @@ private:
     // 初始化函数
     bool initMap();
     bool initPlayer();
-    // 新增初始化函数
     bool initTimeSystem();
     bool initWeatherSystem();
     void setupSystemCallbacks();
@@ -77,6 +74,12 @@ private:
     void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
     void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
     void onMouseClick(cocos2d::EventMouse* event);
+
+    /* -------养殖系统------ */
+    void createAnimal(const std::string& type, const Vec2& playerPos);
+    void interactWithAnimals(const Vec2& playerPos, float interactionRadius);
+    void pickupNearbyItems(const Vec2& playerPos, float pickupRadius);
+    void generateItem(const std::string& itemName, const Vec2& position);
 
     // 更新函数
     void update(float dt) override;
