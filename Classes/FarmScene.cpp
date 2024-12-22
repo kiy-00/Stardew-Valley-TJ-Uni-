@@ -153,14 +153,6 @@ void FarmScene::setupSystemCallbacks() {
 bool FarmScene::createSystemLabels() {
     auto visibleSize = Director::getInstance()->getVisibleSize();
 
-    // 创建时间和季节标签
-    timeSeasonLabel = Label::createWithTTF("Loading...", "fonts/Marker Felt.ttf", 24);
-    if (!timeSeasonLabel) {
-        CCLOG("Failed to create timeSeasonLabel");
-        return false;
-    }
-    timeSeasonLabel->setPosition(Vec2(visibleSize.width / 2, visibleSize.height - 30));
-    this->addChild(timeSeasonLabel, 1000);
 
     // 创建天气标签
     weatherLabel = Label::createWithTTF("Weather: Sunny", "fonts/Marker Felt.ttf", 24);
@@ -175,11 +167,7 @@ bool FarmScene::createSystemLabels() {
 }
 
 void FarmScene::setupSystemSchedulers() {
-    // 设置时间标签更新调度器
-    this->schedule([this](float dt) {
-        this->updateTimeSeasonLabel();
-        }, 0.1f, "time_update");
-
+   
     // 设置天气标签更新调度器
     this->schedule([this](float dt) {
         this->updateWeatherLabel();
@@ -200,48 +188,10 @@ void FarmScene::startSystems() {
         // 在场景的 init 函数中
     }
 
-    // 立即更新一次标签
-    updateTimeSeasonLabel();
+  
     updateWeatherLabel();
 }
 
-
-void FarmScene::updateTimeSeasonLabel() {
-    // 添加空指针检查
-    if (!timeSeasonLabel) {
-        //CCLOG("Warning: timeSeasonLabel is nullptr");
-        return;
-    }
-
-    if (!timeSystem) {
-        //CCLOG("Warning: timeSystem is nullptr");
-        return;
-    }
-
-    auto time = timeSystem->getCurrentTime();
-    std::string seasonStr = timeSystem->getCurrentSeasonString();
-
-    char timeText[100];
-    snprintf(timeText, sizeof(timeText),
-        "Year %d, %s Day %d\n%02d:%02d",
-        time.year,
-        seasonStr.c_str(),
-        time.day,
-        time.hour,
-        time.minute
-    );
-
-    // 使用 runOnMainThread 确保在主线程中更新UI
-    Director::getInstance()->getScheduler()->performFunctionInCocosThread([=]() {
-        if (timeSeasonLabel) {
-            timeSeasonLabel->setString(timeText);
-        }
-    });
-
-    // 添加调试日志
-    //CCLOG("Time Update - Year: %d, Season: %s, Day: %d, Time: %02d:%02d",
-    //    time.year, seasonStr.c_str(), time.day, time.hour, time.minute);
-}
 
 bool FarmScene::initMap() {
     tmxMap = farmMapManager->getMap();
