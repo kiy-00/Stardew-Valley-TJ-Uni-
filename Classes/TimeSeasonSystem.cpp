@@ -121,6 +121,12 @@ void TimeSeasonSystem::updateTimeByMinutes(int deltaMinutes) {
             seasonChangedCallback(SEASON_NAMES[newTime.season]);
         }
     }
+
+    // 检查小时是否发生变化
+    if (newTime.hour != currentTime.hour && timeChangedCallback) {
+      
+        timeChangedCallback(newTime);
+    }
     
     currentTime = newTime;
     saveToUserDefault();
@@ -215,29 +221,29 @@ void TimeSeasonSystem::removeDayChangeListener(const std::string& name) {
 }
 
 // Time scaling
-void TimeSeasonSystem::setTimeScale(float scale) {
-    timeScale = std::max(0.0f, scale);
-    //CCLOG("Time scale set to: %.2f", timeScale);
-}
-
-void TimeSeasonSystem::setTime(const GameTime& time) {
-    GameTime previousTime = currentTime;
-    
-    // Ensure all values are within valid ranges
-    currentTime.minute = std::clamp(time.minute, 0, MINUTES_PER_HOUR - 1);
-    currentTime.hour = std::clamp(time.hour, 0, HOURS_PER_DAY - 1);
-    currentTime.day = std::clamp(time.day, 1, DAYS_PER_SEASON);  // Start from 1
-    currentTime.season = std::clamp(time.season, 0, 3);
-    currentTime.year = std::max(1, time.year);  // At least start from year 1
-
-    /*CCLOG("Time set to - Year: %d, Season: %d, Day: %d, %02d:%02d",
-        currentTime.year, currentTime.season, currentTime.day,
-        currentTime.hour, currentTime.minute);
-*/
-
-    checkAndNotifyChanges(previousTime);
-    saveToUserDefault();
-}
+//void TimeSeasonSystem::setTimeScale(float scale) {
+//    timeScale = std::max(0.0f, scale);
+//    //CCLOG("Time scale set to: %.2f", timeScale);
+//}
+//
+//void TimeSeasonSystem::setTime(const GameTime& time) {
+//    GameTime previousTime = currentTime;
+//    
+//    // Ensure all values are within valid ranges
+//    currentTime.minute = std::clamp(time.minute, 0, MINUTES_PER_HOUR - 1);
+//    currentTime.hour = std::clamp(time.hour, 0, HOURS_PER_DAY - 1);
+//    currentTime.day = std::clamp(time.day, 1, DAYS_PER_SEASON);  // Start from 1
+//    currentTime.season = std::clamp(time.season, 0, 3);
+//    currentTime.year = std::max(1, time.year);  // At least start from year 1
+//
+//    /*CCLOG("Time set to - Year: %d, Season: %d, Day: %d, %02d:%02d",
+//        currentTime.year, currentTime.season, currentTime.day,
+//        currentTime.hour, currentTime.minute);
+//*/
+//
+//    checkAndNotifyChanges(previousTime);
+//    saveToUserDefault();
+//}
 
 // Save to user defaults
 void TimeSeasonSystem::saveToUserDefault() {

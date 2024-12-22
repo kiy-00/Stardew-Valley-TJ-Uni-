@@ -1,0 +1,297 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/cave.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "全部文件 (*)",
+    "fileStates": {
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/base.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/boundary.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/cave.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 748,
+                "y": 806.6666666666667
+            }
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/emerald.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/gold_ore.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/green_diamond_ore.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/iron_ore.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/lapiz_ore.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/magafruit.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/magaheart.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/monster_awake.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/monster_sleep.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/red_diamond_ore.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/arable_2.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/base_fall.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/base_spring.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/base_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/base_winter.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/boundary_fall.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/boundary_spring.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/boundary_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/boundary_winter.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/farmland.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/house_1_fall.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/house_1_spring.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/house_1_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/house_1_winter.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/myhouse_1_fall.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/myhouse_1_spring.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/myhouse_1_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/myhouse_1_winter.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/obj_forbidden_tree_fall.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/obj_forbidden_tree_spring.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/obj_forbidden_tree_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/obj_forbidden_tree_winter.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/obj_move_bushes_fall.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/obj_move_bushes_spring.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/obj_move_bushes_summer.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/obj_move_bushes_winter.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/standard_fall.tmx": {
+            "scale": 0.7338749999999999,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 799.8637370124341,
+                "y": 799.8637370124341
+            }
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/standard_spring.tmx": {
+            "expandedObjectLayers": [
+                9,
+                11,
+                8
+            ],
+            "scale": 0.7338749999999999,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 799.8637370124341,
+                "y": 799.8637370124341
+            }
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/standard_summer.tmx": {
+            "scale": 0.7338749999999999,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 799.8637370124341,
+                "y": 799.8637370124341
+            }
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/standard_winter.tmx": {
+            "scale": 0.7338749999999999,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 799.8637370124341,
+                "y": 799.8637370124341
+            }
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/static_2_stone.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/static_3_cobblestone.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/static_4_flower.tsx": {
+            "scaleInDock": 1
+        },
+        "base.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "bed.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "black_sofa.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "blue_sofa.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "boundary.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "chair.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "chair_2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "dark_bookshelf.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "dark_fireplace.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "inside.tmx": {
+            "expandedObjectLayers": [
+                3,
+                5,
+                4
+            ],
+            "scale": 1.4111458333333333,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 479.751974606924,
+                "y": 320.307079058094
+            }
+        },
+        "red_sofa_left.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "round_table.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "shelf_1.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "shelf_2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "shelf_3.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "shelf_4.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tv_back.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.imagePath": "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/inside/asset/decorates",
+    "map.fixedSize": true,
+    "map.height": 20,
+    "map.lastUsedFormat": "tmx",
+    "map.layerDataFormat": 3,
+    "map.orientation": 1,
+    "map.tileHeight": 32,
+    "map.tileWidth": 32,
+    "map.width": 30,
+    "openFiles": [
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/cave.tmx"
+    ],
+    "project": "inside.tiled-project",
+    "recentFiles": [
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/cave/cave.tmx",
+        "inside.tmx",
+        "/home/yik/Stardew-Valley-TJ-Uni/SVTU/Resources/maps/farm/standard/farmland.tsx",
+        "boundary.tsx",
+        "bed.tsx",
+        "base.tsx",
+        "black_sofa.tsx",
+        "blue_sofa.tsx",
+        "dark_bookshelf.tsx",
+        "red_sofa_left.tsx",
+        "shelf_1.tsx",
+        "shelf_2.tsx"
+    ],
+    "tileset.embedInMap": false,
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.margin": 0,
+    "tileset.spacing": 0,
+    "tileset.tileSize": {
+        "height": 117,
+        "width": 70
+    },
+    "tileset.transparentColor": "#ff00ff",
+    "tileset.type": 0,
+    "tileset.useTransparentColor": false
+}

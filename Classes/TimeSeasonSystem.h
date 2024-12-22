@@ -20,6 +20,7 @@ public:
         WINTER
     };
 
+
     // Game time structure
     struct GameTime {
         int year;       // Game year
@@ -70,9 +71,8 @@ public:
     int getCurrentYear() const { return currentTime.year; }
 
     // Time setters
-    void setTimeScale(float scale); // Set time scale
-    void setTime(const GameTime& time); // Directly set time
-
+   
+  
     // Event listeners
     using SeasonChangeCallback = std::function<void(const SeasonChangeEvent&)>;
     using DayChangeCallback = std::function<void(const DayChangeEvent&)>;
@@ -93,6 +93,12 @@ public:
     const float MINUTES_PER_SEASON = 60.0f;           // 60 game minutes = 1 season
 
     void setSeasonChangedCallback(const std::function<void(const std::string&)>& callback);
+
+    // 添加时间变化回调的类型定义和设置函数
+    using TimeChangedCallback = std::function<void(const GameTime&)>;
+    void setTimeChangedCallback(const TimeChangedCallback& callback) {
+        timeChangedCallback = callback;
+    }
 
 protected:
     TimeSeasonSystem();
@@ -132,6 +138,8 @@ private:
     void advanceSeason();
     void checkAndNotifyChanges(const GameTime& previousTime);
 
+    // 已有的成员...
+    TimeChangedCallback timeChangedCallback;  // 添加回调成员变量
     
 };
 

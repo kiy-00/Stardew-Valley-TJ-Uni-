@@ -2,12 +2,14 @@
 #include "FarmMapManager.h"
 #include "FarmInteractionManager.h"
 #include "TimeSeasonSystem.h"  // 添加时间季节系统头文件
+#include "TimeEffectManager.h"
 #include "cocos2d.h"
 #include "User.h"
 #include "Inventory.h"
 #include "FarmlandManager.h"
 #include "WeatherSystem.h"
 #include "WeatherEffectManager.h"
+
 
 
 
@@ -42,6 +44,7 @@ private:
 
     // 时间季节系统相关
     TimeSeasonSystem* timeSystem;
+    TimeEffectManager* timeEffectManager;
     cocos2d::Label* timeSeasonLabel;  // 显示时间和季节的标签
     void updateTimeSeasonLabel();     // 更新时间显示
     void onSeasonChanged(const std::string& newSeason);

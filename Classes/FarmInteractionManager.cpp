@@ -40,17 +40,17 @@ bool FarmInteractionManager::init(Scene* scene, User* player, FarmMapManager* ma
     
     // 统一设置标签位置
     if(worldPosLabel) {
-        worldPosLabel->setPosition(Vec2(150, 80));
+        worldPosLabel->setPosition(Vec2(200, 120));
         currentScene->addChild(worldPosLabel, 1000);
     }
     
     if(tilePosLabel) {
-        tilePosLabel->setPosition(Vec2(150, 40));
+        tilePosLabel->setPosition(Vec2(200, 80));
         currentScene->addChild(tilePosLabel, 1000);
     }
     
     if(timeLabel) {
-        timeLabel->setPosition(Vec2(150, 120));
+        timeLabel->setPosition(Vec2(200, 160));
         currentScene->addChild(timeLabel, 1000);
     }
     

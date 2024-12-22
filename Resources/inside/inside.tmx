@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="20" nextobjectid="45">
+ <tileset firstgid="1" source="base.tsx"/>
+ <tileset firstgid="8" source="boundary.tsx"/>
+ <tileset firstgid="15" source="bed.tsx"/>
+ <tileset firstgid="19" source="black_sofa.tsx"/>
+ <tileset firstgid="20" source="blue_sofa.tsx"/>
+ <tileset firstgid="21" source="dark_bookshelf.tsx"/>
+ <tileset firstgid="22" source="red_sofa_left.tsx"/>
+ <tileset firstgid="23" source="shelf_1.tsx"/>
+ <tileset firstgid="24" source="shelf_2.tsx"/>
+ <tileset firstgid="25" source="shelf_3.tsx"/>
+ <tileset firstgid="26" source="shelf_4.tsx"/>
+ <tileset firstgid="27" source="dark_fireplace.tsx"/>
+ <tileset firstgid="28" source="round_table.tsx"/>
+ <tileset firstgid="29" source="chair.tsx"/>
+ <tileset firstgid="30" source="chair_2.tsx"/>
+ <tileset firstgid="31" source="tv_back.tsx"/>
+ <tileset firstgid="32" source="bed.tsx"/>
+ <layer id="1" name="base" width="30" height="20">
+  <data encoding="base64" compression="zlib">
+   eJztw8EJAAAMA6Ej+w/dJfpUcNVUVX17DQoEsQ==
+  </data>
+ </layer>
+ <layer id="2" name="boundary" width="30" height="20">
+  <data encoding="base64" compression="zlib">
+   eJzjYGBg4BgAzMlAf8A5au+ovaP2jto7au+ovaP2jjh7qd2GQQa42jgAxrYDDw==
+  </data>
+ </layer>
+ <objectgroup id="6" name="bed">
+  <object id="30" gid="32" x="35" y="379" width="80" height="120"/>
+ </objectgroup>
+ <objectgroup id="7" name="blue_sofa">
+  <object id="31" gid="20" x="541" y="110" width="128" height="80"/>
+ </objectgroup>
+ <objectgroup id="8" name="black_sofa">
+  <object id="32" gid="19" x="674.333" y="113" width="131" height="80"/>
+ </objectgroup>
+ <objectgroup id="9" name="red_sofa_left">
+  <object id="33" gid="22" x="845" y="418" width="80" height="108"/>
+ </objectgroup>
+ <objectgroup id="10" name="dark_fireplace">
+  <object id="34" gid="27" x="844.333" y="228.667" width="80" height="195"/>
+ </objectgroup>
+ <objectgroup id="11" name="tv_back">
+  <object id="35" gid="31" x="335" y="609" width="70" height="117"/>
+ </objectgroup>
+ <objectgroup id="12" name="dark_bookshelf">
+  <object id="36" gid="21" x="33.3333" y="139.667" width="75" height="110"/>
+  <object id="37" gid="21" x="109.667" y="141.667" width="75" height="110"/>
+ </objectgroup>
+ <objectgroup id="13" name="shelf_1">
+  <object id="38" gid="23" x="228.667" y="104" width="73" height="70"/>
+ </objectgroup>
+ <objectgroup id="14" name="shelf_2">
+  <object id="39" gid="24" x="301.333" y="103" width="73" height="70"/>
+ </objectgroup>
+ <objectgroup id="15" name="shelf_3">
+  <object id="40" gid="25" x="379" y="104.333" width="63" height="70"/>
+ </objectgroup>
+ <objectgroup id="16" name="shelf_4">
+  <object id="41" gid="26" x="442.667" y="105" width="70" height="70"/>
+ </objectgroup>
+ <objectgroup id="17" name="round_table">
+  <object id="42" gid="28" x="366" y="359" width="120" height="104"/>
+ </objectgroup>
+ <objectgroup id="18" name="chair">
+  <object id="43" gid="29" x="533" y="333" width="39" height="70"/>
+ </objectgroup>
+ <objectgroup id="19" name="chair_2">
+  <object id="44" gid="30" x="311" y="269" width="38" height="70"/>
+ </objectgroup>
+</map>

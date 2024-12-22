@@ -13,7 +13,7 @@ namespace GameTime {
     constexpr int MINUTES_PER_YEAR = MINUTES_PER_SEASON * SEASONS_PER_YEAR;
     
     // 时间尺度常量
-    constexpr float DEFAULT_TIME_SCALE = 10;  // 调整为 403.2 完成约10秒一个季节
+    constexpr float DEFAULT_TIME_SCALE = 1.0f; 
     constexpr float MIN_TIME_SCALE = 0.1f;
     constexpr float MAX_TIME_SCALE = 1000.0f;
     

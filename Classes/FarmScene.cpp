@@ -95,6 +95,13 @@ bool FarmScene::initTimeSystem() {
     timeSystem->setName("TimeSeasonSystem");
     timeSystem->retain();
     this->addChild(timeSystem);
+
+    // Initialize time effect manager
+    timeEffectManager = TimeEffectManager::getInstance();
+    timeEffectManager->setName("TimeEffectManager");
+    timeEffectManager->retain();
+    this->addChild(timeEffectManager, FIFTH);
+    timeEffectManager->initializeWithScene(this);
     return true;
 }
 
@@ -132,6 +139,15 @@ void FarmScene::setupSystemCallbacks() {
     weatherSystem->setWeatherChangedCallback([this](const std::string& newWeather) {
         this->onWeatherChanged(newWeather);
         });
+
+    // 添加时间变化回调
+    timeSystem->setTimeChangedCallback([this](const TimeSeasonSystem::GameTime& newTime) {
+        if (timeEffectManager) {
+            timeEffectManager->updateTimeEffect(newTime.hour);
+            CCLOG("Time effect updated for hour: %d", newTime.hour);
+        }
+        });
+
 }
 
 bool FarmScene::createSystemLabels() {
@@ -182,8 +198,6 @@ void FarmScene::startSystems() {
         weatherSystem->startWeatherSystem();
         CCLOG("Weather system started successfully");
         // 在场景的 init 函数中
-        auto weatherEffectManager = WeatherEffectManager::getInstance();
-        weatherEffectManager->initializeWithScene(this);
     }
 
     // 立即更新一次标签
