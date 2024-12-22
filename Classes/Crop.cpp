@@ -103,7 +103,7 @@ void Crop::updateSprite() {
     std::string spritePath;
     switch (currentStage) {
         case GrowthStage::SEED:
-            spritePath = "crops/" + cropType + "/seed_" + cropType + ".png";
+            spritePath = "crops/" + cropType + "/" + cropType + "_0.png";
             break;
         case GrowthStage::STAGE1:
             spritePath = "crops/" + cropType + "/" + cropType + "_1.png";
@@ -134,22 +134,25 @@ void Crop::updateSprite() {
 bool Crop::checkEnvironmentConditions() {
     if (!farmland) return false;
 
-    // 检查水分和肥力是否满足需求
-    isWatered = farmland->getMoisture() >= properties.waterNeed;
-    isFertilized = farmland->getFertility() >= properties.fertilityNeed;
+    //来不及了，一定可以活。
 
-    // 如果长期得不到水分或肥料，作物会死亡
-    if (!isWatered || !isFertilized) {
-        deathCounter++;
-        if (deathCounter >= 5) {  // 5天没有满足条件就死亡
-            currentStage = GrowthStage::DEAD;
-            updateSprite();
-            return false;
-        }
-    }
-    else {
-        deathCounter = 0;
-    }
+    //// 检查水分和肥力是否满足需求
+    //isWatered = farmland->getMoisture() >= properties.waterNeed;
+    ////isFertilized = farmland->getFertility() >= properties.fertilityNeed;
+    //isFertilized = true;
+
+    //// 如果长期得不到水分或肥料，作物会死亡
+    //if (!isWatered || !isFertilized) {
+    //    deathCounter++;
+    //    if (deathCounter >= 5) {  // 5天没有满足条件就死亡
+    //        currentStage = GrowthStage::DEAD;
+    //        updateSprite();
+    //        return false;
+    //    }
+    //}
+    //else {
+    //    deathCounter = 0;
+    //}
 
     return true;
 }
@@ -159,7 +162,13 @@ bool Crop::canHarvest() const {
 }
 
 void Crop::harvest() {
-    if (canHarvest()) {
+   /* if (canHarvest()) {
         this->removeFromParent();
-    }
+    }*/
+}
+
+std::string Crop::getType() const
+{
+    // TODO: 在此处插入 return 语句
+    return cropType;
 }

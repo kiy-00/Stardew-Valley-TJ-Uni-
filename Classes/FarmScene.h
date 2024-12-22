@@ -3,6 +3,7 @@
 #include "FarmInteractionManager.h"
 #include "TimeSeasonSystem.h"
 #include "TimeEffectManager.h"
+#include "CropManager.h"
 #include "cocos2d.h"
 #include "User.h"
 #include "Inventory.h"
@@ -90,6 +91,7 @@ private:
     bool isInventoryInitialized = false;
 
     FarmlandManager* farmlandManager;
+    CropManager* cropManager;
     void initFarmland();  // 新增初始化耕地的方法
     std::vector<Vec2> getFarmablePositions(); // 获取可耕种位置
 };

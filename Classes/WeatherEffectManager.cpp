@@ -86,22 +86,46 @@ void WeatherEffectManager::createRainEffect() {
 
     auto rain = ParticleRain::create();
     if (rain) {
-        rain->setPosition(Vec2(Director::getInstance()->getWinSize().width / 2,
-            Director::getInstance()->getWinSize().height + 50));
-        
-        // 调整雨滴参数
+        // 设置发射源在屏幕顶端中间，并略高于可视范围
+        rain->setPosition(Vec2(
+            Director::getInstance()->getWinSize().width / 2,
+            Director::getInstance()->getWinSize().height + 50)
+        );
+
+        // 调整雨滴排布范围，确保雨能覆盖全屏宽度
+        rain->setPosVar(Vec2(
+            Director::getInstance()->getWinSize().width / 2,
+            0.0f)
+        );
+
+        // 控制每秒发射的雨滴数量
         rain->setEmissionRate(800.0f);
+
+        // 雨滴存活时间，设置相对短一些，让雨滴尽快落到屏幕底端消失
+        // 可根据屏幕高度和速度来决定
         rain->setLife(1.2f);
         rain->setLifeVar(0.4f);
+
+        // 雨滴的大小
+        // 对比雪花，雨滴通常更小、更细
         rain->setStartSize(14.0f);
         rain->setStartSizeVar(6.0f);
         rain->setEndSize(8.0f);
         rain->setEndSizeVar(2.0f);
+
+        // 雨滴下落速度要比雪大得多
+        // 这里 speed=900，speedVar=100，表示平均速度900像素/秒，随机波动±100
         rain->setSpeed(900.0f);
         rain->setSpeedVar(100.0f);
+
+        // 雨滴的颜色，偏蓝 + 一些透明度
+        // startColor = 雨滴初始颜色
+        // endColor   = 雨滴将要消失时的颜色
         rain->setStartColor(Color4F(0.7f, 0.8f, 1.0f, 1.0f));
         rain->setEndColor(Color4F(0.7f, 0.8f, 1.0f, 0.3f));
-        rain->setPosVar(Vec2(Director::getInstance()->getWinSize().width / 2, 0));
+
+        // 可根据需要修改重力方向（默认为向下）
+        // rain->setGravity(Vec2(0, -1000)); // 如果要显式指定重力，可加这行
 
         currentEffect = rain;
         currentScene->addChild(currentEffect, 9999);
@@ -111,6 +135,7 @@ void WeatherEffectManager::createRainEffect() {
         CCLOG("Error: Failed to create rain particle system");
     }
 }
+
 
 void WeatherEffectManager::createSnowEffect() {
     if (!currentScene) return;

@@ -31,14 +31,13 @@ public:
         return tileSize;
     }
 
-    // ��ȡ��ǰ״̬
+
     State getState() const { return currentState; }
 
-    // ��ȡ����ʪ��/����������
     float getMoisture() const { return moisture; }
     float getFertility() const { return fertility; }
 
-    // ����״̬������ˮ����ʱ����٣�
+
     void update(float dt);
 
     // 转换瓦片坐标到世界坐标
@@ -52,8 +51,8 @@ public:
 
 private:
     State currentState;
-    float moisture;    // ����ʪ�� 0-100
-    float fertility;   // ���� 0-100
+    float moisture;    
+    float fertility;   
 
     static float tileSize;
 

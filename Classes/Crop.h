@@ -1,3 +1,5 @@
+#ifndef __CROP_H__
+#define __CROP_H__
 #include "TimeSeasonSystem.h"
 #include "WeatherSystem.h"
 #include "FarmlandTile.h"
@@ -75,6 +77,8 @@ public:
     bool canHarvest() const;
     virtual void harvest();
 
+    std::string getType() const;
+
 protected:
     void updateSprite();
     virtual float calculateGrowthRate();
@@ -88,4 +92,4 @@ protected:
         removeEventListeners();
     }
 };
-
+#endif

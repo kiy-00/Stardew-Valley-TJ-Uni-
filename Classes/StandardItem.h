@@ -7,5 +7,7 @@
 #include "CarrotSeed.h"
 #include "PepperSeed.h"
 #include "WheatSeed.h"
+#include "CropItem.h"
+
 
 #endif // __STANDARD_ITEM_H__

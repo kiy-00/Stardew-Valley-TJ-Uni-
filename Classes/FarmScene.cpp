@@ -7,7 +7,6 @@
 #include "RenderConstants.h"
 #include "WeatherSystem.h"
 #include "WeatherEffectManager.h"
-#include "SimpleAudioEngine.h"
 #include "StandardItem.h"
 #include "BreedItem.h"
 #include "AudioManager.h"
@@ -50,13 +49,15 @@ bool FarmScene::init(const std::string& mapType) {
 
     // 初始化剩余组件
     setupKeyboard();
-    //setupMouse();
+    setupMouse();
     initInventory();
     initFarmland();
 
     // 初始化交互管理器
     interactionManager = FarmInteractionManager::getInstance();
     interactionManager->init(this, player, farmMapManager);
+
+   
 
     // 使用新的音频管理器 - 延迟初始化以确保其他系统已经就绪
    /* this->scheduleOnce([this](float dt) {
@@ -375,7 +376,14 @@ void FarmScene::initFarmland() {
     FarmlandTile::setTileSize(actualTileWidth);  // 使用实际大小
     farmlandManager->init(this, farmablePositions, SECOND);
 
+  
     CCLOG("=== End Diagnostics ===");
+
+
+    //创建作物管理者。
+    cropManager = CropManager::getInstance();
+
+    cropManager->init(this, THIRD);
 }
 
 
@@ -399,104 +407,27 @@ std::vector<Vec2> FarmScene::getFarmablePositions() {
     return positions;
 }
 
-//void FarmScene::setupMouse() {
-//    auto mouseListener = EventListenerMouse::create();
-//    mouseListener->onMouseDown = CC_CALLBACK_1(FarmScene::onMouseClick, this);
-//    _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
-//}
-//
-//void FarmScene::onMouseClick(EventMouse* event) {
-//    float slotSize = 30.0f;
-//
-//    // 获取原始鼠标位置
-//    Vec2 mousePosition = event->getLocation();
-//
-//    // 如果背包打开，强制对鼠标位置的 Y 坐标进行偏移
-//    if (player->getIsInventoryOpen()) {
-//        mousePosition.y += 60;
-//    }
-//
-//    CCLOG("Mouse Position After Offset: (%.2f, %.2f)", mousePosition.x, mousePosition.y);
-//
-//    // 计算背包的起始位置
-//    float startX = (Director::getInstance()->getVisibleSize().width - (8 * slotSize)) / 2;
-//    float startY = (Director::getInstance()->getVisibleSize().height - (3 * slotSize)) / 2;
-//
-//    // 计算点击的槽位
-//    int col = static_cast<int>((mousePosition.x - startX) / slotSize);
-//    int row = static_cast<int>((startY + (3 * slotSize) - mousePosition.y) / slotSize);
-//
-//    CCLOG("Clicked Slot: Row = %d, Col = %d", row, col);
-//
-//    // 点击背包槽位的逻辑
-//    if (row >= 0 && row < 3 && col >= 0 && col < 8) {
-//        player->onSlotClicked(row, col);
-//    }
-//    // 点击垃圾桶槽位
-//    else if (row == 0 && col == 8) {
-//        player->onSlotClicked(0, 8);
-//    }
-//    // 如果点击背包以外的区域，并且是左键点击，执行工具动作
-//    else {
-//        if (event->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) {
-//			/* -----新增：执行行为时传入地图管理者---- */
-//			player->performAction(farmMapManager);
-//
-//            // 获取玩家位置和朝向
-//            Vec2 playerPos = player->getPosition();
-//            int direction = player->getDirection();
-//
-//            // 检查当前位置是否可以耕种
-//            Vec2 targetPos = playerPos;
-//            switch (direction) {
-//                case 0: // 下
-//                    targetPos.y -= 32.0f;
-//                    break;
-//                case 1: // 上
-//                    targetPos.y += 32.0f;
-//                    break;
-//                case 2: // 左
-//                    targetPos.x -= 32.0f;
-//                    break;
-//                case 3: // 右
-//                    targetPos.x += 32.0f;
-//                    break;
-//            }
-//
-//            // 获取当前选中的物品
-//            Item* selectedItem = player->getSelectedItem();
-//            if (selectedItem) {
-//                std::string toolType = selectedItem->getName();
-//                // 将目标位置转换为瓦片坐标
-//                Vec2 tilePos = farmMapManager->worldToTileCoord(targetPos);
-//                
-//                // 添加更详细的调试信息
-//                CCLOG("Tool Action Debug:");
-//                CCLOG("Selected Tool Type: %s", toolType.c_str());
-//                CCLOG("World Position: (%.2f, %.2f)", targetPos.x, targetPos.y);
-//                CCLOG("Tile Position: (%.0f, %.0f)", tilePos.x, tilePos.y);
-//                CCLOG("Is Arable: %d", farmMapManager->isArable(targetPos));
-//
-//                farmlandManager->debugAllFarmlandKeys();
-//
-//                if (toolType == "Hoe" && farmMapManager->isArable(targetPos)) {
-//                    CCLOG("Attempting to handle tool action at position (%.2f, %.2f)", targetPos.x, targetPos.y);
-//                    farmlandManager->handleToolAction(toolType, tilePos, direction);
-//                }
-//                else if (toolType == "Kettle" && farmMapManager->isArable(targetPos)) {
-//
-//                    farmlandManager->handleToolAction(toolType, tilePos, direction);
-//
-//                }
-//                else {
-//                    CCLOG("Tool action failed - Conditions not met");
-//                }
-//            } else {
-//                CCLOG("No tool selected");
-//            }
-//        }
-//    }
-//}
+
+
+void FarmScene::setupMouse() {
+    auto mouseListener = EventListenerMouse::create();
+    mouseListener->onMouseDown = CC_CALLBACK_1(FarmScene::onMouseClick, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
+}
+
+void FarmScene::onMouseClick(EventMouse* event) {
+
+
+    // 获取原始鼠标位置
+    Vec2 mousePosition = event->getLocation();
+
+   if(event->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT)
+            /* -----新增：执行行为时传入地图管理者---- */
+    player->performAction(farmMapManager);
+
+         
+}
+
 
 //void FarmScene::setupKeyboard() {
 //    auto keyboardListener = EventListenerKeyboard::create();
@@ -952,24 +883,83 @@ void FarmScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
         }
 
         // 4. 判断选中的物品类型
-        std::string toolType = selectedItem->getName(); // 例如 "Hoe" / "Kettle"
+        std::string itemName = selectedItem->getName(); // 例如 "Hoe" / "Kettle"
+
+        std::string itemType = selectedItem->getItemType();
+
         // 转换成瓦片坐标
         Vec2 tilePos = farmMapManager->worldToTileCoord(targetPos);
 
         // 5. 判定是否可耕种
         bool canFarm = farmMapManager->isArable(targetPos);
 
-        if (toolType == "Hoe" && canFarm) {
-            farmlandManager->handleToolAction(toolType, tilePos, direction);
+        bool canPlant = farmlandManager->canPlant(tilePos);
+
+     
+
+        auto tile = farmlandManager->getFarmlandAt(tilePos);
+        auto crop = cropManager->getCropOnTile(tile);
+
+        bool canHarvest = false;
+
+        if (crop) {
+           canHarvest = crop->canHarvest();
+        }
+
+        if (itemName == "Hoe" && canFarm) {
+            farmlandManager->handleToolAction(itemName, tilePos, direction);
             CCLOG("Used Hoe at tile (%.0f, %.0f)", tilePos.x, tilePos.y);
         }
-        else if (toolType == "Kettle" && canFarm) {
-            farmlandManager->handleToolAction(toolType, tilePos, direction);
+        else if (itemName == "Kettle" && canFarm) {
+            farmlandManager->handleToolAction(itemName, tilePos, direction);
             CCLOG("Used Kettle at tile (%.0f, %.0f)", tilePos.x, tilePos.y);
+        }
+        else if (itemName == "Reap" && canHarvest) {
+           
+            
+
+            auto cropType = crop->getType();
+
+            auto imagePath = "crops/" + cropType + "/" + cropType + "_3.png";
+
+
+           
+            CropItem* cropItem = new CropItem(cropType, "crop, programmer tired, no detailed description", imagePath);
+            player->getInventory()->addItem(cropItem);
+
+            cropManager->removeCrop(tile, true);
+
+        }
+        else if (itemType == "seed" && canPlant) {
+
+            Crop* newCrop = nullptr;
+
+            if (itemName == "Berry Seed")
+            {
+                newCrop = CropManager::getInstance()->plantCrop("berry", tile);
+            }
+            else if (itemName == "Wheat Seed")
+            {
+                newCrop = CropManager::getInstance()->plantCrop("wheat", tile);
+            }
+            else if (itemName == "Pepper Seed")
+            {
+                newCrop = CropManager::getInstance()->plantCrop("pepper", tile);
+            }
+            else if (itemName == "Carrot Seed")
+            {
+                newCrop = CropManager::getInstance()->plantCrop("carrot", tile);
+            }
+          
+            if (newCrop) {
+                CCLOG("Successfully planted Crop at (%.1f, %.1f)", tile->getPosition().x, tile->getPosition().y);
+            }
         }
         else {
             CCLOG("Tool action failed or not a Hoe/Kettle");
         }
+
+
         break;
     }
 

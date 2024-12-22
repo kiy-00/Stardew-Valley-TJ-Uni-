@@ -13,7 +13,7 @@ bool FarmlandManager::init(cocos2d::Scene* scene, const std::vector<Vec2>& farma
         return false;
     }
     this->farmlandLayer = Layer::create();
-    scene->addChild(farmlandLayer, zOrder);  // 使锟矫达拷锟斤拷锟? zOrder
+    scene->addChild(farmlandLayer, zOrder);  
     this->farmablePositions = farmablePositions;
 
     for (const auto& worldPos : farmablePositions) {
@@ -34,6 +34,25 @@ bool FarmlandManager::init(cocos2d::Scene* scene, const std::vector<Vec2>& farma
         }, 1.0f, "farmland_update");
 
     return true;
+}
+bool FarmlandManager::canPlant(const Vec2& tilePos)
+{
+
+    auto tile = getFarmlandAt(tilePos);
+    if (!tile) return false;
+
+    auto state = tile->getState();
+
+    //这里的逻辑以后可以拓展
+
+    if (state == FarmlandTile::State::TILLED ||
+        state == FarmlandTile::State::WATERED ||
+        state == FarmlandTile::State::FERTILIZED)
+    {
+        return true;
+    }
+    return false;
+
 }
 void FarmlandManager::handleToolAction(const std::string& toolType, const Vec2& tilePos, int direction) {
     CCLOG("FarmlandManager::handleToolAction - Start");
