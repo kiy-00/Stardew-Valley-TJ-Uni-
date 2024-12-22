@@ -30,66 +30,85 @@ bool WeatherEffectManager::init() {
     if (!Node::init()) {
         return false;
     }
-    
-    // 注册为天气系统的观察者
-    WeatherSystem::getInstance()->addWeatherChangeListener("WeatherEffectManager",
-        [this](const WeatherChangeEvent& event) {
-            this->updateWeatherEffect(WeatherSystem::weatherToString(event.newWeather));
-        });
-    
     return true;
 }
 
 void WeatherEffectManager::initializeWithScene(Scene* scene) {
     currentScene = scene;
-    if (currentScene) {
-        currentScene->addChild(this);
-    }
+
+    // 注册为天气系统的观察者
+    WeatherSystem::getInstance()->addWeatherChangeListener("WeatherEffectManager",
+        [this](const WeatherChangeEvent& event) {
+            this->updateWeatherEffect(WeatherSystem::weatherToString(event.newWeather));
+        });
 }
 
 void WeatherEffectManager::updateWeatherEffect(const std::string& weatherType) {
+    // 先清除当前特效
     clearCurrentEffect();
+    
+    CCLOG("Creating weather effect for: %s", weatherType.c_str());
     
     if (weatherType == "rainy") {
         createRainEffect();
-    } else if (weatherType == "snowy") {
+        CCLOG("Rain effect created");
+    }
+    else if (weatherType == "snowy") {
         createSnowEffect();
-    } else if (weatherType == "foggy") {
+        CCLOG("Snow effect created");
+    }
+    else if (weatherType == "foggy") {
         createFogEffect();
+        CCLOG("Fog effect created");
+    }
+    else if (weatherType == "cloudy") {
+        createCloudEffect();
+        CCLOG("Cloud effect created");
+    }
+    else {
+        CCLOG("No effect created for weather type: %s", weatherType.c_str());
     }
 }
 
 void WeatherEffectManager::clearCurrentEffect() {
     if (currentEffect) {
+        CCLOG("Clearing current weather effect");
         currentEffect->removeFromParent();
         currentEffect = nullptr;
     }
 }
 
 void WeatherEffectManager::createRainEffect() {
-    if (!currentScene) return;
+    if (!currentScene) {
+        CCLOG("Error: No current scene set for rain effect");
+        return;
+    }
 
     auto rain = ParticleRain::create();
     if (rain) {
-        rain->setVisible(true);
         rain->setPosition(Vec2(Director::getInstance()->getWinSize().width / 2,
-                             Director::getInstance()->getWinSize().height + 50));
+            Director::getInstance()->getWinSize().height + 50));
+        
+        // 调整雨滴参数
+        rain->setEmissionRate(800.0f);
         rain->setLife(1.2f);
         rain->setLifeVar(0.4f);
-        rain->setEmissionRate(800.0f);    // 增加发射率
-        rain->setStartSize(14.0f);        // 增大雨滴尺寸
+        rain->setStartSize(14.0f);
         rain->setStartSizeVar(6.0f);
         rain->setEndSize(8.0f);
         rain->setEndSizeVar(2.0f);
         rain->setSpeed(900.0f);
         rain->setSpeedVar(100.0f);
-        // 设置为浅蓝色
         rain->setStartColor(Color4F(0.7f, 0.8f, 1.0f, 1.0f));
         rain->setEndColor(Color4F(0.7f, 0.8f, 1.0f, 0.3f));
         rain->setPosVar(Vec2(Director::getInstance()->getWinSize().width / 2, 0));
-        
+
         currentEffect = rain;
         currentScene->addChild(currentEffect, 9999);
+        CCLOG("Rain effect parameters set and added to scene");
+    }
+    else {
+        CCLOG("Error: Failed to create rain particle system");
     }
 }
 
@@ -101,7 +120,7 @@ void WeatherEffectManager::createSnowEffect() {
         snow->setVisible(true);
         snow->setEmitterMode(ParticleSystem::Mode::GRAVITY);  // 使用重力模式
         snow->setPosition(Vec2(Director::getInstance()->getWinSize().width / 2,
-                             Director::getInstance()->getWinSize().height + 50));
+            Director::getInstance()->getWinSize().height + 50));
         snow->setLife(6.0f);
         snow->setLifeVar(1.0f);
         snow->setEmissionRate(300.0f);
@@ -118,13 +137,13 @@ void WeatherEffectManager::createSnowEffect() {
         snow->setStartColor(Color4F(0.7f, 0.8f, 1.0f, 0.9f));  // 淡蓝色起始
         snow->setEndColor(Color4F(0.7f, 0.8f, 1.0f, 0.7f));    // 淡蓝色结束
         snow->setPosVar(Vec2(Director::getInstance()->getWinSize().width / 2, 0));
-        
+
         currentEffect = snow;
         currentScene->addChild(currentEffect, 9999);
-        
+
         // 输出调试信息
-        CCLOG("Snow effect created - Emission Rate: %f, Start Size: %f", 
-              snow->getEmissionRate(), snow->getStartSize());
+        CCLOG("Snow effect created - Emission Rate: %f, Start Size: %f",
+            snow->getEmissionRate(), snow->getStartSize());
     }
 }
 
@@ -136,7 +155,7 @@ void WeatherEffectManager::createFogEffect() {
         fog->setVisible(true);
         fog->setEmitterMode(ParticleSystem::Mode::GRAVITY);
         fog->setPosition(Vec2(Director::getInstance()->getWinSize().width / 2,
-                            Director::getInstance()->getWinSize().height / 2));
+            Director::getInstance()->getWinSize().height / 2));
         fog->setLife(8.0f);
         fog->setLifeVar(2.0f);
         fog->setEmissionRate(20.0f);             // 增加发射率
@@ -149,9 +168,190 @@ void WeatherEffectManager::createFogEffect() {
         fog->setStartColor(Color4F(0.8f, 0.8f, 0.8f, 0.1f));
         fog->setEndColor(Color4F(0.8f, 0.8f, 0.8f, 0.0f));
         fog->setPosVar(Vec2(Director::getInstance()->getWinSize().width / 4,
-                           Director::getInstance()->getWinSize().height / 4));
-        
+            Director::getInstance()->getWinSize().height / 4));
+
         currentEffect = fog;
         currentScene->addChild(currentEffect, 9999);
     }
+}
+
+void WeatherEffectManager::createCloudEffect() {
+    if (!currentScene) return;
+
+    // 创建云层
+    auto cloudLayer = Layer::create();
+    currentScene->addChild(cloudLayer, 9998);
+    currentEffect = cloudLayer;
+
+    // 在四个角附近立即生成云朵
+    const std::vector<Vec2> initialPositions = {
+        // 左上角区域
+        Vec2(Director::getInstance()->getWinSize().width * 0.1f,
+             Director::getInstance()->getWinSize().height * 0.9f),
+        Vec2(Director::getInstance()->getWinSize().width * 0.2f,
+             Director::getInstance()->getWinSize().height * 0.85f),
+        Vec2(Director::getInstance()->getWinSize().width * 0.15f,
+             Director::getInstance()->getWinSize().height * 0.8f),
+        Vec2(Director::getInstance()->getWinSize().width * 0.25f,
+             Director::getInstance()->getWinSize().height * 0.75f),
+
+             // 右上角区域
+             Vec2(Director::getInstance()->getWinSize().width * 0.9f,
+                  Director::getInstance()->getWinSize().height * 0.9f),
+             Vec2(Director::getInstance()->getWinSize().width * 0.8f,
+                  Director::getInstance()->getWinSize().height * 0.85f),
+             Vec2(Director::getInstance()->getWinSize().width * 0.85f,
+                  Director::getInstance()->getWinSize().height * 0.8f),
+             Vec2(Director::getInstance()->getWinSize().width * 0.75f,
+                  Director::getInstance()->getWinSize().height * 0.75f),
+
+                  // 左下角区域
+                  Vec2(Director::getInstance()->getWinSize().width * 0.1f,
+                       Director::getInstance()->getWinSize().height * 0.3f),
+                  Vec2(Director::getInstance()->getWinSize().width * 0.2f,
+                       Director::getInstance()->getWinSize().height * 0.35f),
+                  Vec2(Director::getInstance()->getWinSize().width * 0.15f,
+                       Director::getInstance()->getWinSize().height * 0.4f),
+                  Vec2(Director::getInstance()->getWinSize().width * 0.25f,
+                       Director::getInstance()->getWinSize().height * 0.45f),
+
+                       // 右下角区域
+                       Vec2(Director::getInstance()->getWinSize().width * 0.9f,
+                            Director::getInstance()->getWinSize().height * 0.3f),
+                       Vec2(Director::getInstance()->getWinSize().width * 0.8f,
+                            Director::getInstance()->getWinSize().height * 0.35f),
+                       Vec2(Director::getInstance()->getWinSize().width * 0.85f,
+                            Director::getInstance()->getWinSize().height * 0.4f),
+                       Vec2(Director::getInstance()->getWinSize().width * 0.75f,
+                            Director::getInstance()->getWinSize().height * 0.45f),
+
+                            // 上方中间区域（较稀疏）
+                            Vec2(Director::getInstance()->getWinSize().width * 0.4f,
+                                 Director::getInstance()->getWinSize().height * 0.8f),
+                            Vec2(Director::getInstance()->getWinSize().width * 0.6f,
+                                 Director::getInstance()->getWinSize().height * 0.8f),
+
+                                 // 下方中间区域（较稀疏）
+                                 Vec2(Director::getInstance()->getWinSize().width * 0.4f,
+                                      Director::getInstance()->getWinSize().height * 0.4f),
+                                 Vec2(Director::getInstance()->getWinSize().width * 0.6f,
+                                      Director::getInstance()->getWinSize().height * 0.4f),
+
+                                      // 左侧中间
+                                      Vec2(Director::getInstance()->getWinSize().width * 0.15f,
+                                           Director::getInstance()->getWinSize().height * 0.6f),
+                                      Vec2(Director::getInstance()->getWinSize().width * 0.2f,
+                                           Director::getInstance()->getWinSize().height * 0.55f),
+
+                                           // 右侧中间
+                                           Vec2(Director::getInstance()->getWinSize().width * 0.85f,
+                                                Director::getInstance()->getWinSize().height * 0.6f),
+                                           Vec2(Director::getInstance()->getWinSize().width * 0.8f,
+                                                Director::getInstance()->getWinSize().height * 0.55f),
+                                                // 左上角外围追加
+                                                Vec2(Director::getInstance()->getWinSize().width * (0.05f + random(-0.02f, 0.02f)),
+                                                     Director::getInstance()->getWinSize().height * (0.95f + random(-0.02f, 0.02f))),
+                                                Vec2(Director::getInstance()->getWinSize().width * (0.08f + random(-0.02f, 0.02f)),
+                                                     Director::getInstance()->getWinSize().height * (0.92f + random(-0.02f, 0.02f))),
+                                                Vec2(Director::getInstance()->getWinSize().width * (0.12f + random(-0.02f, 0.02f)),
+                                                     Director::getInstance()->getWinSize().height * (0.88f + random(-0.02f, 0.02f))),
+                                                Vec2(Director::getInstance()->getWinSize().width * (0.18f + random(-0.02f, 0.02f)),
+                                                     Director::getInstance()->getWinSize().height * (0.93f + random(-0.02f, 0.02f))),
+                                                Vec2(Director::getInstance()->getWinSize().width * (0.22f + random(-0.02f, 0.02f)),
+                                                     Director::getInstance()->getWinSize().height * (0.89f + random(-0.02f, 0.02f))),
+
+                                                     // 右上角外围追加
+                                                     Vec2(Director::getInstance()->getWinSize().width * (0.95f + random(-0.02f, 0.02f)),
+                                                          Director::getInstance()->getWinSize().height * (0.95f + random(-0.02f, 0.02f))),
+                                                     Vec2(Director::getInstance()->getWinSize().width * (0.92f + random(-0.02f, 0.02f)),
+                                                          Director::getInstance()->getWinSize().height * (0.92f + random(-0.02f, 0.02f))),
+                                                     Vec2(Director::getInstance()->getWinSize().width * (0.88f + random(-0.02f, 0.02f)),
+                                                          Director::getInstance()->getWinSize().height * (0.88f + random(-0.02f, 0.02f))),
+                                                     Vec2(Director::getInstance()->getWinSize().width * (0.82f + random(-0.02f, 0.02f)),
+                                                          Director::getInstance()->getWinSize().height * (0.93f + random(-0.02f, 0.02f))),
+                                                     Vec2(Director::getInstance()->getWinSize().width * (0.78f + random(-0.02f, 0.02f)),
+                                                          Director::getInstance()->getWinSize().height * (0.89f + random(-0.02f, 0.02f))),
+
+                                                          // 左下角外围追加
+                                                          Vec2(Director::getInstance()->getWinSize().width * (0.05f + random(-0.02f, 0.02f)),
+                                                               Director::getInstance()->getWinSize().height * (0.25f + random(-0.02f, 0.02f))),
+                                                          Vec2(Director::getInstance()->getWinSize().width * (0.08f + random(-0.02f, 0.02f)),
+                                                               Director::getInstance()->getWinSize().height * (0.28f + random(-0.02f, 0.02f))),
+                                                          Vec2(Director::getInstance()->getWinSize().width * (0.12f + random(-0.02f, 0.02f)),
+                                                               Director::getInstance()->getWinSize().height * (0.32f + random(-0.02f, 0.02f))),
+                                                          Vec2(Director::getInstance()->getWinSize().width * (0.18f + random(-0.02f, 0.02f)),
+                                                               Director::getInstance()->getWinSize().height * (0.27f + random(-0.02f, 0.02f))),
+                                                          Vec2(Director::getInstance()->getWinSize().width * (0.22f + random(-0.02f, 0.02f)),
+                                                               Director::getInstance()->getWinSize().height * (0.31f + random(-0.02f, 0.02f))),
+
+                                                               // 右下角外围追加
+                                                               Vec2(Director::getInstance()->getWinSize().width * (0.95f + random(-0.02f, 0.02f)),
+                                                                    Director::getInstance()->getWinSize().height * (0.25f + random(-0.02f, 0.02f))),
+                                                               Vec2(Director::getInstance()->getWinSize().width * (0.92f + random(-0.02f, 0.02f)),
+                                                                    Director::getInstance()->getWinSize().height * (0.28f + random(-0.02f, 0.02f))),
+                                                               Vec2(Director::getInstance()->getWinSize().width * (0.88f + random(-0.02f, 0.02f)),
+                                                                    Director::getInstance()->getWinSize().height * (0.32f + random(-0.02f, 0.02f))),
+                                                               Vec2(Director::getInstance()->getWinSize().width * (0.82f + random(-0.02f, 0.02f)),
+                                                                    Director::getInstance()->getWinSize().height * (0.27f + random(-0.02f, 0.02f))),
+                                                               Vec2(Director::getInstance()->getWinSize().width * (0.78f + random(-0.02f, 0.02f)),
+                                                                    Director::getInstance()->getWinSize().height * (0.31f + random(-0.02f, 0.02f))),
+
+                                                                    // 上边缘额外追加
+                                                                    Vec2(Director::getInstance()->getWinSize().width * (0.3f + random(-0.02f, 0.02f)),
+                                                                         Director::getInstance()->getWinSize().height * (0.95f + random(-0.02f, 0.02f))),
+                                                                    Vec2(Director::getInstance()->getWinSize().width * (0.5f + random(-0.02f, 0.02f)),
+                                                                         Director::getInstance()->getWinSize().height * (0.92f + random(-0.02f, 0.02f))),
+                                                                    Vec2(Director::getInstance()->getWinSize().width * (0.7f + random(-0.02f, 0.02f)),
+                                                                         Director::getInstance()->getWinSize().height * (0.95f + random(-0.02f, 0.02f))),
+
+                                                                         // 下边缘额外追加
+                                                                         Vec2(Director::getInstance()->getWinSize().width * (0.3f + random(-0.02f, 0.02f)),
+                                                                              Director::getInstance()->getWinSize().height * (0.25f + random(-0.02f, 0.02f))),
+                                                                         Vec2(Director::getInstance()->getWinSize().width * (0.5f + random(-0.02f, 0.02f)),
+                                                                              Director::getInstance()->getWinSize().height * (0.28f + random(-0.02f, 0.02f))),
+                                                                         Vec2(Director::getInstance()->getWinSize().width * (0.7f + random(-0.02f, 0.02f)),
+                                                                              Director::getInstance()->getWinSize().height * (0.25f + random(-0.02f, 0.02f)))
+    };
+
+    // 立即生成初始云朵
+    for (const auto& pos : initialPositions) {
+        auto cloud = Sprite::create("weather/cloud.png");
+        if (cloud) {
+            cloud->setPosition(pos);
+            cloud->setOpacity(180);
+            cloud->setScale(random(0.8f, 1.2f));
+            cloudLayer->addChild(cloud);
+
+            // 给初始云朵添加轻微的漂浮动作
+            float duration = random(4.0f, 6.0f);
+            float offsetY = random(-20.0f, 20.0f);
+            auto moveUp = MoveBy::create(duration / 2, Vec2(0, offsetY));
+            auto moveDown = moveUp->reverse();
+            cloud->runAction(RepeatForever::create(Sequence::create(moveUp, moveDown, nullptr)));
+        }
+    }
+
+    // 定期生成新的云朵
+    cloudLayer->schedule([this, cloudLayer](float dt) {
+        auto cloud = Sprite::create("weather/cloud.png");
+        if (cloud) {
+            float startY = random(Director::getInstance()->getWinSize().height * 0.3f,
+                Director::getInstance()->getWinSize().height * 0.8f);
+            cloud->setPosition(Vec2(-cloud->getContentSize().width, startY));
+            cloud->setOpacity(180);
+            cloud->setScale(random(0.8f, 1.2f));
+            cloudLayer->addChild(cloud);
+
+            float speed = random(30.0f, 50.0f);
+            float distance = Director::getInstance()->getWinSize().width +
+                cloud->getContentSize().width * 2;
+            float duration = distance / speed;
+
+            auto moveAction = MoveTo::create(duration,
+                Vec2(Director::getInstance()->getWinSize().width + cloud->getContentSize().width,
+                    startY + random(-30.0f, 30.0f)));
+            auto removeAction = RemoveSelf::create();
+            cloud->runAction(Sequence::create(moveAction, removeAction, nullptr));
+        }
+        }, 3.0f, "create_cloud");
 }

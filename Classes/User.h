@@ -8,23 +8,23 @@
 
 class User : public cocos2d::Sprite {
 public:
-	// Ê¹ÓÃÖ¸¶¨ÊôÐÔ´´½¨UserÊµÀý
+	// Ê¹ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½UserÊµï¿½ï¿½
 	static User* create(const std::string& name, const std::string& gender, int health, int energy, int money);
 
-	// ³õÊ¼»¯ÓÃ»§Êý¾Ý²¢¼ÓÔØ¶¯»­Ö¡
+	// ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½Ý²ï¿½ï¿½ï¿½ï¿½Ø¶ï¿½ï¿½ï¿½Ö¡
 	virtual bool init(const std::string& name, const std::string& gender, int health, int energy, int money);
 
-	// ½ÇÉ«ÒÆ¶¯·½·¨£¬¸ù¾Ý·½Ïò¸üÐÂ½ÇÉ«×´Ì¬
-	void moveUp();   // ÏòÉÏÒÆ¶¯
-	void moveDown(); // ÏòÏÂÒÆ¶¯
-	void moveLeft(); // Ïò×óÒÆ¶¯
-	void moveRight();// ÏòÓÒÒÆ¶¯
+	// ï¿½ï¿½É«ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý·ï¿½ï¿½ï¿½ï¿½ï¿½Â½ï¿½É«×´Ì¬
+	void moveUp();   // ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½
+	void moveDown(); // ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½
+	void moveLeft(); // ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½
+	void moveRight();// ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½
 	void stopMoving() { m_isMoving = false; }
 
-	// ¶¨ÆÚ¸üÐÂ¶¯»­£¬Óë¶¨Ê±Æ÷Ïà½áºÏ
+	// ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½Â¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë¶¨Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	void updateAnimation(float dt);
 
-	// »ù±¾ÊôÐÔµÄgetterºÍsetter£¬ÓÃÓÚ·ÃÎÊºÍÐÞ¸Ä½ÇÉ«µÄÃû³Æ¡¢ÐÔ±ð¡¢½ðÇ®¡¢½¡¿µ¡¢ÄÜÁ¿µÈÐÅÏ¢
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôµï¿½getterï¿½ï¿½setterï¿½ï¿½ï¿½ï¿½ï¿½Ú·ï¿½ï¿½Êºï¿½ï¿½Þ¸Ä½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½Æ¡ï¿½ï¿½Ô±ð¡¢½ï¿½Ç®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
 	const std::string& getName() const { return m_name; }
 	void setName(const std::string& name) { m_name = name; }
 	const std::string& getGender() const { return m_gender; }
@@ -36,23 +36,23 @@ public:
 	int getEnergy() const { return m_energy; }
 	void setEnergy(int energy) { m_energy = energy; }
 
-	// »ñÈ¡±³°ü¶ÔÏó£¬ÒÔ±ã¹ÜÀíºÍ²éÑ¯ÎïÆ·
+	// ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½ï¿½ï¿½Í²ï¿½Ñ¯ï¿½ï¿½Æ·
 	Inventory* getInventory() const { return inventory; }
 
-	// ¼õÉÙÑ¡ÖÐÎïÆ·µÄÊýÁ¿£¬²¢¸ù¾Ýstatus¸üÐÂÏÔÊ¾
+	// ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½statusï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾
 	bool reduceSelectedItemQuantity(int quantity, bool status);
 
-	// »ñÈ¡ºÍÉèÖÃµ±Ç°Ñ¡ÖÐµÄ±³°ü²ÛÎ»
+	// ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½Ç°Ñ¡ï¿½ÐµÄ±ï¿½ï¿½ï¿½ï¿½ï¿½Î»
 	std::pair<int, int> getSelectedSlot() const { return selectedSlot; }
 	void setSelectedSlot(int first, int second) { selectedSlot = std::make_pair(first, second); }
 
-	// »ñÈ¡ºÍÉèÖÃ½ÇÉ«·½ÏòÓëÒÆ¶¯×´Ì¬
+	// ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ã½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½×´Ì¬
 	int getDirection() const { return m_direction; }
 	void setDirection(int direction) { m_direction = direction; }
 	bool isMoving() const { return m_isMoving; }
 	void setMoving(bool moving) { m_isMoving = moving; }
 
-	// ±³°üÏà¹Ø¹¦ÄÜ£ºÇÐ»»±³°üÏÔÊ¾¡¢µã»÷²ÛÎ»¡¢¸üÐÂ±³°üÏÔÊ¾
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¹ï¿½ï¿½Ü£ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½Â±ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾
 	void toggleInventory();
 	void onSlotClicked(int row, int col);
 	void updateInventoryDisplay();
@@ -60,28 +60,28 @@ public:
 	bool getIsInventoryOpen() const { return isInventoryOpen; }
 	void setIsInventoryOpen(bool open) { isInventoryOpen = open; }
 
-	// ºáÀ¸¹¦ÄÜ£º´´½¨ÎïÆ·À¸ºÍÑ¡ÔñÎïÆ·
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½Æ·
 	void createInventoryBar();
 	void selectItemFromInventory(int index);
 
-	// »ñÈ¡µ±Ç°Ñ¡ÖÐÎïÆ·ºÍÆäÏÔÊ¾¾«Áé
+	// ï¿½ï¿½È¡ï¿½ï¿½Ç°Ñ¡ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½
 	Item* getSelectedItem();
 	cocos2d::Sprite* getHeldItemSprite() const;
 
-	// ÖÆÔìÏµÍ³£ºÇÐ»»²ÛÎ»Í¼ÏñÏÔÊ¾
+	// ï¿½ï¿½ï¿½ï¿½ÏµÍ³ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½Î»Í¼ï¿½ï¿½ï¿½ï¿½Ê¾
 	void toggleSlotImage();
 	bool getIsSlotImageOpen() const { return isSlotImageOpen; }
 	void setIsSlotImageOpen(bool open) { isSlotImageOpen = open; }
 
-	// ¹¤¾ß¶¯×÷Ïà¹Ø£ºÖ´ÐÐ¹¤¾ß¶¯×÷£¨Èç»Ó¶¯¹¤¾ß£©
+	// ï¿½ï¿½ï¿½ß¶ï¿½ï¿½ï¿½ï¿½ï¿½Ø£ï¿½Ö´ï¿½Ð¹ï¿½ï¿½ß¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¶ï¿½ï¿½ï¿½ï¿½ß£ï¿½
 	void performToolAction();
 
-	// ÐÂÔö£ºÍ¸Ã÷¶È¿ØÖÆ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½È¿ï¿½ï¿½ï¿½
 	void updateVisibility(bool isPenetrable) {
 		this->setOpacity(isPenetrable ? 128 : 255);
 	}
 
-	// ÐÂÔö£ºÎïÀíÏµÍ³³õÊ¼»¯
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÏµÍ³ï¿½ï¿½Ê¼ï¿½ï¿½
 	void initPhysics() {
 		cocos2d::Size playerSize = this->getContentSize();
 		auto physicsBody = cocos2d::PhysicsBody::createBox(
@@ -102,39 +102,39 @@ public:
 	}
 
 private:
-	int m_updateCounter; // ¶¯»­¸üÐÂ¼ÆÊýÆ÷£¬ÓÃÓÚ¿ØÖÆ¶¯»­Ö¡ÂÊ
+	int m_updateCounter; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½Ö¡ï¿½ï¿½
 
-	// »ù±¾ÊôÐÔ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	std::string m_name;
 	std::string m_gender;
 	int m_health;
 	int m_energy;
 	int m_money;
 
-	cocos2d::Sprite* heldItemSprite; // ÏÔÊ¾ÊÖÖÐ³ÖÓÐÎïÆ·µÄ¾«Áé
-	Inventory* inventory;            // ½ÇÉ«µÄ±³°ü
-	cocos2d::Sprite* slotSprite = nullptr; // ÖÆÔì²ÛÎ»Í¼ÏñµÄ¾«Áé
+	cocos2d::Sprite* heldItemSprite; // ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½Ð³ï¿½ï¿½ï¿½ï¿½ï¿½Æ·ï¿½Ä¾ï¿½ï¿½ï¿½
+	Inventory* inventory;            // ï¿½ï¿½É«ï¿½Ä±ï¿½ï¿½ï¿½
+	cocos2d::Sprite* slotSprite = nullptr; // ï¿½ï¿½ï¿½ï¿½ï¿½Î»Í¼ï¿½ï¿½Ä¾ï¿½ï¿½ï¿½
 
-	int m_direction;  // µ±Ç°½ÇÉ«·½Ïò 0ÏÂ1ÉÏ2×ó3ÓÒ
-	bool m_isMoving;  // ÊÇ·ñ´¦ÓÚÒÆ¶¯×´Ì¬
+	int m_direction;  // ï¿½ï¿½Ç°ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ 0ï¿½ï¿½1ï¿½ï¿½2ï¿½ï¿½3ï¿½ï¿½
+	bool m_isMoving;  // ï¿½Ç·ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½×´Ì¬
 
-	int m_frameIndex; // ¶¯»­Ö¡Ë÷Òý
-	cocos2d::Vector<cocos2d::SpriteFrame*> m_animationFrames[4]; // ´æ´¢ÉÏÏÂ×óÓÒËÄ¸ö·½ÏòµÄ¶¯»­Ö¡
-	bool isInventoryOpen; // ±³°üÊÇ·ñ´ò¿ª
-	const float slotSize = 30.0f;   // Ã¿¸ö²ÛÎ»µÄ´óÐ¡
-	cocos2d::Layer* inventoryLayer = nullptr; // ÏÔÊ¾±³°üµÄÍ¼²ã
-	std::pair<int, int> selectedSlot = { -1, -1 }; // µ±Ç°Ñ¡ÖÐµÄ²ÛÎ»×ø±ê
+	int m_frameIndex; // ï¿½ï¿½ï¿½ï¿½Ö¡ï¿½ï¿½ï¿½ï¿½
+	cocos2d::Vector<cocos2d::SpriteFrame*> m_animationFrames[4]; // ï¿½æ´¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½ï¿½ï¿½Ä¶ï¿½ï¿½ï¿½Ö¡
+	bool isInventoryOpen; // ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½
+	const float slotSize = 30.0f;   // Ã¿ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ä´ï¿½Ð¡
+	cocos2d::Layer* inventoryLayer = nullptr; // ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½
+	std::pair<int, int> selectedSlot = { -1, -1 }; // ï¿½ï¿½Ç°Ñ¡ï¿½ÐµÄ²ï¿½Î»ï¿½ï¿½ï¿½ï¿½
 
-	bool isSlotImageOpen = false; // ÖÆÔì²ÛÎ»Í¼ÏñÊÇ·ñÏÔÊ¾
+	bool isSlotImageOpen = false; // ï¿½ï¿½ï¿½ï¿½ï¿½Î»Í¼ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Ê¾
 
-	bool m_isPerformingToolAction = false; // ÊÇ·ñÕýÔÚ²¥·Å¹¤¾ßÊ¹ÓÃ¶¯»­
+	bool m_isPerformingToolAction = false; // ï¿½Ç·ï¿½ï¿½ï¿½ï¿½Ú²ï¿½ï¿½Å¹ï¿½ï¿½ï¿½Ê¹ï¿½Ã¶ï¿½ï¿½ï¿½
 
-	cocos2d::Sprite* toolActionSprite; // ÓÃÓÚÏÔÊ¾¹¤¾ß¶¯×÷¶¯»­µÄ¾«Áé
+	cocos2d::Sprite* toolActionSprite; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ß¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ï¿½
 
-	// ¼ÓÔØ½ÇÉ«ÐÐ×ß¶¯»­Ö¡
+	// ï¿½ï¿½ï¿½Ø½ï¿½É«ï¿½ï¿½ï¿½ß¶ï¿½ï¿½ï¿½Ö¡
 	void loadAnimationFrames();
 
-	// ¸ù¾Ý¹¤¾ßÃû³ÆºÍ·½Ïò»ñÈ¡¹¤¾ß¶¯»­Ö¡
+	// ï¿½ï¿½ï¿½Ý¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÆºÍ·ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ß¶ï¿½ï¿½ï¿½Ö¡
 	cocos2d::Vector<cocos2d::SpriteFrame*> getToolAnimationFrames(const std::string& toolName, int direction);
 };
 

@@ -27,15 +27,13 @@ bool FarmScene::init(const std::string& mapType) {
 
     currentMapType = mapType;
 
+
+
     // 按顺序初始化各个系统
     if (!initTimeSystem() || !initWeatherSystem() || !createSystemLabels()) {
         CCLOG("Failed to initialize core systems");
         return false;
     }
-
-    // 设置回调和调度器
-    setupSystemCallbacks();
-    setupSystemSchedulers();
 
     // 初始化地图管理器
     farmMapManager = FarmMapManager::getInstance();
@@ -48,6 +46,8 @@ bool FarmScene::init(const std::string& mapType) {
     if (!initMap() || !initPlayer()) {
         return false;
     }
+
+
 
     // 初始化剩余组件
     setupKeyboard();
@@ -71,8 +71,17 @@ bool FarmScene::init(const std::string& mapType) {
         player->createInventoryBar();
         }, 0.1f, "createInventoryBarKey");
 
+
     // 启动所有系统
     startSystems();
+
+
+    // 设置回调和调度器
+    setupSystemCallbacks();
+    setupSystemSchedulers();
+
+    weatherEffectManager->updateWeatherEffect(weatherSystem->getCurrentWeatherString());
+
 
     return true;
 }
@@ -86,7 +95,6 @@ bool FarmScene::initTimeSystem() {
     timeSystem->setName("TimeSeasonSystem");
     timeSystem->retain();
     this->addChild(timeSystem);
-    timeSystem->setTimeScale(67.2f);
     return true;
 }
 
@@ -99,6 +107,18 @@ bool FarmScene::initWeatherSystem() {
     weatherSystem->setName("WeatherSystem");
     weatherSystem->retain();
     this->addChild(weatherSystem);
+
+    // 初始化天气特效管理器
+    weatherEffectManager = WeatherEffectManager::getInstance();
+    if (!weatherEffectManager) {
+        CCLOG("Failed to create WeatherEffectManager");
+        return false;
+    }
+    weatherEffectManager->setName("WeatherEffectSystem");
+    weatherEffectManager->retain();
+    this->addChild(weatherEffectManager, FIFTH);
+    weatherEffectManager->initializeWithScene(this);
+
     return true;
 }
 

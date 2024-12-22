@@ -7,6 +7,7 @@
 #include "Inventory.h"
 #include "FarmlandManager.h"
 #include "WeatherSystem.h"
+#include "WeatherEffectManager.h"
 
 
 
@@ -49,6 +50,7 @@ private:
 
     //天气系统相关
     WeatherSystem* weatherSystem;
+    WeatherEffectManager* weatherEffectManager;
     Label* weatherLabel;  // For displaying current weather
 
     void updateWeatherLabel();

@@ -12,7 +12,7 @@ USING_NS_CC;
 
 class TimeSeasonSystem : public Node {
 public:
-    // ����ö��
+    // Season enumeration
     enum class Season {
         SPRING,
         SUMMER,
@@ -20,13 +20,13 @@ public:
         WINTER
     };
 
-    // ʱ����صĽṹ��
+    // Game time structure
     struct GameTime {
-        int year;       // ��Ϸ���
-        int season;     // ����(0-3)
-        int day;        // ��ǰ����(1-28)
-        int hour;       // Сʱ(0-23)
-        int minute;     // ����(0-59)
+        int year;       // Game year
+        int season;     // Season (0-3)
+        int day;        // Current day (1-28)
+        int hour;       // Hour (0-23)
+        int minute;     // Minute (0-59)
 
         bool operator==(const GameTime& other) const {
             return year == other.year && season == other.season &&
@@ -34,7 +34,7 @@ public:
         }
     };
 
-    // �¼����ݽṹ
+    // Event structures
     struct SeasonChangeEvent {
         Season previousSeason;
         Season newSeason;
@@ -49,31 +49,31 @@ public:
         int year;
     };
 
-    // ��������
+    // Conversion functions
     static Season intToSeason(int seasonInt);
     static std::string seasonToString(Season season);
 
-    // �����ͳ�ʼ��
+    // Singleton initialization
     static TimeSeasonSystem* getInstance();
     virtual bool init() override;
 
-    // ʱ�����
+    // Time control
     void startTime();
     void pauseTime();
     void resumeTime();
 
-    // ʱ��ͼ��ڻ�ȡ
+    // Time getters
     const GameTime& getCurrentTime() const { return currentTime; }
     Season getCurrentSeason() const { return static_cast<Season>(currentTime.season); }
     std::string getCurrentSeasonString() const;
     int getCurrentDay() const { return currentTime.day; }
     int getCurrentYear() const { return currentTime.year; }
 
-    // ʱ������
-    void setTimeScale(float scale); // ����ʱ������
-    void setTime(const GameTime& time); // ֱ������ʱ��
+    // Time setters
+    void setTimeScale(float scale); // Set time scale
+    void setTime(const GameTime& time); // Directly set time
 
-    // �¼�����ע��
+    // Event listeners
     using SeasonChangeCallback = std::function<void(const SeasonChangeEvent&)>;
     using DayChangeCallback = std::function<void(const DayChangeEvent&)>;
 
@@ -82,17 +82,15 @@ public:
     void removeSeasonChangeListener(const std::string& name);
     void removeDayChangeListener(const std::string& name);
 
-    // �浵���
+    // Save and load
     void saveToUserDefault();
     void loadFromUserDefault();
 
-    // ����
-    static const int DAYS_PER_SEASON = 28;
-    static const int HOURS_PER_DAY = 24;
-    static const int MINUTES_PER_HOUR = 60;
-    static const std::vector<std::string> SEASON_NAMES;
-    const float REAL_SECONDS_PER_GAME_MINUTE = 1.0f;  // 现实1秒 = 游戏1分钟
-    const float MINUTES_PER_SEASON = 60.0f;           // 游戏60分钟 = 1个季节
+    // 使用新的常量命名空间
+    using Constants = GameTime;
+
+    const float REAL_SECONDS_PER_GAME_MINUTE = 0.1f;  // Changed: 1 real second = 10 game minutes
+    const float MINUTES_PER_SEASON = 60.0f;           // 60 game minutes = 1 season
 
     void setSeasonChangedCallback(const std::function<void(const std::string&)>& callback);
 
@@ -103,27 +101,33 @@ protected:
 private:
     static TimeSeasonSystem* instance;
 
-    // ��������
+    static const std::vector<std::string> SEASON_NAMES;
+
+    // Time variables
     GameTime currentTime;
     float timeScale;
     float accumulatedTime;
     bool isRunning;
 
-    // �ص��洢
+    // Callback storage
     std::map<std::string, SeasonChangeCallback> seasonChangeCallbacks;
     std::map<std::string, DayChangeCallback> dayChangeCallbacks;
 
     std::function<void(const std::string&)> seasonChangedCallback;
 
-    // ���·���
+    // Update functions
     void update(float dt) override;
     void updateTime(float deltaMinutes);
 
-    // �¼�֪ͨ
+    // 添加新的辅助方法
+    void updateTimeByMinutes(int deltaMinutes);
+    bool isValidTime(const GameTime& time) const;
+
+    // Event notifications
     void notifySeasonChange(Season previousSeason);
     void notifyDayChange(int previousDay);
 
-    // ʱ����㸨������
+    // Time advancement functions
     void advanceDay();
     void advanceSeason();
     void checkAndNotifyChanges(const GameTime& previousTime);

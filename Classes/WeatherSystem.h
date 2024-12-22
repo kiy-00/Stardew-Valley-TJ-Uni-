@@ -11,12 +11,12 @@ USING_NS_CC;
 
 // Weather types enum
 enum class WeatherType {
-    SUNNY,
+    SUNNY = 0,
     CLOUDY,
     RAINY,
-    STORMY,
     SNOWY,
     FOGGY
+    // 移除了 STORMY
 };
 
 // Weather change event structure
@@ -69,6 +69,8 @@ public:
     void updateSeasonWeatherProbabilities(const std::string& season);
 
     static std::string weatherToString(WeatherType weather);
+
+    void setWeatherDurationRange(float minDuration, float maxDuration);
 
 protected:
     WeatherSystem();

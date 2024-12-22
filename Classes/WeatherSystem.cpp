@@ -5,22 +5,25 @@
 // Static member initialization
 WeatherSystem* WeatherSystem::instance = nullptr;
 const std::vector<std::string> WeatherSystem::WEATHER_NAMES = {
-    "sunny", "cloudy", "rainy", "stormy", "snowy", "foggy"
+    "sunny", "cloudy", "rainy", "snowy", "foggy"  // 移除了 "stormy"
 };
 
 WeatherSystem::WeatherSystem()
     : currentWeather(WeatherType::SUNNY)
-    , weatherChangeProbability(0.2f)        // 增加变化概率
-    , minWeatherDuration(10.0f)             // 改为10秒
-    , maxWeatherDuration(10.0f)            // 改为10秒
-    , currentWeatherDuration(10.0f)         // 改为10秒
+    , weatherChangeProbability(0.8f)        // 增加变化概率
+    , minWeatherDuration(10.0f)             
+    , maxWeatherDuration(20.0f)            
+    , currentWeatherDuration(10.0f)        
     , elapsedTime(0.0f)
     , isRunning(false) {
     initializeSeasonProbabilities();
 
     // 随机持续时间代码（临时注释）
-    /* currentWeatherDuration = minWeatherDuration +
-        static_cast<float>(rand()) / RAND_MAX * (maxWeatherDuration - minWeatherDuration);*/
+    // 移除这段代码，因为它会在构造函数中过早设置持续时间
+    /* 删除:
+    currentWeatherDuration = minWeatherDuration +
+        static_cast<float>(rand()) / RAND_MAX * (maxWeatherDuration - minWeatherDuration);
+    */
 }
 
 WeatherSystem::~WeatherSystem() {
@@ -49,49 +52,53 @@ bool WeatherSystem::init() {
     }
 
     loadFromUserDefault();
+    
+    // 初始化时立即通知当前天气，触发特效生成
+    WeatherType previousWeather = currentWeather;
+    notifyWeatherChange(previousWeather);
+    if (weatherChangedCallback) {
+        weatherChangedCallback(getCurrentWeatherString());
+    }
+    
     scheduleUpdate();
     return true;
 }
 
 void WeatherSystem::initializeSeasonProbabilities() {
-    // Spring probabilities
+    // Spring probabilities - 重新分配概率
     springProbabilities = {
         {WeatherType::SUNNY, 0.35f},
         {WeatherType::CLOUDY, 0.25f},
         {WeatherType::RAINY, 0.25f},
-        {WeatherType::STORMY, 0.05f},
-        {WeatherType::FOGGY, 0.10f},
+        {WeatherType::FOGGY, 0.15f},
         {WeatherType::SNOWY, 0.0f}
     };
 
-    // Summer probabilities - increased chance of sunny and stormy weather
+    // Summer probabilities - 重新分配概率
     summerProbabilities = {
-        {WeatherType::SUNNY, 0.40f},
-        {WeatherType::CLOUDY, 0.20f},
-        {WeatherType::RAINY, 0.20f},
-        {WeatherType::STORMY, 0.15f},
+        {WeatherType::SUNNY, 0.45f},
+        {WeatherType::CLOUDY, 0.25f},
+        {WeatherType::RAINY, 0.25f},
         {WeatherType::FOGGY, 0.05f},
         {WeatherType::SNOWY, 0.0f}
     };
 
-    // Fall probabilities - more varied weather
+    // Fall probabilities - 重新分配概率
     fallProbabilities = {
         {WeatherType::SUNNY, 0.25f},
         {WeatherType::CLOUDY, 0.30f},
         {WeatherType::RAINY, 0.25f},
-        {WeatherType::STORMY, 0.05f},
-        {WeatherType::FOGGY, 0.15f},
+        {WeatherType::FOGGY, 0.20f},
         {WeatherType::SNOWY, 0.0f}
     };
 
-    // Winter probabilities - added snow chance
+    // Winter probabilities - 重新分配概率
     winterProbabilities = {
         {WeatherType::SUNNY, 0.20f},
         {WeatherType::CLOUDY, 0.25f},
         {WeatherType::RAINY, 0.10f},
-        {WeatherType::STORMY, 0.05f},
         {WeatherType::FOGGY, 0.15f},
-        {WeatherType::SNOWY, 0.25f}
+        {WeatherType::SNOWY, 0.30f}
     };
 }
 
@@ -113,19 +120,23 @@ void WeatherSystem::update(float dt) {
     if (!isRunning) return;
 
     elapsedTime += dt;
-
+    
     // 添加调试日志
+    CCLOG("Weather System Status:");
+    CCLOG("Current Weather: %s", getCurrentWeatherString().c_str());
+    CCLOG("Elapsed Time: %.2f / %.2f", elapsedTime, currentWeatherDuration);
+    
     if (elapsedTime >= currentWeatherDuration) {
-        CCLOG("Weather Update - Current Duration: %.2f, Elapsed: %.2f",
-            currentWeatherDuration, elapsedTime);
-        // Time to change weather
         WeatherType previousWeather = currentWeather;
-
-        // Get current season's probabilities
+        
+        // 获取当前季节对应的天气概率表
         std::map<WeatherType, float> currentProbabilities;
         auto timeSystem = dynamic_cast<TimeSeasonSystem*>(Director::getInstance()->getRunningScene()->getChildByName("TimeSeasonSystem"));
         if (timeSystem) {
             std::string season = timeSystem->getCurrentSeasonString();
+            CCLOG("Current Season: %s", season.c_str());
+            
+            // 根据季节选择概率表
             if (season == "spring") {
                 currentProbabilities = springProbabilities;
             }
@@ -139,49 +150,56 @@ void WeatherSystem::update(float dt) {
                 currentProbabilities = winterProbabilities;
             }
             else {
-                currentProbabilities = springProbabilities; // fallback
+                currentProbabilities = springProbabilities;
             }
+            
+            // 更新当前季节的天气变化概率
             updateSeasonWeatherProbabilities(season);
         }
         else {
-            currentProbabilities = springProbabilities; // fallback if no time system
+            CCLOG("Warning: TimeSystem not found, using spring probabilities");
+            currentProbabilities = springProbabilities;
         }
 
-        // Determine and set new weather
+        // 强制生成新天气
         WeatherType newWeather = determineNextWeather(currentProbabilities);
+        while (newWeather == currentWeather) {
+            newWeather = determineNextWeather(currentProbabilities);
+        }
+        
+        // 设置新天气
         setWeather(newWeather);
-
-        // Reset timers
+        CCLOG("Weather Changed: %s -> %s", 
+              weatherToString(previousWeather).c_str(),
+              weatherToString(newWeather).c_str());
+        
+        // 重置计时和持续时间
         elapsedTime = 0.0f;
-        
-        // 测试阶段：使用固定的2秒持续时间
-        currentWeatherDuration = 2.0f;
-        
-        // 随机持续时间代码（临时注释）
-        /*
         currentWeatherDuration = minWeatherDuration +
             static_cast<float>(rand()) / RAND_MAX * (maxWeatherDuration - minWeatherDuration);
-        */
-
-        // Notify about weather change
-        if (previousWeather != currentWeather) {
-            notifyWeatherChange(previousWeather);
-        }
+        CCLOG("New Weather Duration: %.2f", currentWeatherDuration);
     }
 }
 
 WeatherType WeatherSystem::determineNextWeather(const std::map<WeatherType, float>& probabilities) {
     float random = static_cast<float>(rand()) / RAND_MAX;
     float cumulativeProbability = 0.0f;
-
+    
+    CCLOG("Weather Selection - Random Value: %.2f", random);
+    
     for (const auto& pair : probabilities) {
         cumulativeProbability += pair.second;
+        CCLOG("Weather Option: %s, Probability: %.2f, Cumulative: %.2f",
+              weatherToString(pair.first).c_str(), pair.second, cumulativeProbability);
+        
         if (random <= cumulativeProbability) {
+            CCLOG("Selected Weather: %s", weatherToString(pair.first).c_str());
             return pair.first;
         }
     }
-
-    return WeatherType::SUNNY; // Default fallback
+    
+    CCLOG("Fallback to Sunny Weather");
+    return WeatherType::SUNNY;
 }
 
 void WeatherSystem::setWeather(WeatherType weather) {
@@ -239,19 +257,16 @@ void WeatherSystem::removeWeatherChangeListener(const std::string& name) {
 }
 
 std::string WeatherSystem::weatherToString(WeatherType weather) {
-    CCLOG("Converting weather type: %d", static_cast<int>(weather));  // 添加调试日志
     size_t index = static_cast<size_t>(weather);
     if (index >= WEATHER_NAMES.size()) {
         CCLOG("Warning: Invalid weather index: %zu", index);
         return "sunny";  // 默认返回
     }
-    CCLOG("Weather name at index %zu: %s", index, WEATHER_NAMES[index].c_str());
     return WEATHER_NAMES[index];
 }
 
 std::string WeatherSystem::getCurrentWeatherString() const {
     std::string result = weatherToString(currentWeather);
-    CCLOG("getCurrentWeatherString returning: %s", result.c_str());
     return result;
 }
 
@@ -268,15 +283,21 @@ void WeatherSystem::loadFromUserDefault() {
     auto ud = UserDefault::getInstance();
     currentWeather = static_cast<WeatherType>(ud->getIntegerForKey("weather_type", 0));
     weatherChangeProbability = ud->getFloatForKey("weather_change_probability", 0.1f);
+    minWeatherDuration = ud->getFloatForKey("min_weather_duration", 10.0f);
+    maxWeatherDuration = ud->getFloatForKey("max_weather_duration", 20.0f);
     
-    // 固定持续时间为10秒
-    minWeatherDuration = 10.0f;
-    maxWeatherDuration = 10.0f;
-    currentWeatherDuration = 10.0f;
-    
-    // 随机持续时间代码（临时注释）
-    /*
+    // 确保在加载配置后设置新的持续时间
     currentWeatherDuration = minWeatherDuration +
         static_cast<float>(rand()) / RAND_MAX * (maxWeatherDuration - minWeatherDuration);
-    */
+    
+    // 重置经过的时间
+    elapsedTime = 0.0f;
+}
+
+void WeatherSystem::setWeatherDurationRange(float minDuration, float maxDuration) {
+    minWeatherDuration = std::max(0.0f, minDuration);
+    maxWeatherDuration = std::max(minWeatherDuration, maxDuration);
+    
+    // 若需要立刻重置当前天气剩余持续时间，可在此处加入逻辑
+    // ...existing code...
 }

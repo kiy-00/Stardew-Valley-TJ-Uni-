@@ -241,6 +241,10 @@
           "npc_spawn_points": [
               {"id": "merchant", "position": [15, 15]},
               {"id": "fisher", "position": [5, 25]}
+          ],
+          "teleport_points": [
+              {"target_map": "inside", "position": [20, 20]},
+              {"target_map": "cave", "position": [30, 30]}
           ]
       }
   }
