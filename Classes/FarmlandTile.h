@@ -8,10 +8,10 @@ USING_NS_CC;
 class FarmlandTile : public cocos2d::Sprite {
 public:
     enum class State {
-        EMPTY,          // δ����
-        TILLED,         // �Ѹ���
-        WATERED,        // �ѽ�ˮ
-        FERTILIZED      // ��ʩ��
+        EMPTY,          
+        TILLED,         
+        WATERED,        
+        FERTILIZED      
     };
 
     static FarmlandTile* create(const Vec2& tilePos);
@@ -19,11 +19,11 @@ public:
     bool init(const Vec2& position);
     bool initWithTilePosition(const Vec2& tilePos);
 
-    // ״̬ת������
-    void till();       // ����
-    void water();      // ��ˮ
-    void fertilize();  // ʩ��
-    void resetState(); // ����״̬
+   
+    void till();       
+    void water();      
+    void fertilize();  
+    void resetState(); 
 
     static void setTileSize(float size);
 

@@ -52,7 +52,7 @@ void FarmlandManager::handleToolAction(const std::string& toolType, const Vec2& 
         CCLOG("Executing till action");
         tile->till();
     }
-    else if (toolType == "Wateringcan") {
+    else if (toolType == "Kettle") {
         CCLOG("Executing water action");
         tile->water();
     }
@@ -90,7 +90,6 @@ std::string FarmlandManager::positionToString(const Vec2& pos) {
 }
 
 void FarmlandManager::update(float dt) {
-    // �������и���״̬
     for (auto& pair : farmlands) {
         pair.second->update(dt);
     }
