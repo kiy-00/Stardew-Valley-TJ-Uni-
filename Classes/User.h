@@ -67,7 +67,9 @@ public:
 
 	// 横栏功能：创建物品栏和选择物品
 	void createInventoryBar();
+	void selectItemFromInventory(int row, int col);  // 新增
 	void selectItemFromInventory(int index);
+
 
 	// 获取当前选中物品和其显示精灵
 	Item* getSelectedItem();
@@ -114,6 +116,39 @@ public:
 
 	void pickupNearbyItems(const std::vector<cocos2d::Sprite*>& items, float pickupRadius);
 
+	//新增：高亮选中的格子
+	void highlightInventorySlot(int row, int col) {
+		// 如果背包未打开，不显示高亮
+		if (!isInventoryOpen || !inventoryLayer) return;
+
+		// 移除旧的高亮效果
+		auto oldHighlight = inventoryLayer->getChildByName("slot_highlight");
+		if (oldHighlight) {
+			oldHighlight->removeFromParent();
+		}
+
+		// 创建新的高亮框
+		auto highlight = DrawNode::create();
+		highlight->setName("slot_highlight");
+
+		// 计算高亮框的位置（注意这里的坐标转换）
+		float x = col * slotSize;
+		float y = row * slotSize;
+
+		// 绘制高亮框
+		Vec2 vertices[] = {
+			Vec2(x, y),
+			Vec2(x + slotSize, y),
+			Vec2(x + slotSize, y + slotSize),
+			Vec2(x, y + slotSize)
+		};
+
+		// 绘制半透明黄色填充
+		highlight->drawPolygon(vertices, 4, Color4F(1, 1, 0, 0.2f), 1, Color4F(1, 1, 0, 0.5f));
+
+		inventoryLayer->addChild(highlight);
+	}
+	
 private:
 	// 基本属性
 	std::string m_name;
@@ -149,6 +184,8 @@ private:
 
 	// 根据工具名称和方向获取工具动画帧
 	cocos2d::Vector<cocos2d::SpriteFrame*> getToolAnimationFrames(const std::string& toolName, int direction);
+
+	cocos2d::DrawNode* highlightNode = nullptr;  // 用于高亮显示当前选中的格子
 };
 
 #endif // __USER_H__

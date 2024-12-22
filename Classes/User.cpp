@@ -312,7 +312,7 @@ void User::onSlotClicked(int row, int col) {
             if (selectedItem) {
                 reduceSelectedItemQuantity(selectedItem->getQuantity(), false);
                 // 重置选中槽位
-                selectedSlot = { -1, -1 };
+                //selectedSlot = { -1, -1 };
                 heldItemSprite->setVisible(false);
                 updateInventoryDisplay();
             }
@@ -396,6 +396,14 @@ void User::updateHeldItemSprite() {
 void User::updateInventoryDisplay() {
     if (!inventoryLayer) return;
 
+    // 保存当前高亮的引用
+    auto highlight = inventoryLayer->getChildByName("slot_highlight");
+    if (highlight) {
+        highlight->retain();  // 暂时保留高亮节点
+        highlight->removeFromParent();
+    }
+
+
     inventoryLayer->removeAllChildren();  // 清除当前显示的所有内容
 
     const int slotsPerRow = 8;
@@ -438,6 +446,12 @@ void User::updateInventoryDisplay() {
                 inventoryLayer->addChild(quantityLabel);
             }
         }
+    }
+
+    // 恢复高亮效果
+    if (highlight) {
+        inventoryLayer->addChild(highlight);
+        highlight->release();  // 释放临时保留的引用
     }
 }
 
@@ -492,83 +506,77 @@ void User::createInventoryBar() {
 // selectItemFromInventory 从横栏选中物品槽位
 // 显示选中物品的图标（heldItemSprite）并更新状态。
 ////////////////////////////////////////////////////////////
-void User::selectItemFromInventory(int index) {
-
-    heldItemSprite->setVisible(false);
-
-    if (index < 0 || index >= 8) {
-        return; // 无效的索引，直接返回
-    }
-
-    // 获取横栏层
-    auto currentBarLayer = Director::getInstance()->getRunningScene()->getChildByName("InventoryBarLayer");
-    if (!currentBarLayer) {
+// 在 User.cpp 中实现
+void User::selectItemFromInventory(int row, int col) {
+    // 边界检查
+    if (row < 0 || row >= 3 || col < 0 || col >= 8) {
         return;
     }
 
-    // 重置所有槽位为 slot.png
-    for (int i = 0; i < 8; ++i) {
-        auto slotSprite = dynamic_cast<cocos2d::Sprite*>(currentBarLayer->getChildByTag(i));
-        if (slotSprite) {
-            slotSprite->setTexture("pack/slot.png"); // 恢复为默认状态
+    selectedSlot = { row, col };  // 更新选中的槽位
+
+    // 获取横栏层并更新显示
+    auto currentBarLayer = Director::getInstance()->getRunningScene()->getChildByName("InventoryBarLayer");
+    if (currentBarLayer) {
+        // 重置所有槽位为默认状态
+        for (int i = 0; i < 8; ++i) {
+            auto slotSprite = dynamic_cast<Sprite*>(currentBarLayer->getChildByTag(i));
+            if (slotSprite) {
+                slotSprite->setTexture("pack/slot.png");
+            }
         }
-    }
-    CCLOG("当前选中槽位: 行: %d, 列?: %d", selectedSlot.first, selectedSlot.second);
-    CCLOG(" 列?: %d", index);
-    // 获取并更改当前选中槽位的纹理
-    auto selectedSlotSprite = dynamic_cast<cocos2d::Sprite*>(currentBarLayer->getChildByTag(index));
-    if (selectedSlotSprite) {
-        CCLOG("Changing texture of slot %d to slot_02.png", index);
-        selectedSlotSprite->setTexture("pack/slot_02.png"); // 设为选中状态
-    }
-    else {
-        CCLOG("No slot found for index: %d", index);
-    }
 
-    // 在这里获取对应索引的物品
-    auto items = inventory->getItems(0, index);
-
-    if (items.empty() || items[0]->getQuantity() == 0) {
-        // 处理空情况，例如隐藏 heldItemSprite
-        CCLOG("not found，items.size() = %lu", items.size());
-        heldItemSprite->setVisible(false);
-        return; // 确保不继续执行后续逻辑
-    }
-
-    if (!items.empty()) {
-        inventory->selectSlot(0, index);
-        selectedSlot = { 0, index };
-        Item* selectedItem = items[0]; // 获取物品
-        if (selectedItem) {
-            // 更新 heldItemSprite 的贴图
-            heldItemSprite->setTexture(selectedItem->getImagePath());
-            heldItemSprite->setVisible(true);
-            switch (m_direction) {
-            case 0: // 下
-                heldItemSprite->setVisible(true);
-                heldItemSprite->setScaleX(1.0f);
-                heldItemSprite->setPosition(cocos2d::Vec2(34, 16)); // 下方向的位置
-                break;
-            case 1: // 上
-                heldItemSprite->setVisible(true);
-                heldItemSprite->setScaleX(1.0f);
-                heldItemSprite->setPosition(cocos2d::Vec2(36, 20)); // 上方向的位置
-                break;
-            case 2: // 左
-                heldItemSprite->setVisible(true);
-                heldItemSprite->setScaleX(-1.0f);
-                heldItemSprite->setPosition(cocos2d::Vec2(12, 15)); // 左方向的位置
-                break;
-            case 3: // 右
-                heldItemSprite->setVisible(true);
-                heldItemSprite->setScaleX(1.0f);
-                heldItemSprite->setPosition(cocos2d::Vec2(28, 15)); // 右方向的位置
-                break;
+        // 如果选中的是第一行的格子，更新横栏显示
+        if (row == 0) {
+            auto selectedSlotSprite = dynamic_cast<Sprite*>(currentBarLayer->getChildByTag(col));
+            if (selectedSlotSprite) {
+                selectedSlotSprite->setTexture("pack/slot_02.png");
             }
         }
     }
+
+    // 更新手持物品
+    auto items = inventory->getItems(row, col);
+    if (!items.empty() && items[0]->getQuantity() > 0) {
+        heldItemSprite->setTexture(items[0]->getImagePath());
+        heldItemSprite->setVisible(true);
+
+        // 根据方向更新手持物品位置
+        switch (m_direction) {
+        case 0: // 下
+            heldItemSprite->setScaleX(1.0f);
+            heldItemSprite->setPosition(Vec2(34, 16));
+            break;
+        case 1: // 上
+            heldItemSprite->setScaleX(1.0f);
+            heldItemSprite->setPosition(Vec2(36, 20));
+            break;
+        case 2: // 左
+            heldItemSprite->setScaleX(-1.0f);
+            heldItemSprite->setPosition(Vec2(12, 15));
+            break;
+        case 3: // 右
+            heldItemSprite->setScaleX(1.0f);
+            heldItemSprite->setPosition(Vec2(28, 15));
+            break;
+        }
+    }
+    else {
+        heldItemSprite->setVisible(false);
+    }
+
+    // 更新背包中的高亮显示
+    if (isInventoryOpen) {
+        highlightInventorySlot(row, col);
+    }
 }
 
+// 保持原有的函数作为兼容接口
+void User::selectItemFromInventory(int index) {
+    int row = 0;  // 总是选择第一行
+    int col = index % 8;
+    selectItemFromInventory(row, col);
+}
 ////////////////////////////////////////////////////////////
 // getSelectedItem 获取当前选中的物品
 // @return 当前选中槽位的物品指针，如果没有选中返回nullptr
@@ -639,6 +647,8 @@ void User::toggleSlotImage() {
             Director::getInstance()->getRunningScene()->addChild(slotSprite, 10);
             isSlotImageOpen = true;
         }
+        // 在背包创建完成后添加初始高亮效果
+        highlightInventorySlot(0, 0);  // 默认高亮第一个格子
     }
     else {
         // 如果槽位图像已经存在，则移除它

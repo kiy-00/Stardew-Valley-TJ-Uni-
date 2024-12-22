@@ -4,13 +4,13 @@
 #include "FarmMapRenderer.h"
 #include "SpritePathManager.h"
 #include "TimeSeasonSystem.h"
-#include "ToolItem.h"
-#include "RodItem.h"
-#include "BreedItem.h"
 #include "RenderConstants.h"
 #include "WeatherSystem.h"
 #include "WeatherEffectManager.h"
 #include "SimpleAudioEngine.h"
+#include "StandardItem.h"
+#include "BreedItem.h"
+#include "AudioManager.h"
 
 
 USING_NS_CC;
@@ -23,12 +23,6 @@ bool FarmScene::init(const std::string& mapType) {
     if (!Scene::initWithPhysics()) {
         return false;
     }
-
-   /* auto audioengine = CocosDenshion::SimpleAudioEngine::getInstance();
-    audioengine->preloadBackgroundMusic("bgmusic.mp3");
-    audioengine->playBackgroundMusic("bgmusic.mp3", true);*/
-    //CCLOG("是否成功加载音乐：%d\n", audioengine->isBackgroundMusicPlaying());
-    
 
     // 初始化物理世界
     auto physicsWorld = this->getPhysicsWorld();
@@ -46,7 +40,6 @@ bool FarmScene::init(const std::string& mapType) {
     // 初始化地图管理器
     farmMapManager = FarmMapManager::getInstance();
     if (!farmMapManager->initWithFarmType(mapType, timeSystem->getCurrentSeasonString())) {
-        // CCLOG("Failed to init FarmMapManager");
         return false;
     }
 
@@ -57,13 +50,23 @@ bool FarmScene::init(const std::string& mapType) {
 
     // 初始化剩余组件
     setupKeyboard();
-    setupMouse();
+    //setupMouse();
     initInventory();
     initFarmland();
 
     // 初始化交互管理器
     interactionManager = FarmInteractionManager::getInstance();
     interactionManager->init(this, player, farmMapManager);
+
+    // 使用新的音频管理器 - 延迟初始化以确保其他系统已经就绪
+   /* this->scheduleOnce([this](float dt) {
+        auto audioManager = AudioManager::getInstance();
+        if (audioManager && audioManager->init()) {
+            audioManager->setBackgroundMusicVolume(0.8f);
+            audioManager->playBackgroundMusic("music/bgmusic.mp3", true);
+            audioManager->logAudioStatus();
+        }
+        }, 0.5f, "init_audio");*/
 
     this->schedule([this](float dt) {
         interactionManager->update(dt);
@@ -76,25 +79,6 @@ bool FarmScene::init(const std::string& mapType) {
         player->createInventoryBar();
         }, 0.1f, "createInventoryBarKey");
 
-    auto audioengine = CocosDenshion::SimpleAudioEngine::getInstance();
-    if (!audioengine) {
-        CCLOG("Failed to get SimpleAudioEngine instance");
-        return false;
-    }
-
-    // 尝试预加载并检查结果
-    audioengine->preloadBackgroundMusic("music/bgmusic.mp3");
-    CCLOG("开始加载音乐文件");
-
-    // 尝试播放并检查结果
-    audioengine->playBackgroundMusic("music/bgmusic.mp3", true);
-
-    // 检查是否正在播放
-    CCLOG("是否正在播放音乐：%d", audioengine->isBackgroundMusicPlaying());
-
-    // 检查音量设置
-    CCLOG("当前音乐音量：%f", audioengine->getBackgroundMusicVolume());
-
     // 启动所有系统
     startSystems();
 
@@ -103,7 +87,6 @@ bool FarmScene::init(const std::string& mapType) {
     setupSystemSchedulers();
 
     weatherEffectManager->updateWeatherEffect(weatherSystem->getCurrentWeatherString());
-
 
     return true;
 }
@@ -334,6 +317,20 @@ void FarmScene::initInventory() {
 	player->getInventory()->addItem(rod);
 	ToolItem* kettle = new ToolItem("Kettle", "A useful tool.", "tool/kettle.png");
 	player->getInventory()->addItem(kettle);
+
+    //默认玩家一开始就有很多种子
+    BerrySeed* berrySeeds = BerrySeed::create();
+    player->getInventory()->addItem(berrySeeds);
+
+    CarrotSeed* carrotSeeds = CarrotSeed::create();
+    player->getInventory()->addItem(carrotSeeds);
+
+    PepperSeed* pepperSeeds = PepperSeed::create();
+    player->getInventory()->addItem(pepperSeeds);
+
+    WheatSeed* wheatSeeds = WheatSeed::create();
+    player->getInventory()->addItem(wheatSeeds);
+    
 }
 
 
@@ -402,242 +399,625 @@ std::vector<Vec2> FarmScene::getFarmablePositions() {
     return positions;
 }
 
-void FarmScene::setupMouse() {
-    auto mouseListener = EventListenerMouse::create();
-    mouseListener->onMouseDown = CC_CALLBACK_1(FarmScene::onMouseClick, this);
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
-}
+//void FarmScene::setupMouse() {
+//    auto mouseListener = EventListenerMouse::create();
+//    mouseListener->onMouseDown = CC_CALLBACK_1(FarmScene::onMouseClick, this);
+//    _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
+//}
+//
+//void FarmScene::onMouseClick(EventMouse* event) {
+//    float slotSize = 30.0f;
+//
+//    // 获取原始鼠标位置
+//    Vec2 mousePosition = event->getLocation();
+//
+//    // 如果背包打开，强制对鼠标位置的 Y 坐标进行偏移
+//    if (player->getIsInventoryOpen()) {
+//        mousePosition.y += 60;
+//    }
+//
+//    CCLOG("Mouse Position After Offset: (%.2f, %.2f)", mousePosition.x, mousePosition.y);
+//
+//    // 计算背包的起始位置
+//    float startX = (Director::getInstance()->getVisibleSize().width - (8 * slotSize)) / 2;
+//    float startY = (Director::getInstance()->getVisibleSize().height - (3 * slotSize)) / 2;
+//
+//    // 计算点击的槽位
+//    int col = static_cast<int>((mousePosition.x - startX) / slotSize);
+//    int row = static_cast<int>((startY + (3 * slotSize) - mousePosition.y) / slotSize);
+//
+//    CCLOG("Clicked Slot: Row = %d, Col = %d", row, col);
+//
+//    // 点击背包槽位的逻辑
+//    if (row >= 0 && row < 3 && col >= 0 && col < 8) {
+//        player->onSlotClicked(row, col);
+//    }
+//    // 点击垃圾桶槽位
+//    else if (row == 0 && col == 8) {
+//        player->onSlotClicked(0, 8);
+//    }
+//    // 如果点击背包以外的区域，并且是左键点击，执行工具动作
+//    else {
+//        if (event->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) {
+//			/* -----新增：执行行为时传入地图管理者---- */
+//			player->performAction(farmMapManager);
+//
+//            // 获取玩家位置和朝向
+//            Vec2 playerPos = player->getPosition();
+//            int direction = player->getDirection();
+//
+//            // 检查当前位置是否可以耕种
+//            Vec2 targetPos = playerPos;
+//            switch (direction) {
+//                case 0: // 下
+//                    targetPos.y -= 32.0f;
+//                    break;
+//                case 1: // 上
+//                    targetPos.y += 32.0f;
+//                    break;
+//                case 2: // 左
+//                    targetPos.x -= 32.0f;
+//                    break;
+//                case 3: // 右
+//                    targetPos.x += 32.0f;
+//                    break;
+//            }
+//
+//            // 获取当前选中的物品
+//            Item* selectedItem = player->getSelectedItem();
+//            if (selectedItem) {
+//                std::string toolType = selectedItem->getName();
+//                // 将目标位置转换为瓦片坐标
+//                Vec2 tilePos = farmMapManager->worldToTileCoord(targetPos);
+//                
+//                // 添加更详细的调试信息
+//                CCLOG("Tool Action Debug:");
+//                CCLOG("Selected Tool Type: %s", toolType.c_str());
+//                CCLOG("World Position: (%.2f, %.2f)", targetPos.x, targetPos.y);
+//                CCLOG("Tile Position: (%.0f, %.0f)", tilePos.x, tilePos.y);
+//                CCLOG("Is Arable: %d", farmMapManager->isArable(targetPos));
+//
+//                farmlandManager->debugAllFarmlandKeys();
+//
+//                if (toolType == "Hoe" && farmMapManager->isArable(targetPos)) {
+//                    CCLOG("Attempting to handle tool action at position (%.2f, %.2f)", targetPos.x, targetPos.y);
+//                    farmlandManager->handleToolAction(toolType, tilePos, direction);
+//                }
+//                else if (toolType == "Kettle" && farmMapManager->isArable(targetPos)) {
+//
+//                    farmlandManager->handleToolAction(toolType, tilePos, direction);
+//
+//                }
+//                else {
+//                    CCLOG("Tool action failed - Conditions not met");
+//                }
+//            } else {
+//                CCLOG("No tool selected");
+//            }
+//        }
+//    }
+//}
 
-void FarmScene::onMouseClick(EventMouse* event) {
-    float slotSize = 30.0f;
+//void FarmScene::setupKeyboard() {
+//    auto keyboardListener = EventListenerKeyboard::create();
+//
+//    // 添加按键按下事件
+//    keyboardListener->onKeyPressed = CC_CALLBACK_2(FarmScene::onKeyPressed, this);
+//
+//    // 添加按键释放事件
+//    keyboardListener->onKeyReleased = CC_CALLBACK_2(FarmScene::onKeyReleased, this);
+//
+//    // 使用addEventListenerWithFixedPriority替代
+//    _eventDispatcher->addEventListenerWithFixedPriority(keyboardListener, 1);
+//
+//    //CCLOG("键盘事件监听器设置完成");
+//}
 
-    // 获取原始鼠标位置
-    Vec2 mousePosition = event->getLocation();
+//void FarmScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event) {
+//    switch (keyCode) {
+//        case EventKeyboard::KeyCode::KEY_UP_ARROW:
+//        case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+//        case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+//        case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+//        case EventKeyboard::KeyCode::KEY_W:
+//        case EventKeyboard::KeyCode::KEY_A:
+//        case EventKeyboard::KeyCode::KEY_S:
+//        case EventKeyboard::KeyCode::KEY_D:
+//            player->setMoving(false);
+//            break;
+//        default:
+//            break;
+//    }
+//}
 
-    // 如果背包打开，强制对鼠标位置的 Y 坐标进行偏移
-    if (player->getIsInventoryOpen()) {
-        mousePosition.y += 60;
-    }
 
-    CCLOG("Mouse Position After Offset: (%.2f, %.2f)", mousePosition.x, mousePosition.y);
-
-    // 计算背包的起始位置
-    float startX = (Director::getInstance()->getVisibleSize().width - (8 * slotSize)) / 2;
-    float startY = (Director::getInstance()->getVisibleSize().height - (3 * slotSize)) / 2;
-
-    // 计算点击的槽位
-    int col = static_cast<int>((mousePosition.x - startX) / slotSize);
-    int row = static_cast<int>((startY + (3 * slotSize) - mousePosition.y) / slotSize);
-
-    CCLOG("Clicked Slot: Row = %d, Col = %d", row, col);
-
-    // 点击背包槽位的逻辑
-    if (row >= 0 && row < 3 && col >= 0 && col < 8) {
-        player->onSlotClicked(row, col);
-    }
-    // 点击垃圾桶槽位
-    else if (row == 0 && col == 8) {
-        player->onSlotClicked(0, 8);
-    }
-    // 如果点击背包以外的区域，并且是左键点击，执行工具动作
-    else {
-        if (event->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) {
-			/* -----新增：执行行为时传入地图管理者---- */
-			player->performAction(farmMapManager);
-
-            // 获取玩家位置和朝向
-            Vec2 playerPos = player->getPosition();
-            int direction = player->getDirection();
-
-            // 检查当前位置是否可以耕种
-            Vec2 targetPos = playerPos;
-            switch (direction) {
-                case 0: // 下
-                    targetPos.y -= 32.0f;
-                    break;
-                case 1: // 上
-                    targetPos.y += 32.0f;
-                    break;
-                case 2: // 左
-                    targetPos.x -= 32.0f;
-                    break;
-                case 3: // 右
-                    targetPos.x += 32.0f;
-                    break;
-            }
-
-            // 获取当前选中的物品
-            Item* selectedItem = player->getSelectedItem();
-            if (selectedItem) {
-                std::string toolType = selectedItem->getName();
-                // 将目标位置转换为瓦片坐标
-                Vec2 tilePos = farmMapManager->worldToTileCoord(targetPos);
-                
-                // 添加更详细的调试信息
-                CCLOG("Tool Action Debug:");
-                CCLOG("Selected Tool Type: %s", toolType.c_str());
-                CCLOG("World Position: (%.2f, %.2f)", targetPos.x, targetPos.y);
-                CCLOG("Tile Position: (%.0f, %.0f)", tilePos.x, tilePos.y);
-                CCLOG("Is Arable: %d", farmMapManager->isArable(targetPos));
-
-                farmlandManager->debugAllFarmlandKeys();
-
-                if (toolType == "Hoe" && farmMapManager->isArable(targetPos)) {
-                    CCLOG("Attempting to handle tool action at position (%.2f, %.2f)", targetPos.x, targetPos.y);
-                    farmlandManager->handleToolAction(toolType, tilePos, direction);
-                }
-                else if (toolType == "Kettle" && farmMapManager->isArable(targetPos)) {
-
-                    farmlandManager->handleToolAction(toolType, tilePos, direction);
-
-                }
-                else {
-                    CCLOG("Tool action failed - Conditions not met");
-                }
-            } else {
-                CCLOG("No tool selected");
-            }
-        }
-    }
-}
+//void FarmScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
+//    float moveDistance = 16.0f;
+//    Vec2 currentPos = player->getPosition();
+//    Vec2 targetPos = currentPos;
+//    int index = -1;
+//
+//    /* ------------------养殖系统-------------- */
+//    // 创建动物
+//    switch (keyCode) {
+//	case EventKeyboard::KeyCode::KEY_C: {
+//		if (farmMapManager->isFarmPermit(targetPos)) {
+//			createAnimal("chicken", targetPos);
+//		}
+//		break;
+//	}
+//	case EventKeyboard::KeyCode::KEY_V: {
+//		if (farmMapManager->isFarmPermit(targetPos)) {
+//			createAnimal("sheep", targetPos);
+//		}
+//		break;
+//	}
+//	case EventKeyboard::KeyCode::KEY_M: {
+//		interactWithAnimals(targetPos, 50.0f);
+//		break;
+//	}
+//	case EventKeyboard::KeyCode::KEY_G: {
+//		pickupNearbyItems(targetPos, 50.0f);
+//		break;
+//	}
+//    }
+//
+//    /* ----------------物品拾取---------------- */
+//	if (keyCode == EventKeyboard::KeyCode::KEY_G) {
+//        // 拾取范围半径
+//		float pickupRadius = 50.0f; 
+//
+//		// 获取场景中的所有物品
+//		std::vector<Sprite*> items;
+//		for (auto child : this->getChildren()) {
+//			auto sprite = static_cast<Sprite*>(child);
+//			if (sprite && static_cast<Item*>(sprite->getUserData())) { // 检查是否绑定了 Item
+//				items.push_back(sprite);
+//			}
+//		}
+//		// 调用玩家拾取方法
+//		player->pickupNearbyItems(items, pickupRadius);
+//	}
+//
+//    // 数字键选择物品
+//    switch (keyCode) {
+//        case EventKeyboard::KeyCode::KEY_1:
+//        case EventKeyboard::KeyCode::KEY_2:
+//        case EventKeyboard::KeyCode::KEY_3:
+//        case EventKeyboard::KeyCode::KEY_4:
+//        case EventKeyboard::KeyCode::KEY_5:
+//        case EventKeyboard::KeyCode::KEY_6:
+//        case EventKeyboard::KeyCode::KEY_7:
+//        case EventKeyboard::KeyCode::KEY_8:
+//            index = static_cast<int>(keyCode) - static_cast<int>(EventKeyboard::KeyCode::KEY_1);
+//            player->setSelectedSlot(0, index);
+//            player->selectItemFromInventory(index);
+//            break;
+//
+//        // 移动控制
+//        case EventKeyboard::KeyCode::KEY_W:
+//        case EventKeyboard::KeyCode::KEY_UP_ARROW:
+//            targetPos.y += moveDistance;
+//            player->moveUp();
+//            break;
+//        case EventKeyboard::KeyCode::KEY_S:
+//        case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+//            targetPos.y -= moveDistance;
+//            player->moveDown();
+//            break;
+//        case EventKeyboard::KeyCode::KEY_A:
+//        case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+//            targetPos.x -= moveDistance;
+//            player->moveLeft();
+//            break;
+//        case EventKeyboard::KeyCode::KEY_D:
+//        case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+//            targetPos.x += moveDistance;
+//            player->moveRight();
+//            break;
+//
+//        // 背包和物品控制
+//        case EventKeyboard::KeyCode::KEY_E:
+//            if (!player->getIsSlotImageOpen()) {
+//                player->toggleInventory();
+//            }
+//            break;
+//        case EventKeyboard::KeyCode::KEY_R:
+//            player->reduceSelectedItemQuantity(1, true);
+//            break;
+//        case EventKeyboard::KeyCode::KEY_N:
+//            if (!player->getIsInventoryOpen()) {
+//                player->toggleSlotImage();
+//            }
+//            break;
+//        default:
+//            return;
+//    }
+//
+//    // 处理移动逻辑
+//    if (keyCode == EventKeyboard::KeyCode::KEY_W ||
+//        keyCode == EventKeyboard::KeyCode::KEY_S ||
+//        keyCode == EventKeyboard::KeyCode::KEY_A ||
+//        keyCode == EventKeyboard::KeyCode::KEY_D ||
+//        keyCode == EventKeyboard::KeyCode::KEY_UP_ARROW ||
+//        keyCode == EventKeyboard::KeyCode::KEY_DOWN_ARROW ||
+//        keyCode == EventKeyboard::KeyCode::KEY_LEFT_ARROW ||
+//        keyCode == EventKeyboard::KeyCode::KEY_RIGHT_ARROW) {
+//
+//        bool canWalk = farmMapManager->isWalkable(targetPos);
+//        if (canWalk) {
+//            auto moveAction = MoveTo::create(0.2f, targetPos);
+//            auto callback = CallFunc::create([this, targetPos]() {
+//                bool isPenetrable = farmMapManager->isPenetrable(targetPos);
+//                player->updateVisibility(isPenetrable);
+//                player->stopMoving();
+//                });
+//            auto sequence = Sequence::create(moveAction, callback, nullptr);
+//            player->runAction(sequence);
+//        }
+//    }
+//}
 
 void FarmScene::setupKeyboard() {
     auto keyboardListener = EventListenerKeyboard::create();
-
-    // 添加按键按下事件
     keyboardListener->onKeyPressed = CC_CALLBACK_2(FarmScene::onKeyPressed, this);
-
-    // 添加按键释放事件
     keyboardListener->onKeyReleased = CC_CALLBACK_2(FarmScene::onKeyReleased, this);
-
-    // 使用addEventListenerWithFixedPriority替代
     _eventDispatcher->addEventListenerWithFixedPriority(keyboardListener, 1);
-
-    //CCLOG("键盘事件监听器设置完成");
 }
 
 void FarmScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event) {
+    // 如果背包打开，不处理移动释放事件
+    if (player->getIsInventoryOpen()) {
+        return;
+    }
+
     switch (keyCode) {
-        case EventKeyboard::KeyCode::KEY_UP_ARROW:
-        case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-        case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-        case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-        case EventKeyboard::KeyCode::KEY_W:
-        case EventKeyboard::KeyCode::KEY_A:
-        case EventKeyboard::KeyCode::KEY_S:
-        case EventKeyboard::KeyCode::KEY_D:
-            player->setMoving(false);
-            break;
-        default:
-            break;
+    case EventKeyboard::KeyCode::KEY_UP_ARROW:
+    case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+    case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+    case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+    case EventKeyboard::KeyCode::KEY_W:
+    case EventKeyboard::KeyCode::KEY_A:
+    case EventKeyboard::KeyCode::KEY_S:
+    case EventKeyboard::KeyCode::KEY_D:
+        player->setMoving(false);
+        break;
+    default:
+        break;
     }
 }
 
+//void FarmScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
+//    float moveDistance = 16.0f;
+//    Vec2 currentPos = player->getPosition();
+//    Vec2 targetPos = currentPos;
+//
+//    // 在 FarmScene::onKeyPressed 中的背包导航部分
+//    if (player->getIsInventoryOpen()) {
+//        auto currentSlot = player->getSelectedSlot();
+//        int row = currentSlot.first;
+//        int col = currentSlot.second;
+//
+//        int newRow = 0;
+//
+//
+//
+//        switch (keyCode) {
+//        case EventKeyboard::KeyCode::KEY_UP_ARROW:
+//        case EventKeyboard::KeyCode::KEY_W:
+//            row = (row + 1) % 3;  // 3行，从0到2
+//            player->setSelectedSlot(row, col);
+//            player->highlightInventorySlot(row, col);
+//            return;
+//
+//        case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+//        case EventKeyboard::KeyCode::KEY_S:
+//         
+//            row = (row - 1 + 3) % 3;  // 3行，从0到2
+//            player->setSelectedSlot(row, col);
+//            player->highlightInventorySlot(row, col);
+//            return;
+//
+//        case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+//        case EventKeyboard::KeyCode::KEY_A:
+//            col = (col - 1 + 8) % 8;  // 8列，从0到7
+//            player->setSelectedSlot(row, col);
+//            player->highlightInventorySlot(row, col);
+//            return;
+//
+//        case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+//        case EventKeyboard::KeyCode::KEY_D:
+//            col = (col + 1) % 8;  // 8列，从0到7
+//            player->setSelectedSlot(row, col);
+//            player->highlightInventorySlot(row, col);
+//            return;
+//
+//        case EventKeyboard::KeyCode::KEY_SPACE:
+//            // 直接使用当前行列来选择物品
+//            player->setSelectedSlot(row, col);
+//            player->selectItemFromInventory(row, col);  // 修改这个函数接收行和列
+//            return;
+//
+//        case EventKeyboard::KeyCode::KEY_E:
+//            player->toggleInventory();
+//            return;
+//
+//        default:
+//            return;
+//        }
+//    }
+//    // 背包关闭时的常规按键处理
+//    switch (keyCode) {
+//        // 养殖系统相关
+//    case EventKeyboard::KeyCode::KEY_C:
+//        if (farmMapManager->isFarmPermit(targetPos)) {
+//            createAnimal("chicken", targetPos);
+//        }
+//        break;
+//    case EventKeyboard::KeyCode::KEY_V:
+//        if (farmMapManager->isFarmPermit(targetPos)) {
+//            createAnimal("sheep", targetPos);
+//        }
+//        break;
+//    case EventKeyboard::KeyCode::KEY_M:
+//        interactWithAnimals(targetPos, 50.0f);
+//        break;
+//    case EventKeyboard::KeyCode::KEY_G:
+//        pickupNearbyItems(targetPos, 50.0f);
+//        break;
+//
+//        // 移动控制
+//    case EventKeyboard::KeyCode::KEY_W:
+//    case EventKeyboard::KeyCode::KEY_UP_ARROW:
+//        targetPos.y += moveDistance;
+//        player->moveUp();
+//        break;
+//    case EventKeyboard::KeyCode::KEY_S:
+//    case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+//        targetPos.y -= moveDistance;
+//        player->moveDown();
+//        break;
+//    case EventKeyboard::KeyCode::KEY_A:
+//    case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+//        targetPos.x -= moveDistance;
+//        player->moveLeft();
+//        break;
+//    case EventKeyboard::KeyCode::KEY_D:
+//    case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+//        targetPos.x += moveDistance;
+//        player->moveRight();
+//        break;
+//
+//        // 在打开背包时设置初始选择
+//    case EventKeyboard::KeyCode::KEY_E:
+//        if (!player->getIsSlotImageOpen()) {
+//            player->toggleInventory();
+//            if (player->getIsInventoryOpen()) {
+//                player->setSelectedSlot(0, 0);  // 设置初始选择位置
+//                player->highlightInventorySlot(0, 0);
+//            }
+//        }
+//        break;
+//    case EventKeyboard::KeyCode::KEY_R:
+//        player->reduceSelectedItemQuantity(1, true);
+//        break;
+//    case EventKeyboard::KeyCode::KEY_N:
+//        if (!player->getIsInventoryOpen()) {
+//            player->toggleSlotImage();
+//        }
+//        break;
+//    default:
+//        return;
+//    }
+//
+//    // 处理移动逻辑
+//    if (keyCode == EventKeyboard::KeyCode::KEY_W ||
+//        keyCode == EventKeyboard::KeyCode::KEY_S ||
+//        keyCode == EventKeyboard::KeyCode::KEY_A ||
+//        keyCode == EventKeyboard::KeyCode::KEY_D ||
+//        keyCode == EventKeyboard::KeyCode::KEY_UP_ARROW ||
+//        keyCode == EventKeyboard::KeyCode::KEY_DOWN_ARROW ||
+//        keyCode == EventKeyboard::KeyCode::KEY_LEFT_ARROW ||
+//        keyCode == EventKeyboard::KeyCode::KEY_RIGHT_ARROW) {
+//
+//        bool canWalk = farmMapManager->isWalkable(targetPos);
+//        if (canWalk) {
+//            auto moveAction = MoveTo::create(0.2f, targetPos);
+//            auto callback = CallFunc::create([this, targetPos]() {
+//                bool isPenetrable = farmMapManager->isPenetrable(targetPos);
+//                player->updateVisibility(isPenetrable);
+//                player->stopMoving();
+//                });
+//            auto sequence = Sequence::create(moveAction, callback, nullptr);
+//            player->runAction(sequence);
+//        }
+//    }
+//}
 
 void FarmScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
     float moveDistance = 16.0f;
     Vec2 currentPos = player->getPosition();
     Vec2 targetPos = currentPos;
-    int index = -1;
 
-    /* ------------------养殖系统-------------- */
-    // 创建动物
-    switch (keyCode) {
-	case EventKeyboard::KeyCode::KEY_C: {
-		if (farmMapManager->isFarmPermit(targetPos)) {
-			createAnimal("chicken", targetPos);
-		}
-		break;
-	}
-	case EventKeyboard::KeyCode::KEY_V: {
-		if (farmMapManager->isFarmPermit(targetPos)) {
-			createAnimal("sheep", targetPos);
-		}
-		break;
-	}
-	case EventKeyboard::KeyCode::KEY_M: {
-		interactWithAnimals(targetPos, 50.0f);
-		break;
-	}
-	case EventKeyboard::KeyCode::KEY_G: {
-		pickupNearbyItems(targetPos, 50.0f);
-		break;
-	}
-    }
+    // 1) 如果背包已打开，则进行背包导航逻辑
+    if (player->getIsInventoryOpen()) {
+        auto currentSlot = player->getSelectedSlot();
+        int row = currentSlot.first;
+        int col = currentSlot.second;
 
-    /* ----------------物品拾取---------------- */
-	if (keyCode == EventKeyboard::KeyCode::KEY_G) {
-        // 拾取范围半径
-		float pickupRadius = 50.0f; 
-
-		// 获取场景中的所有物品
-		std::vector<Sprite*> items;
-		for (auto child : this->getChildren()) {
-			auto sprite = static_cast<Sprite*>(child);
-			if (sprite && static_cast<Item*>(sprite->getUserData())) { // 检查是否绑定了 Item
-				items.push_back(sprite);
-			}
-		}
-		// 调用玩家拾取方法
-		player->pickupNearbyItems(items, pickupRadius);
-	}
-
-    // 数字键选择物品
-    switch (keyCode) {
-        case EventKeyboard::KeyCode::KEY_1:
-        case EventKeyboard::KeyCode::KEY_2:
-        case EventKeyboard::KeyCode::KEY_3:
-        case EventKeyboard::KeyCode::KEY_4:
-        case EventKeyboard::KeyCode::KEY_5:
-        case EventKeyboard::KeyCode::KEY_6:
-        case EventKeyboard::KeyCode::KEY_7:
-        case EventKeyboard::KeyCode::KEY_8:
-            index = static_cast<int>(keyCode) - static_cast<int>(EventKeyboard::KeyCode::KEY_1);
-            player->setSelectedSlot(0, index);
-            player->selectItemFromInventory(index);
-            break;
-
-        // 移动控制
-        case EventKeyboard::KeyCode::KEY_W:
+        switch (keyCode) {
         case EventKeyboard::KeyCode::KEY_UP_ARROW:
-            targetPos.y += moveDistance;
-            player->moveUp();
-            break;
-        case EventKeyboard::KeyCode::KEY_S:
+        case EventKeyboard::KeyCode::KEY_W:
+            row = (row + 1) % 3;  // 上键 = row+1
+            player->setSelectedSlot(row, col);
+            player->highlightInventorySlot(row, col);
+            return;
         case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-            targetPos.y -= moveDistance;
-            player->moveDown();
-            break;
-        case EventKeyboard::KeyCode::KEY_A:
+        case EventKeyboard::KeyCode::KEY_S:
+            row = (row - 1 + 3) % 3;  // 下键 = row-1
+            player->setSelectedSlot(row, col);
+            player->highlightInventorySlot(row, col);
+            return;
         case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-            targetPos.x -= moveDistance;
-            player->moveLeft();
-            break;
-        case EventKeyboard::KeyCode::KEY_D:
+        case EventKeyboard::KeyCode::KEY_A:
+            col = (col - 1 + 8) % 8;
+            player->setSelectedSlot(row, col);
+            player->highlightInventorySlot(row, col);
+            return;
         case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-            targetPos.x += moveDistance;
-            player->moveRight();
-            break;
-
-        // 背包和物品控制
+        case EventKeyboard::KeyCode::KEY_D:
+            col = (col + 1) % 8;
+            player->setSelectedSlot(row, col);
+            player->highlightInventorySlot(row, col);
+            return;
+        case EventKeyboard::KeyCode::KEY_SPACE:
+            // 按空格就确认选中
+            player->selectItemFromInventory(row, col);
+            return;
         case EventKeyboard::KeyCode::KEY_E:
-            if (!player->getIsSlotImageOpen()) {
-                player->toggleInventory();
+            // 关闭背包
+            player->toggleInventory();
+            return;
+
+            // ------------------ 新增：L键丢弃物品 ------------------
+        case EventKeyboard::KeyCode::KEY_L: {
+            // 如果有选中物品，就把它丢到“垃圾桶”
+            Item* selectedItem = player->getSelectedItem();
+            if (selectedItem) {
+                // 这里有两种实现方式：
+                // 方式1：直接调用 player->onSlotClicked(0, 8) 模拟“垃圾桶槽位”点击
+                player->onSlotClicked(0, 8);
+
+                // 方式2：直接把选中物品数量清零
+                //player->reduceSelectedItemQuantity(selectedItem->getQuantity(), false);
+
+                //// 更新背包/横栏显示
+                //player->updateInventoryDisplay();
+                //createInventoryBarIfNeeded(); // 这里按你自己的代码来，可能是 player->createInventoryBar() 之类
             }
             break;
-        case EventKeyboard::KeyCode::KEY_R:
-            player->reduceSelectedItemQuantity(1, true);
-            break;
-        case EventKeyboard::KeyCode::KEY_N:
-            if (!player->getIsInventoryOpen()) {
-                player->toggleSlotImage();
-            }
-            break;
+        }
         default:
             return;
+        }
     }
 
-    // 处理移动逻辑
+    // 2) 背包关闭时的常规按键处理
+    switch (keyCode) {
+        // ------------------ 养殖系统 ------------------
+    case EventKeyboard::KeyCode::KEY_C:
+        if (farmMapManager->isFarmPermit(targetPos)) {
+            createAnimal("chicken", targetPos);
+        }
+        break;
+    case EventKeyboard::KeyCode::KEY_V:
+        if (farmMapManager->isFarmPermit(targetPos)) {
+            createAnimal("sheep", targetPos);
+        }
+        break;
+    case EventKeyboard::KeyCode::KEY_M:
+        interactWithAnimals(targetPos, 50.0f);
+        break;
+    case EventKeyboard::KeyCode::KEY_G:
+        // 拾取范围半径 = 50 像素
+        pickupNearbyItems(targetPos, 50.0f);
+        break;
+
+
+                                      // ------------------ 新增：F键耕地 / 浇水 ------------------
+    case EventKeyboard::KeyCode::KEY_F: {
+        // 1. 获取玩家面朝方向
+        int direction = player->getDirection();
+        // 2. 计算前方 32 像素(1格)的世界坐标 targetPos
+        switch (direction) {
+        case 0: // 下
+            targetPos.y -= 32.0f;
+            break;
+        case 1: // 上
+            targetPos.y += 32.0f;
+            break;
+        case 2: // 左
+            targetPos.x -= 32.0f;
+            break;
+        case 3: // 右
+            targetPos.x += 32.0f;
+            break;
+        }
+
+        // 3. 获取当前选中的物品
+        Item* selectedItem = player->getSelectedItem();
+        if (!selectedItem) {
+            CCLOG("No tool selected to farm with KEY_F");
+            break;
+        }
+
+        // 4. 判断选中的物品类型
+        std::string toolType = selectedItem->getName(); // 例如 "Hoe" / "Kettle"
+        // 转换成瓦片坐标
+        Vec2 tilePos = farmMapManager->worldToTileCoord(targetPos);
+
+        // 5. 判定是否可耕种
+        bool canFarm = farmMapManager->isArable(targetPos);
+
+        if (toolType == "Hoe" && canFarm) {
+            farmlandManager->handleToolAction(toolType, tilePos, direction);
+            CCLOG("Used Hoe at tile (%.0f, %.0f)", tilePos.x, tilePos.y);
+        }
+        else if (toolType == "Kettle" && canFarm) {
+            farmlandManager->handleToolAction(toolType, tilePos, direction);
+            CCLOG("Used Kettle at tile (%.0f, %.0f)", tilePos.x, tilePos.y);
+        }
+        else {
+            CCLOG("Tool action failed or not a Hoe/Kettle");
+        }
+        break;
+    }
+
+                                      // ------------------ 移动控制 ------------------
+    case EventKeyboard::KeyCode::KEY_W:
+    case EventKeyboard::KeyCode::KEY_UP_ARROW:
+        targetPos.y += moveDistance;
+        player->moveUp();
+        break;
+    case EventKeyboard::KeyCode::KEY_S:
+    case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+        targetPos.y -= moveDistance;
+        player->moveDown();
+        break;
+    case EventKeyboard::KeyCode::KEY_A:
+    case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+        targetPos.x -= moveDistance;
+        player->moveLeft();
+        break;
+    case EventKeyboard::KeyCode::KEY_D:
+    case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+        targetPos.x += moveDistance;
+        player->moveRight();
+        break;
+
+        // ------------------ 背包开启 ------------------
+    case EventKeyboard::KeyCode::KEY_E:
+        if (!player->getIsSlotImageOpen()) {
+            player->toggleInventory();
+            if (player->getIsInventoryOpen()) {
+                player->setSelectedSlot(0, 0);  // 设置初始选择位置
+                player->highlightInventorySlot(0, 0);
+            }
+        }
+        break;
+    case EventKeyboard::KeyCode::KEY_R:
+        player->reduceSelectedItemQuantity(1, true);
+        break;
+    case EventKeyboard::KeyCode::KEY_N:
+        if (!player->getIsInventoryOpen()) {
+            player->toggleSlotImage();
+        }
+        break;
+    default:
+        return;
+    }
+
+    // 3) 处理移动逻辑
     if (keyCode == EventKeyboard::KeyCode::KEY_W ||
         keyCode == EventKeyboard::KeyCode::KEY_S ||
         keyCode == EventKeyboard::KeyCode::KEY_A ||

@@ -2,8 +2,6 @@
 #define __BERRY_SEED_H__
 
 #include "Item.h"
-#include "Berry.h"
-#include "FarmlandTile.h"
 
 class BerrySeed : public Item {
 public:
@@ -15,8 +13,11 @@ public:
         1                                      // 初始数量
     ) {}
 
-    static BerrySeed* create() {
-        return new BerrySeed();
+    //未来更改初始种子逻辑
+    static BerrySeed* create(int quantity = 50) {
+        BerrySeed* seed = new BerrySeed();
+        seed->setQuantity(quantity);  // 设置初始数量
+        return seed;
     }
 };
 

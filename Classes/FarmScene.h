@@ -32,6 +32,8 @@ public:
         return this->tmxMap;
     }
 
+  
+
 private:
     // 地图相关
     cocos2d::TMXTiledMap* tmxMap;
