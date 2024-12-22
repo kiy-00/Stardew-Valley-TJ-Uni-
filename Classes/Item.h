@@ -10,7 +10,7 @@ public:
     Item(const std::string& name, const std::string& description, const std::string& itemType, const std::string& imagePath, int quantity = 1)
         : m_name(name), m_description(description), m_itemType(itemType), m_imagePath(imagePath), m_quantity(quantity) {}
 
-    virtual ~Item() {}
+	virtual ~Item() {} 
 
     virtual std::string getName() const { return m_name; }
     virtual std::string getDescription() const { return m_description; }

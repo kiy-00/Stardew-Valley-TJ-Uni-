@@ -4,27 +4,32 @@
 #include "cocos2d.h"
 #include "Inventory.h"
 #include "Item.h"
+#include "FishItem.h"
+#include "FishingLayer.h"
+#include "FishDataFactory.h"
+#include "FarmMapManager.h"
 
+class FishingLayer;
 
 class User : public cocos2d::Sprite {
 public:
-	// ʹ��ָ�����Դ���Userʵ��
+	// 使用指定属性创建User实例
 	static User* create(const std::string& name, const std::string& gender, int health, int energy, int money);
 
-	// ��ʼ���û����ݲ����ض���֡
+	// 初始化用户数据并加载动画帧
 	virtual bool init(const std::string& name, const std::string& gender, int health, int energy, int money);
 
-	// ��ɫ�ƶ����������ݷ�����½�ɫ״̬
-	void moveUp();   // �����ƶ�
-	void moveDown(); // �����ƶ�
-	void moveLeft(); // �����ƶ�
-	void moveRight();// �����ƶ�
+	// 角色移动方法，根据方向更新角色状态
+	void moveUp();   // 向上移动
+	void moveDown(); // 向下移动
+	void moveLeft(); // 向左移动
+	void moveRight();// 向右移动
 	void stopMoving() { m_isMoving = false; }
 
-	// ���ڸ��¶������붨ʱ������
+	// 定期更新动画，与定时器相结合
 	void updateAnimation(float dt);
 
-	// �������Ե�getter��setter�����ڷ��ʺ��޸Ľ�ɫ�����ơ��Ա𡢽�Ǯ����������������Ϣ
+	// 基本属性的getter和setter，用于访问和修改角色的名称、性别、金钱、健康、能量等信息
 	const std::string& getName() const { return m_name; }
 	void setName(const std::string& name) { m_name = name; }
 	const std::string& getGender() const { return m_gender; }
@@ -36,23 +41,23 @@ public:
 	int getEnergy() const { return m_energy; }
 	void setEnergy(int energy) { m_energy = energy; }
 
-	// ��ȡ���������Ա�����Ͳ�ѯ��Ʒ
+	// 获取背包对象，以便管理和查询物品
 	Inventory* getInventory() const { return inventory; }
 
-	// ����ѡ����Ʒ��������������status������ʾ
+	// 减少选中物品的数量，并根据status更新显示
 	bool reduceSelectedItemQuantity(int quantity, bool status);
 
-	// ��ȡ�����õ�ǰѡ�еı�����λ
+	// 获取和设置当前选中的背包槽位
 	std::pair<int, int> getSelectedSlot() const { return selectedSlot; }
 	void setSelectedSlot(int first, int second) { selectedSlot = std::make_pair(first, second); }
 
-	// ��ȡ�����ý�ɫ�������ƶ�״̬
+	// 获取和设置角色方向与移动状态
 	int getDirection() const { return m_direction; }
 	void setDirection(int direction) { m_direction = direction; }
 	bool isMoving() const { return m_isMoving; }
 	void setMoving(bool moving) { m_isMoving = moving; }
 
-	// ������ع��ܣ��л�������ʾ�������λ�����±�����ʾ
+	// 背包相关功能：切换背包显示、点击槽位、更新背包显示
 	void toggleInventory();
 	void onSlotClicked(int row, int col);
 	void updateInventoryDisplay();
@@ -60,28 +65,31 @@ public:
 	bool getIsInventoryOpen() const { return isInventoryOpen; }
 	void setIsInventoryOpen(bool open) { isInventoryOpen = open; }
 
-	// �������ܣ�������Ʒ����ѡ����Ʒ
+	// 横栏功能：创建物品栏和选择物品
 	void createInventoryBar();
 	void selectItemFromInventory(int index);
 
-	// ��ȡ��ǰѡ����Ʒ������ʾ����
+	// 获取当前选中物品和其显示精灵
 	Item* getSelectedItem();
 	cocos2d::Sprite* getHeldItemSprite() const;
 
-	// ����ϵͳ���л���λͼ����ʾ
+	// 制造系统：切换槽位图像显示
 	void toggleSlotImage();
 	bool getIsSlotImageOpen() const { return isSlotImageOpen; }
 	void setIsSlotImageOpen(bool open) { isSlotImageOpen = open; }
 
-	// ���߶�����أ�ִ�й��߶�������Ӷ����ߣ�
-	void performToolAction();
+	/* 执行当前持有物品的对应动作 */
+	void performAction(FarmMapManager* farmMapManager);
+	void performToolAction();  // 执行基本工具动作（如挥动工具）
+	void plantSeed();		   // 执行播种逻辑
+	void startFishing();       // 执行钓鱼逻辑
 
-	// ������͸���ȿ���
+	// 新增：透明度控制
 	void updateVisibility(bool isPenetrable) {
 		this->setOpacity(isPenetrable ? 128 : 255);
 	}
 
-	// ����������ϵͳ��ʼ��
+	// 新增：物理系统初始化
 	void initPhysics() {
 		cocos2d::Size playerSize = this->getContentSize();
 		auto physicsBody = cocos2d::PhysicsBody::createBox(
@@ -101,40 +109,45 @@ public:
 		this->setPhysicsBody(physicsBody);
 	}
 
-private:
-	int m_updateCounter; // �������¼����������ڿ��ƶ���֡��
+	/* --------新增（用于拾取地图中的物品）------- */
+	cocos2d::EventListenerTouchOneByOne* createPickupListener(Item* item, cocos2d::Sprite* sprite);
 
-	// ��������
+	void pickupNearbyItems(const std::vector<cocos2d::Sprite*>& items, float pickupRadius);
+
+private:
+	// 基本属性
 	std::string m_name;
 	std::string m_gender;
 	int m_health;
 	int m_energy;
 	int m_money;
+	int m_updateCounter;
 
-	cocos2d::Sprite* heldItemSprite; // ��ʾ���г�����Ʒ�ľ���
-	Inventory* inventory;            // ��ɫ�ı���
-	cocos2d::Sprite* slotSprite = nullptr; // �����λͼ��ľ���
+	cocos2d::Sprite* heldItemSprite;		// 显示手中持有物品的精灵
+	Inventory* inventory;					// 角色的背包
+	cocos2d::Sprite* slotSprite = nullptr;  // 制造槽位图像的精灵
 
-	int m_direction;  // ��ǰ��ɫ���� 0��1��2��3��
-	bool m_isMoving;  // �Ƿ����ƶ�״̬
+	int m_direction;  // 当前角色方向 0下1上2左3右
+	bool m_isMoving;  // 是否处于移动状态
+	int m_frameIndex; // 动画帧索引
 
-	int m_frameIndex; // ����֡����
-	cocos2d::Vector<cocos2d::SpriteFrame*> m_animationFrames[4]; // �洢���������ĸ�����Ķ���֡
-	bool isInventoryOpen; // �����Ƿ��
-	const float slotSize = 30.0f;   // ÿ����λ�Ĵ�С
-	cocos2d::Layer* inventoryLayer = nullptr; // ��ʾ������ͼ��
-	std::pair<int, int> selectedSlot = { -1, -1 }; // ��ǰѡ�еĲ�λ����
+	cocos2d::Vector<cocos2d::SpriteFrame*> m_animationFrames[4]; // 存储上下左右四个方向的动画帧
 
-	bool isSlotImageOpen = false; // �����λͼ���Ƿ���ʾ
+	bool isInventoryOpen; // 背包是否打开
+	const float slotSize = 30.0f;   // 每个槽位的大小
+	cocos2d::Layer* inventoryLayer = nullptr; // 显示背包的图层
+	std::pair<int, int> selectedSlot = { -1, -1 }; // 当前选中的槽位坐标
 
-	bool m_isPerformingToolAction = false; // �Ƿ����ڲ��Ź���ʹ�ö���
+	bool isSlotImageOpen = false; // 制造槽位图像是否显示
 
-	cocos2d::Sprite* toolActionSprite; // ������ʾ���߶��������ľ���
+	bool m_isPerformingToolAction = false; // 是否正在播放工具使用动画
 
-	// ���ؽ�ɫ���߶���֡
+	cocos2d::Sprite* toolActionSprite; // 用于显示工具动作动画的精灵
+
+	// 加载角色行走动画帧
 	void loadAnimationFrames();
 
-	// ���ݹ������ƺͷ����ȡ���߶���֡
+	// 根据工具名称和方向获取工具动画帧
 	cocos2d::Vector<cocos2d::SpriteFrame*> getToolAnimationFrames(const std::string& toolName, int direction);
 };
 

@@ -50,9 +50,10 @@ bool User::init(const std::string& name, const std::string& gender, int health, 
 
     // 初始化背包
     inventory = new Inventory();
-    isInventoryOpen = false; // 背包开始是关闭的
+    isInventoryOpen = false;
 
-    loadAnimationFrames(); // 加载角色动画帧
+    // 加载角色动画帧
+    loadAnimationFrames();
 
     // 设置默认站立动画帧
     this->setSpriteFrame(m_animationFrames[0].at(0));
@@ -80,8 +81,8 @@ void User::updateAnimation(float dt) {
     }
 
     m_updateCounter++;
-    // 每 5 次调用才切换一帧，降低动画切换频率
-    if (m_updateCounter % 5 == 0) {
+    // 每 4 次调用才切换一帧，降低动画切换频率
+    if (m_updateCounter % 4 == 0) {
         if (m_isMoving) {
             // 移动中，循环播放移动动画
             m_frameIndex = (m_frameIndex + 1) % 4;
@@ -108,26 +109,26 @@ void User::updateAnimation(float dt) {
             }
             // 根据方向摆放物品位置与方向
             switch (m_direction) {
-                case 0: // 下
-                    heldItemSprite->setVisible(true);
-                    heldItemSprite->setScaleX(1.0f);
-                    heldItemSprite->setPosition(Vec2(34, 16));
-                    break;
-                case 1: // 上
-                    heldItemSprite->setVisible(true);
-                    heldItemSprite->setScaleX(1.0f);
-                    heldItemSprite->setPosition(Vec2(36, 20));
-                    break;
-                case 2: // 左
-                    heldItemSprite->setVisible(true);
-                    heldItemSprite->setScaleX(-1.0f);
-                    heldItemSprite->setPosition(Vec2(12, 15));
-                    break;
-                case 3: // 右
-                    heldItemSprite->setVisible(true);
-                    heldItemSprite->setScaleX(1.0f);
-                    heldItemSprite->setPosition(Vec2(28, 15));
-                    break;
+            case 0: // 下
+                heldItemSprite->setVisible(true);
+                heldItemSprite->setScaleX(1.0f);
+                heldItemSprite->setPosition(Vec2(34, 16));
+                break;
+            case 1: // 上
+                heldItemSprite->setVisible(true);
+                heldItemSprite->setScaleX(1.0f);
+                heldItemSprite->setPosition(Vec2(36, 20));
+                break;
+            case 2: // 左
+                heldItemSprite->setVisible(true);
+                heldItemSprite->setScaleX(-1.0f);
+                heldItemSprite->setPosition(Vec2(12, 15));
+                break;
+            case 3: // 右
+                heldItemSprite->setVisible(true);
+                heldItemSprite->setScaleX(1.0f);
+                heldItemSprite->setPosition(Vec2(28, 15));
+                break;
             }
         }
     }
@@ -164,11 +165,11 @@ Vector<SpriteFrame*> User::getToolAnimationFrames(const std::string& toolName, i
     Vector<SpriteFrame*> frames;
     std::string directionName;
     switch (direction) {
-        case 0: directionName = "down"; break;
-        case 1: directionName = "up"; break;
-        case 2: directionName = "left"; break;
-        case 3: directionName = "right"; break;
-        default: directionName = "down"; break;
+    case 0: directionName = "down"; break;
+    case 1: directionName = "up"; break;
+    case 2: directionName = "left"; break;
+    case 3: directionName = "right"; break;
+    default: directionName = "down"; break;
     }
 
     // 加载对应方向的plist文件
@@ -235,7 +236,7 @@ void User::toggleInventory() {
         const float slotSize = 30.0f;
 
         // 设置背包整体位置相对于玩家
-		inventoryLayer->setPosition(this->getPosition() + Vec2(-125, 100));
+        inventoryLayer->setPosition(this->getPosition() + Vec2(-125, 100));
 
         // 创建半透明背景
         auto background = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 180));
@@ -301,56 +302,56 @@ void User::toggleInventory() {
 // 根据点击的槽位选择物品或移动物品。
 ////////////////////////////////////////////////////////////
 void User::onSlotClicked(int row, int col) {
-	if (!inventoryLayer) return;
+    if (!inventoryLayer) return;
 
-	// 检查是否点击垃圾桶槽位 
-	if (row == 0 && col == 8) {
-		// 如果当前有选中物品，则将其全部删除
-		if (selectedSlot.first != -1 && selectedSlot.second != -1) {
-			Item* selectedItem = getSelectedItem();
-			if (selectedItem) {
-				reduceSelectedItemQuantity(selectedItem->getQuantity(), false);
-				// 重置选中槽位
-				selectedSlot = { -1, -1 };
-				heldItemSprite->setVisible(false);
-				updateInventoryDisplay();
-			}
-		}
-		return;
-	}
-
-	// 获取当前槽位的物品列表
-	auto slotItems = inventory->getItems(row, col);
-	bool slotEmpty = slotItems.empty() || slotItems[0]->getQuantity() == 0;
-
-	// 情况1：当前未选中任何物品
-	if (selectedSlot.first == -1 && selectedSlot.second == -1) {
-		if (!slotEmpty) {
-			// 选中当前槽位的物品
-			inventory->selectSlot(row, col);
-			selectedSlot = { row, col };
-			updateHeldItemSprite();
-			updateInventoryDisplay();
-		}
-		return;
-	}
-	// 情况2：当前已经选中一个物品
-	if (slotEmpty) {
-		// 将选中物品移动到该空槽位
-		if (inventory->moveItems(row, col)) {
-			selectedSlot = { -1, -1 };
-			heldItemSprite->setVisible(false);
-			updateInventoryDisplay();
-		}
+    // 检查是否点击垃圾桶槽位 
+    if (row == 0 && col == 8) {
+        // 如果当前有选中物品，则将其全部删除
+        if (selectedSlot.first != -1 && selectedSlot.second != -1) {
+            Item* selectedItem = getSelectedItem();
+            if (selectedItem) {
+                reduceSelectedItemQuantity(selectedItem->getQuantity(), false);
+                // 重置选中槽位
+                selectedSlot = { -1, -1 };
+                heldItemSprite->setVisible(false);
+                updateInventoryDisplay();
+            }
+        }
         return;
-	}
+    }
+
+    // 获取当前槽位的物品列表
+    auto slotItems = inventory->getItems(row, col);
+    bool slotEmpty = slotItems.empty() || slotItems[0]->getQuantity() == 0;
+
+    // 情况1：当前未选中任何物品
+    if (selectedSlot.first == -1 && selectedSlot.second == -1) {
+        if (!slotEmpty) {
+            // 选中当前槽位的物品
+            inventory->selectSlot(row, col);
+            selectedSlot = { row, col };
+            updateHeldItemSprite();
+            updateInventoryDisplay();
+        }
+        return;
+    }
+    // 情况2：当前已经选中一个物品
+    if (slotEmpty) {
+        // 将选中物品移动到该空槽位
+        if (inventory->moveItems(row, col)) {
+            selectedSlot = { -1, -1 };
+            heldItemSprite->setVisible(false);
+            updateInventoryDisplay();
+        }
+        return;
+    }
     else {
-		// 选中新的物品
-		inventory->selectSlot(row, col);
-		selectedSlot = { row, col };
-		updateHeldItemSprite();
-		updateInventoryDisplay();
-	}
+        // 选中新的物品
+        inventory->selectSlot(row, col);
+        selectedSlot = { row, col };
+        updateHeldItemSprite();
+        updateInventoryDisplay();
+    }
 }
 
 ////////////////////////////////////////////////////////////
@@ -358,34 +359,34 @@ void User::onSlotClicked(int row, int col) {
 // 根据当前是否选中物品更新显示。
 ////////////////////////////////////////////////////////////
 void User::updateHeldItemSprite() {
-	Item* selectedItem = getSelectedItem();
-	if (selectedItem) {
-		heldItemSprite->setTexture(selectedItem->getImagePath());
-		heldItemSprite->setVisible(true);
+    Item* selectedItem = getSelectedItem();
+    if (selectedItem) {
+        heldItemSprite->setTexture(selectedItem->getImagePath());
+        heldItemSprite->setVisible(true);
 
-		// 根据当前方向设置物品的位置和朝向
-		switch (m_direction) {
-		case 0: // 下
-			heldItemSprite->setScaleX(1.0f);
-			heldItemSprite->setPosition(Vec2(34, 16));
-			break;
-		case 1: // 上
-			heldItemSprite->setScaleX(1.0f);
-			heldItemSprite->setPosition(Vec2(36, 20));
-			break;
-		case 2: // 左
-			heldItemSprite->setScaleX(-1.0f);
-			heldItemSprite->setPosition(Vec2(12, 15));
-			break;
-		case 3: // 右
-			heldItemSprite->setScaleX(1.0f);
-			heldItemSprite->setPosition(Vec2(28, 15));
-			break;
-		}
-	}
-	else {
-		heldItemSprite->setVisible(false);
-	}
+        // 根据当前方向设置物品的位置和朝向
+        switch (m_direction) {
+        case 0: // 下
+            heldItemSprite->setScaleX(1.0f);
+            heldItemSprite->setPosition(Vec2(34, 16));
+            break;
+        case 1: // 上
+            heldItemSprite->setScaleX(1.0f);
+            heldItemSprite->setPosition(Vec2(36, 20));
+            break;
+        case 2: // 左
+            heldItemSprite->setScaleX(-1.0f);
+            heldItemSprite->setPosition(Vec2(12, 15));
+            break;
+        case 3: // 右
+            heldItemSprite->setScaleX(1.0f);
+            heldItemSprite->setPosition(Vec2(28, 15));
+            break;
+        }
+    }
+    else {
+        heldItemSprite->setVisible(false);
+    }
 }
 
 ////////////////////////////////////////////////////////////
@@ -393,51 +394,51 @@ void User::updateHeldItemSprite() {
 // 根据当前背包物品信息重新绘制背包UI。
 ////////////////////////////////////////////////////////////
 void User::updateInventoryDisplay() {
-	if (!inventoryLayer) return;
+    if (!inventoryLayer) return;
 
-	inventoryLayer->removeAllChildren();  // 清除当前显示的所有内容
+    inventoryLayer->removeAllChildren();  // 清除当前显示的所有内容
 
-	const int slotsPerRow = 8;
-	const int rows = 3;
-	const float slotSize = 30.0f;
+    const int slotsPerRow = 8;
+    const int rows = 3;
+    const float slotSize = 30.0f;
 
-	// 绘制背景
-	auto background = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 180));
-	background->setContentSize(cocos2d::Size(slotsPerRow * slotSize + slotSize, rows * slotSize + slotSize));
-	background->setPosition(-slotSize / 2, -slotSize / 2);
-	inventoryLayer->addChild(background);
+    // 绘制背景
+    auto background = cocos2d::LayerColor::create(cocos2d::Color4B(0, 0, 0, 180));
+    background->setContentSize(cocos2d::Size(slotsPerRow * slotSize + slotSize, rows * slotSize + slotSize));
+    background->setPosition(-slotSize / 2, -slotSize / 2);
+    inventoryLayer->addChild(background);
 
-	// 绘制背包槽位
-	for (int row = 0; row < rows; ++row) {
-		for (int col = 0; col < slotsPerRow; ++col) {
-			auto slot = cocos2d::Sprite::create("pack/slot.png");
-			slot->setPosition(Vec2(col * slotSize + slotSize / 2, row * slotSize + slotSize / 2));
-			inventoryLayer->addChild(slot);
-		}
-	}
+    // 绘制背包槽位
+    for (int row = 0; row < rows; ++row) {
+        for (int col = 0; col < slotsPerRow; ++col) {
+            auto slot = cocos2d::Sprite::create("pack/slot.png");
+            slot->setPosition(Vec2(col * slotSize + slotSize / 2, row * slotSize + slotSize / 2));
+            inventoryLayer->addChild(slot);
+        }
+    }
 
-	// 绘制垃圾桶槽位
-	auto trashSlot = cocos2d::Sprite::create("pack/garbage.png");
-	trashSlot->setPosition(Vec2(slotsPerRow * slotSize + slotSize / 2, slotSize / 2));
-	inventoryLayer->addChild(trashSlot);
+    // 绘制垃圾桶槽位
+    auto trashSlot = cocos2d::Sprite::create("pack/garbage.png");
+    trashSlot->setPosition(Vec2(slotsPerRow * slotSize + slotSize / 2, slotSize / 2));
+    inventoryLayer->addChild(trashSlot);
 
-	// 重新绘制物品
-	for (int row = 0; row < rows; ++row) {
-		for (int col = 0; col < slotsPerRow; ++col) {
-			auto slotItems = inventory->getItems(row, col);
-			if (!slotItems.empty()) {
-				Item* item = slotItems[0];
-				auto sprite = item->getSprite();
-				sprite->setPosition(Vec2(col * slotSize + slotSize / 2, row * slotSize + slotSize / 2));
-				inventoryLayer->addChild(sprite);
+    // 重新绘制物品
+    for (int row = 0; row < rows; ++row) {
+        for (int col = 0; col < slotsPerRow; ++col) {
+            auto slotItems = inventory->getItems(row, col);
+            if (!slotItems.empty()) {
+                Item* item = slotItems[0];
+                auto sprite = item->getSprite();
+                sprite->setPosition(Vec2(col * slotSize + slotSize / 2, row * slotSize + slotSize / 2));
+                inventoryLayer->addChild(sprite);
 
-				int quantity = item->getQuantity();
-				auto quantityLabel = cocos2d::Label::createWithSystemFont(std::to_string(quantity), "Arial", 12);
-				quantityLabel->setPosition(Vec2(col * slotSize + slotSize - 10, row * slotSize + 10));
-				inventoryLayer->addChild(quantityLabel);
-			}
-		}
-	}
+                int quantity = item->getQuantity();
+                auto quantityLabel = cocos2d::Label::createWithSystemFont(std::to_string(quantity), "Arial", 12);
+                quantityLabel->setPosition(Vec2(col * slotSize + slotSize - 10, row * slotSize + 10));
+                inventoryLayer->addChild(quantityLabel);
+            }
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////
@@ -543,26 +544,26 @@ void User::selectItemFromInventory(int index) {
             heldItemSprite->setTexture(selectedItem->getImagePath());
             heldItemSprite->setVisible(true);
             switch (m_direction) {
-                case 0: // 下
-                    heldItemSprite->setVisible(true);
-                    heldItemSprite->setScaleX(1.0f);
-                    heldItemSprite->setPosition(cocos2d::Vec2(34, 16)); // 下方向的位置
-                    break;
-                case 1: // 上
-                    heldItemSprite->setVisible(true);
-                    heldItemSprite->setScaleX(1.0f);
-                    heldItemSprite->setPosition(cocos2d::Vec2(36, 20)); // 上方向的位置
-                    break;
-                case 2: // 左
-                    heldItemSprite->setVisible(true);
-                    heldItemSprite->setScaleX(-1.0f);
-                    heldItemSprite->setPosition(cocos2d::Vec2(12, 15)); // 左方向的位置
-                    break;
-                case 3: // 右
-                    heldItemSprite->setVisible(true);
-                    heldItemSprite->setScaleX(1.0f);
-                    heldItemSprite->setPosition(cocos2d::Vec2(28, 15)); // 右方向的位置
-                    break;
+            case 0: // 下
+                heldItemSprite->setVisible(true);
+                heldItemSprite->setScaleX(1.0f);
+                heldItemSprite->setPosition(cocos2d::Vec2(34, 16)); // 下方向的位置
+                break;
+            case 1: // 上
+                heldItemSprite->setVisible(true);
+                heldItemSprite->setScaleX(1.0f);
+                heldItemSprite->setPosition(cocos2d::Vec2(36, 20)); // 上方向的位置
+                break;
+            case 2: // 左
+                heldItemSprite->setVisible(true);
+                heldItemSprite->setScaleX(-1.0f);
+                heldItemSprite->setPosition(cocos2d::Vec2(12, 15)); // 左方向的位置
+                break;
+            case 3: // 右
+                heldItemSprite->setVisible(true);
+                heldItemSprite->setScaleX(1.0f);
+                heldItemSprite->setPosition(cocos2d::Vec2(28, 15)); // 右方向的位置
+                break;
             }
         }
     }
@@ -648,6 +649,76 @@ void User::toggleSlotImage() {
 }
 
 ////////////////////////////////////////////////////////////
+// @brief  检查并拾取玩家附近范围内的物品
+// @param  items        场景中所有绑定了 Item 对象的 Sprite 列表
+// @param  pickupRadius 拾取范围半径（以像素为单位）
+// 
+// @details
+// 遍历给定的 Sprite 列表，检测每个物品与玩家之间的距离，
+// 如果物品在拾取范围内，则将其对应的 Item 实例添加到玩家的背包，
+// 并从场景中移除该物品的 Sprite。
+// 
+// @note
+// - 每个物品的 Sprite 必须绑定有效的 Item 对象作为 UserData。
+// - 物品拾取后，Item 实例会被添加到背包中，Sprite 从场景中移除。
+////////////////////////////////////////////////////////////
+void User::pickupNearbyItems(const std::vector<cocos2d::Sprite*>& items, float pickupRadius) {
+	Vec2 playerPos = this->getPosition();
+
+	for (auto sprite : items) {
+		if (!sprite) continue;
+
+		// 检测物品是否在拾取范围内
+		Vec2 itemPos = sprite->getPosition();
+		float distance = playerPos.distance(itemPos);
+		if (distance <= pickupRadius) {
+			// 获取 Sprite 绑定的 Item 对象
+			void* userData = sprite->getUserData();
+			if (!userData) continue;
+
+			// 显式转换为 Item*
+			Item* item = static_cast<Item*>(userData); 
+			if (item) { 
+				// 将物品加入背包
+				inventory->addItem(item);
+
+				// 从场景中移除物品
+				sprite->removeFromParent();
+			}
+		}
+	}
+}
+
+
+////////////////////////////////////////////////////////////
+// performAction 通用动作入口函数
+// 据物品类型执行不同逻辑
+////////////////////////////////////////////////////////////
+void User::performAction(FarmMapManager* farmMapManager) {
+    Item* currentItem = getSelectedItem();
+    if (!currentItem) {
+        CCLOG("No item selected.");
+        return;
+    }
+
+    std::string itemType = currentItem->getItemType();
+    if (itemType == "tool") {
+        performToolAction();
+    }
+    else if (itemType == "seed") {
+        plantSeed();
+    }
+    else if (itemType == "rod") {
+        if (farmMapManager->isFishingSpot(getPosition())) {
+            startFishing();
+        }
+    }
+    else {
+        CCLOG("No specific action defined for item type: %s", itemType.c_str());
+    }
+}
+
+////////////////////////////////////////////////////////////
 // performToolAction 执行工具动作动画
 // 当角色手持工具并点击鼠标左键时播放工具动画。
 // 播放期间隐藏heldItemSprite，结束后再显示。
@@ -692,18 +763,18 @@ void User::performToolAction() {
 
     if (toolName == "kettle") {
         switch (m_direction) {
-            case 0: toolActionSprite->setPosition(Vec2(30, 16)); break; // 下
-            case 1: toolActionSprite->setPosition(Vec2(32, 18)); break; // 上
-            case 2: toolActionSprite->setPosition(Vec2(8, 20));  break; // 左
-            case 3: toolActionSprite->setPosition(Vec2(32, 20)); break; // 右
+        case 0: toolActionSprite->setPosition(Vec2(30, 16)); break; // 下
+        case 1: toolActionSprite->setPosition(Vec2(32, 18)); break; // 上
+        case 2: toolActionSprite->setPosition(Vec2(8, 20));  break; // 左
+        case 3: toolActionSprite->setPosition(Vec2(32, 20)); break; // 右
         }
     }
     else {
         switch (m_direction) {
-            case 0: toolActionSprite->setPosition(Vec2(30, 16)); break; // 下
-            case 1: toolActionSprite->setPosition(Vec2(30, 24)); break; // 上
-            case 2: toolActionSprite->setPosition(Vec2(8, 20));  break; // 左
-            case 3: toolActionSprite->setPosition(Vec2(32, 20)); break; // 右
+        case 0: toolActionSprite->setPosition(Vec2(30, 16)); break; // 下
+        case 1: toolActionSprite->setPosition(Vec2(30, 24)); break; // 上
+        case 2: toolActionSprite->setPosition(Vec2(8, 20));  break; // 左
+        case 3: toolActionSprite->setPosition(Vec2(32, 20)); break; // 右
         }
         toolActionSprite->setScale(1.5f);
     }
@@ -725,4 +796,66 @@ void User::performToolAction() {
     toolActionSprite->stopAllActions();
     toolActionSprite->runAction(Sequence::create(animate, callback, nullptr));
     CCLOG("Tool action animation started for tool: %s", toolName.c_str());
+}
+
+////////////////////////////////////////////////////////////
+// plantSeed 执行种植逻辑
+////////////////////////////////////////////////////////////
+void User::plantSeed() {
+    CCLOG("Planting a seed at current location.");
+}
+
+
+////////////////////////////////////////////////////////////
+// startFishing 执行钓鱼逻辑
+// 钓鱼小游戏 + 随机挑选鱼 + 按 G 加入背包
+////////////////////////////////////////////////////////////
+void User::startFishing() {
+	CCLOG("Starting fishing game in current scene.");
+
+	// 创建 FishingLayer
+	auto fishingLayer = FishingLayer::create();
+
+	// 设置小游戏结束时的回调
+	fishingLayer->onGameEnd = [weakFishingLayer = fishingLayer, this](bool success, const FishInfo& fish) {
+		auto fishingLayer = weakFishingLayer; // 恢复强引用
+		if (!fishingLayer) return;            // 若 FishingLayer 已销毁，则跳过
+		if (!success) return;                 // 如果小游戏失败，不显示任何东西
+
+        // 根据当前季节或天气筛选鱼
+        std::vector<FishInfo> allFish = FishDataFactory::createFishData();
+
+        // 随机挑选一条鱼
+        int randomIndex = RandomHelper::random_int(0, (int)allFish.size() - 1);
+        FishInfo candidateFish = allFish[randomIndex];
+
+		auto currentScene = Director::getInstance()->getRunningScene();
+		if (!currentScene) return;
+
+		// 创建鱼的 Sprite
+		auto fishSprite = Sprite::create(candidateFish.spriteName);
+
+		// 设置鱼的显示位置在人物上方
+		auto playerPos = this->getPosition();
+		fishSprite->setPosition(playerPos + Vec2(20, 10));
+		fishSprite->setScale(1.5f);
+
+		// 创建 FishItem 并绑定到 Sprite
+		FishItem* fishItem = new FishItem(candidateFish.name, "A freshly caught fish.", candidateFish.spriteName);
+        fishSprite->setUserData(static_cast<void*>(fishItem));
+
+		// 将鱼图添加到场景中
+		currentScene->addChild(fishSprite, SIX);
+		};
+
+	// 设置 FishingLayer 的位置在玩家左侧
+	auto playerPosition = this->getPosition();
+	fishingLayer->setPosition(playerPosition - Vec2(120, 0));
+
+	// 缩小整个 FishingLayer 场景为 50%
+	fishingLayer->setScale(0.5f);
+
+	// 将 FishingLayer 添加到当前场景
+	auto currentScene = cocos2d::Director::getInstance()->getRunningScene();
+	currentScene->addChild(fishingLayer, SIX);
 }

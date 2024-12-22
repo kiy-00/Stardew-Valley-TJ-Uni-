@@ -118,7 +118,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
     register_all_packages();
 
     // create a scene. it's an autorelease object
-    auto scene = FarmScene::createScene("standard");
+    //auto scene = FarmScene::createScene("standard");
+    auto scene = FarmScene::createScene("island");
 
     // run
     director->runWithScene(scene);
