@@ -454,4 +454,4 @@ Director::getInstance()->runWithScene(scene);
 - **Physical World**：场景使用了 `Scene::initWithPhysics()`，可通过 `physicsWorld->setDebugDrawMask(...)` 在调试时查看碰撞边界（默认重力为 `Vec2::ZERO`）。
 - **动画更新**：玩家的动画通过 `player->updateAnimation(dt)` 实时刷新（在 `FarmScene::update(...)` 中调用）。
 - **相机跟随**：默认将相机跟随玩家移动，并对地图边界进行限制。
-- **草丛花丛透明效果：**玩家在地图上可以与其他物体之间进行交互，比如穿过花丛和草丛会隐身，碰到一些物体：房子、石头等有物体碰撞效果。
+- **草丛花丛透明效果**：玩家在地图上可以与其他物体之间进行交互，比如穿过花丛和草丛会隐身，碰到一些物体：房子、石头等有物体碰撞效果。
